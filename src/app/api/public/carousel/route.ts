@@ -1,0 +1,24 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getCarouselImages } from '@/lib/supabase/admin-carousel'
+
+// GET - 获取活跃的轮播图（公开接口）
+export async function GET(request: NextRequest) {
+  try {
+    console.log('📷 获取公开轮播图数据...')
+    
+    const images = await getCarouselImages()
+    
+    console.log('📷 轮播图数据获取成功:', images.length)
+    
+    return NextResponse.json({
+      success: true,
+      data: images
+    })
+  } catch (error) {
+    console.error('获取轮播图失败:', error)
+    return NextResponse.json({
+      success: false,
+      error: error.message || '获取轮播图失败'
+    }, { status: 500 })
+  }
+}

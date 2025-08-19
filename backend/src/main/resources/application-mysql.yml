@@ -1,0 +1,49 @@
+# 华为云RDS MySQL数据库配置
+spring:
+  datasource:
+    # 华为云RDS连接信息
+    url: jdbc:mysql://121.36.17.209:14000/rds-carbon_new?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+    username: root
+    password: hx9jgnmK6u_k*Qjo
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+    # 连接池配置
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      auto-commit: true
+      
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        
+  # SQL初始化
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-mysql.sql
+      data-locations: classpath:data-mysql.sql
+      continue-on-error: true
+
+# JWT配置
+jwt:
+  secret: mySecretKeyForGreenTechPlatform2024
+  expiration: 86400000 # 24小时
+  refresh-expiration: 604800000 # 7天
+
+# 日志配置
+logging:
+  level:
+    com.greentech.platform: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

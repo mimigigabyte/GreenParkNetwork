@@ -1,0 +1,5 @@
+# ICO文件占位符 - 实际使用时需要替换为真实的ICO二进制文件
+# 你可以使用在线工具将SVG转换为ICO格式
+# 或者使用以下命令生成ICO文件：
+# 1. 安装ImageMagick: https://imagemagick.org/
+# 2. 运行: magick convert favicon.svg -resize 16x16,32x32,48x48 favicon.ico 

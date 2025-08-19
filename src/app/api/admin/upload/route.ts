@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { checkAdminAuth } from '@/lib/admin-auth'
+import { supabaseAdmin } from '@/lib/supabase'
+
+// POST - 上传文件到 Supabase Storage
+export async function POST(request: NextRequest) {
+  // 检查管理员权限
+  if (!checkAdminAuth(request)) {
+    return NextResponse.json({ error: '需要管理员权限' }, { status: 401 })
+  }
+
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Supabase admin client not available' }, { status: 500 })
+  }
+
+  try {
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    const bucket = formData.get('bucket') as string || 'images'
+    const folder = formData.get('folder') as string || 'uploads'
+
+    if (!file) {
+      return NextResponse.json({ error: '没有提供文件' }, { status: 400 })
+    }
+
+    console.log('📤 管理员文件上传:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      bucket,
+      folder
+    })
+
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: '只支持图片文件' }, { status: 400 })
+    }
+
+    // 验证文件大小 (10MB)
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) {
+      return NextResponse.json({ error: '文件大小不能超过10MB' }, { status: 400 })
+    }
+
+    // 生成唯一文件名
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+    
+    console.log('📤 生成的文件名:', fileName)
+
+    // 上传文件到 Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from(bucket)
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (error) {
+      console.error('❌ Supabase Storage 上传错误:', error)
+      
+      if (error.message.includes('Bucket not found')) {
+        return NextResponse.json({ 
+          error: `存储桶 '${bucket}' 不存在` 
+        }, { status: 400 })
+      }
+      
+      return NextResponse.json({ 
+        error: `上传失败: ${error.message}` 
+      }, { status: 500 })
+    }
+
+    console.log('✅ 文件上传成功:', data.path)
+
+    // 获取公共URL
+    const { data: publicData } = supabaseAdmin.storage
+      .from(bucket)
+      .getPublicUrl(fileName)
+
+    if (!publicData || !publicData.publicUrl) {
+      return NextResponse.json({ 
+        error: '无法生成文件访问URL' 
+      }, { status: 500 })
+    }
+
+    console.log('✅ 公共URL生成成功:', publicData.publicUrl)
+
+    return NextResponse.json({
+      url: publicData.publicUrl,
+      filename: file.name,
+      size: file.size,
+      type: file.type,
+      path: data.path
+    })
+
+  } catch (error) {
+    console.error('💥 文件上传过程中出现异常:', error)
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : '上传失败，请重试' 
+    }, { status: 500 })
+  }
+}

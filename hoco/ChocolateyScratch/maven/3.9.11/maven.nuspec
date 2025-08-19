@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>maven</id>
+    <version>3.9.11</version>
+    <title>Maven</title>
+    <authors>The Apache Maven team</authors>
+    <owners>TheCakeIsNaOH, Michael Pereira, Anthony Accioly</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://maven.apache.org/</projectUrl>
+    <iconUrl>https://cdn.statically.io/gh/TheCakeIsNaOH/chocolatey-packages/97fc87d57673255d9490a64e54bea94a3db79616/Icons/maven.svg</iconUrl>
+    <description>Apache Maven is a software project management and comprehension tool. Based on the concept of a project object 
+	model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information
+    
+**Please Note**: This is an automatically updated package. If you find it is
+out of date by more than a day or two, please contact the maintainer(s) and
+let them know the package is no longer updating correctly.</description>
+    <summary>Apache Maven is a software project management and comprehension tool. Based on the concept of a project object 
+	model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information</summary>
+    <releaseNotes>https://maven.apache.org/docs/3.9.11/release-notes.html</releaseNotes>
+    <copyright>2002-2021 The Apache Software Foundation</copyright>
+    <tags>apache maven build script xml java development</tags>
+    <projectSourceUrl>https://maven.apache.org/scm.html</projectSourceUrl>
+    <packageSourceUrl>https://github.com/TheCakeIsNaOH/chocolatey-packages</packageSourceUrl>
+    <docsUrl>https://maven.apache.org/guides/index.html</docsUrl>
+    <mailingListUrl>https://maven.apache.org/mailing-lists.html</mailingListUrl>
+    <bugTrackerUrl>https://issues.apache.org/jira/projects/MNG/issues</bugTrackerUrl>
+  </metadata>
+</package>

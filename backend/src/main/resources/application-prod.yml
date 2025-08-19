@@ -1,0 +1,103 @@
+# 生产环境配置 - 华为云RDS
+spring:
+  profiles:
+    active: prod
+    
+  datasource:
+    # 华为云RDS MySQL连接配置
+    url: jdbc:mysql://121.36.17.209:14000/rds-carbon_new?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+    username: root
+    password: hx9jgnmK6u_k*Qjo
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+    # 华为云RDS优化的连接池配置
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      auto-commit: true
+      connection-test-query: SELECT 1
+      validation-timeout: 3000
+      leak-detection-threshold: 60000
+      
+  # JPA配置 - 生产环境
+  jpa:
+    hibernate:
+      ddl-auto: validate  # 生产环境使用validate，不自动修改表结构
+    show-sql: false       # 生产环境关闭SQL日志
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 20
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+        
+  # SQL初始化 - 生产环境不自动执行
+  sql:
+    init:
+      mode: never
+
+# Redis配置（如果使用Upstash Redis）
+  redis:
+    host: ${REDIS_HOST:your-redis-host.upstash.io}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:your-redis-password}
+    ssl: true
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+
+# JWT配置 - 生产环境
+jwt:
+  secret: ${JWT_SECRET:your-production-jwt-secret-key-min-256-bits}
+  expiration: 86400000     # 24小时
+  refresh-expiration: 604800000  # 7天
+
+# 邮件服务配置
+email:
+  from: ${EMAIL_FROM:noreply@greentech-platform.com}
+  resend:
+    api-key: ${RESEND_API_KEY:your-resend-api-key}
+
+# 日志配置 - 生产环境
+logging:
+  level:
+    root: INFO
+    com.greentech.platform: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/greentech-platform.log
+    max-size: 100MB
+    max-history: 30
+
+# 服务器配置
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+
+# 应用监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized

@@ -1,0 +1,13 @@
+# 这个文件用于保持public目录结构
+# 您可以将logo图片放在这里
+
+# 建议的目录结构：
+# public/
+# ├── logo.png          (主要logo)
+# ├── logo.svg          (矢量logo)
+# ├── favicon.ico       (网站图标)
+# └── images/
+#     ├── logo/
+#     │   ├── logo-light.png
+#     │   └── logo-dark.png
+#     └── solutions/     (解决方案图片) 

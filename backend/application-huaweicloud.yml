@@ -1,0 +1,79 @@
+# 华为云RDS配置
+spring:
+  
+  # 数据库配置 - 华为云RDS
+  datasource:
+    url: ${HUAWEICLOUD_DB_URL:jdbc:mysql://your-rds-instance.huaweicloud.com:3306/your_database_name}
+    username: ${HUAWEICLOUD_DB_USER:root}
+    password: ${HUAWEICLOUD_DB_PASSWORD:your-database-password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      # 华为云RDS连接池优化配置
+      leak-detection-threshold: 60000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
+        # 华为云RDS优化配置
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        connection:
+          provider_disables_autocommit: true
+
+  # Redis配置 - 华为云DCS
+  data:
+    redis:
+      host: ${HUAWEICLOUD_REDIS_HOST:your-dcs-instance.huaweicloud.com}
+      port: ${HUAWEICLOUD_REDIS_PORT:6379}
+      password: ${HUAWEICLOUD_REDIS_PASSWORD:your-redis-password}
+      timeout: 2000ms
+      connect-timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# 华为云配置
+huaweicloud:
+  # 华为云认证信息
+  auth:
+    access-key-id: ${HUAWEICLOUD_ACCESS_KEY_ID:your-access-key-id}
+    secret-access-key: ${HUAWEICLOUD_SECRET_ACCESS_KEY:your-secret-access-key}
+    region: ${HUAWEICLOUD_REGION:cn-north-4}
+  
+  # RDS实例信息
+  rds:
+    instance-id: ${HUAWEICLOUD_RDS_INSTANCE_ID:your-rds-instance-id}
+    database-name: ${HUAWEICLOUD_DB_NAME:your_database_name}
+    port: ${HUAWEICLOUD_DB_PORT:3306}
+  
+  # DCS实例信息
+  dcs:
+    instance-id: ${HUAWEICLOUD_DCS_INSTANCE_ID:your-dcs-instance-id}
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.greentech.platform: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.zaxxer.hikari: DEBUG
+    org.springframework.jdbc: DEBUG 

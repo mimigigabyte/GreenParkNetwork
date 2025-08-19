@@ -1,0 +1,117 @@
+# Supabase 测试环境配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: 绿色技术平台
+  profiles:
+    active: supabase
+
+  # Supabase PostgreSQL 数据库配置
+  datasource:
+    url: ${SUPABASE_DB_URL:jdbc:postgresql://db.qpeanozckghazlzzhrni.supabase.co:5432/postgres}
+    username: ${SUPABASE_DB_USER:postgres}
+    password: ${SUPABASE_DB_PASSWORD:Dr8sb1arf8jO2vUh}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+
+  # JPA配置 - PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+
+  # Redis配置 - Upstash
+  data:
+    redis:
+      url: ${UPSTASH_REDIS_URL:redis://localhost:6379}
+      password: ${UPSTASH_REDIS_PASSWORD:}
+      timeout: 2000ms
+      connect-timeout: 2000ms
+
+  # Spring Security 配置
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SUPABASE_URL:https://qpeanozckghazlzzhrni.supabase.co}/auth/v1
+
+# Supabase 配置
+supabase:
+  url: ${SUPABASE_URL:https://qpeanozckghazlzzhrni.supabase.co}
+  anon-key: ${SUPABASE_ANON_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwZWFub3pja2doYXpsenpocm5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyODU4NTAsImV4cCI6MjA2OTg2MTg1MH0.LaJALEd_KP6LLaKEjRo7zuwjCA6Bbt_2QpSWPmbyw1I}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwZWFub3pja2doYXpsenpocm5pIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDI4NTg1MCwiZXhwIjoyMDY5ODYxODUwfQ.wE2j1kNbMKkQgZSkzLR7z6WFft6v90VfWkSd5SBi2P8}
+  jwt-secret: ${SUPABASE_JWT_SECRET:Ccnv371q3wHF7dBIMOiY5IzXzqm3mWw8yb1jyVTIx+MnopCKEELSRdoQs/oaO7KxkXrqBFvhuXR0v6nf/GsPKg==}
+
+# 应用配置
+app:
+  name: 绿色技术平台
+  version: 1.0.0
+  domain: ${APP_DOMAIN:localhost:8080}
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  # 使用 Supabase 的 JWT secret
+  jwt:
+    secret: ${SUPABASE_JWT_SECRET:Ccnv371q3wHF7dBIMOiY5IzXzqm3mWw8yb1jyVTIx+MnopCKEELSRdoQs/oaO7KxkXrqBFvhuXR0v6nf/GsPKg==}
+    expiration: ${JWT_EXPIRATION:86400} # 24小时
+
+# 其他服务配置保持不变
+stripe:
+  api-key: ${STRIPE_SECRET_KEY:sk_test_xxx}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_xxx}
+  public-key: ${STRIPE_PUBLIC_KEY:pk_test_xxx}
+
+wechat:
+  pay:
+    app-id: ${WECHAT_APP_ID:your-app-id}
+    mch-id: ${WECHAT_MCH_ID:your-mch-id}
+    api-key: ${WECHAT_API_KEY:your-api-key}
+    cert-path: ${WECHAT_CERT_PATH:classpath:cert/apiclient_cert.p12}
+
+resend:
+  api-key: ${RESEND_API_KEY:re_xxx}
+  from-email: ${RESEND_FROM_EMAIL:noreply@greentech.com}
+
+openrouter:
+  api-key: ${OPENROUTER_API_KEY:sk-or-xxx}
+  base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1}
+
+# 日志配置
+logging:
+  level:
+    com.greentech.platform: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator健康检查
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Swagger文档配置
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
