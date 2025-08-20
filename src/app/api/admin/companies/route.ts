@@ -7,6 +7,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJ
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 // GET - 获取企业列表（分页）
 export async function GET(request: NextRequest) {
   try {

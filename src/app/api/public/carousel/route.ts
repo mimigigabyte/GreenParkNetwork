@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCarouselImages } from '@/lib/supabase/admin-carousel'
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 // GET - 获取活跃的轮播图（公开接口）
 export async function GET(request: NextRequest) {
   try {

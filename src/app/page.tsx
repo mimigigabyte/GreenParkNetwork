@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -13,7 +13,8 @@ import { AuthModal } from '@/components/auth/auth-modal';
 import { ProductCategory, TechProduct, SearchParams, SortType, getProductCategories, searchTechProducts, getSearchStats } from '@/api/tech';
 import { useAuthContext } from '@/components/auth/auth-provider';
 
-export default function HomePage() {
+// 分离SearchParams逻辑的组件
+function HomePageContent() {
   const searchParams = useSearchParams();
   const { user } = useAuthContext();
   const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -299,5 +300,23 @@ export default function HomePage() {
         initialAction={searchParams.get('action') as 'register' | 'login' | 'reset-password' | null}
       />
     </div>
+  );
+}
+
+// 主组件，用Suspense包装
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 } 

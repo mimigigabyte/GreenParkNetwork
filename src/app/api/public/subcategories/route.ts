@@ -6,6 +6,9 @@ const supabaseUrl = 'https://qpeanozckghazlzzhrni.supabase.co'
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwZWFub3pja2doYXpsenpocm5pIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDI4NTg1MCwiZXhwIjoyMDY5ODYxODUwfQ.wE2j1kNbMKkQgZSkzLR7z6WFft6v90VfWkSd5SBi2P8'
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 // GET - 根据分类ID获取启用的子分类（公开接口，无需管理员权限）
 export async function GET(request: NextRequest) {
   try {
