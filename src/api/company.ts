@@ -54,21 +54,18 @@ export const submitCompanyProfile = async (data: CompanyProfileData) => {
       // 回退到localStorage的token
       token = localStorage.getItem('access_token');
     }
-    const response = await fetch('/api/company/profile', {
+    // 使用安全的fetch
+    const { safeFetch, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeFetch('/api/company/profile', {
       method: hasExisting ? 'PUT' : 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(requestData),
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || '提交企业信息失败');
-    }
-
-    return await response.json();
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('提交企业信息错误:', error);
     throw error;
@@ -90,20 +87,12 @@ export const getUserCompanyInfo = async () => {
       token = localStorage.getItem('access_token');
     }
     
-    const response = await fetch('/api/company/profile', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    // 使用安全的fetch
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet('/api/company/profile', true); // true表示使用认证
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || '获取企业信息失败');
-    }
-
-    return await response.json();
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('获取企业信息错误:', error);
     throw error;

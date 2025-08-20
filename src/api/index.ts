@@ -12,6 +12,8 @@ export interface ApiResponse<T = unknown> {
   attemptsLeft?: number
 }
 
+import { createSafeHeaders, createContentTypeHeader } from '@/lib/header-utils'
+
 export class ApiClient {
   private baseURL: string
 
@@ -25,12 +27,33 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`
+      
+      // 创建安全的headers
+      const baseHeaders = {
+        'Content-Type': createContentTypeHeader(),
+      }
+      
+      const headersRecord: Record<string, string | null | undefined> = { ...baseHeaders }
+      
+      if (options.headers) {
+        if (options.headers instanceof Headers) {
+          options.headers.forEach((value, key) => {
+            headersRecord[key] = value;
+          });
+        } else if (Array.isArray(options.headers)) {
+          options.headers.forEach(([key, value]) => {
+            headersRecord[key] = value;
+          });
+        } else {
+          Object.assign(headersRecord, options.headers);
+        }
+      }
+      
+      const safeHeaders = createSafeHeaders(headersRecord)
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
         ...options,
+        headers: safeHeaders,
       })
 
       const data = await response.json()
@@ -47,6 +70,7 @@ export class ApiClient {
         data,
       }
     } catch (error) {
+      console.error('API请求错误:', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : '网络错误',

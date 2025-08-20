@@ -91,18 +91,10 @@ export interface SearchResult {
 // 获取产品分类
 export const getProductCategories = async (): Promise<ApiResponse<ProductCategory[]>> => {
   try {
-    const response = await fetch('/api/tech/categories', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet('/api/tech/categories');
+    const result = await handleApiResponse(response);
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch categories');
@@ -139,18 +131,10 @@ export const searchTechProducts = async (params: SearchParams): Promise<ApiRespo
       }
     });
     
-    const response = await fetch(`/api/tech/search?${queryString.toString()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet(`/api/tech/search?${queryString.toString()}`);
+    const result = await handleApiResponse(response);
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to search technologies');
@@ -182,18 +166,10 @@ export const getSearchStats = async (params: SearchParams): Promise<ApiResponse<
       }
     });
     
-    const response = await fetch(`/api/tech/search-stats?${queryString.toString()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet(`/api/tech/search-stats?${queryString.toString()}`);
+    const result = await handleApiResponse(response);
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to get search stats');
@@ -225,18 +201,10 @@ interface FilterData {
 
 export const getFilterOptions = async (): Promise<ApiResponse<FilterData>> => {
   try {
-    const response = await fetch('/api/tech/filter-options', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet('/api/tech/filter-options');
+    const result = await handleApiResponse(response);
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to get filter options');
