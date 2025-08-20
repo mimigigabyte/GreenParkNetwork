@@ -114,7 +114,7 @@ export default function TestAdminFixPage() {
                     </div>
                     <div>
                       <span className="text-gray-600">总页数:</span>
-                      <span className="font-medium ml-2">{result.data.totalPages}</span>
+                      <span className="font-medium ml-2">{Math.ceil((result.data.count || 0) / 10)}</span>
                     </div>
                   </div>
                   

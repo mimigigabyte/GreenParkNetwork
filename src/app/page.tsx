@@ -166,7 +166,7 @@ export default function HomePage() {
       const response = await searchTechProducts(searchParams);
       if (response.success && response.data) {
         setProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
+        setTotalPages(Math.ceil(response.data.total / response.data.pageSize));
         setCurrentPage(1);
         
         // 更新统计数据
@@ -197,7 +197,7 @@ export default function HomePage() {
       const response = await searchTechProducts(searchParams);
       if (response.success && response.data) {
         setProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
+        setTotalPages(Math.ceil(response.data.total / response.data.pageSize));
         setCurrentPage(1);
         
         // 如果筛选条件包含分类变化，更新selectedCategory状态
