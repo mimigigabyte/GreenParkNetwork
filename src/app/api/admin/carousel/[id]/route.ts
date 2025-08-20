@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { 
   getCarouselImageById,
   updateCarouselImage,
-  deleteCarouselImage,
-  UpdateCarouselImageData
+  deleteCarouselImage
 } from '@/lib/supabase/admin-carousel'
+import { UpdateCarouselImageData } from '@/lib/types/admin'
 import { checkAdminAuth } from '@/lib/admin-auth'
 
 // GET - 获取单个轮播图详情
