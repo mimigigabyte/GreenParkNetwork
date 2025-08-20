@@ -62,7 +62,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
   const onSubmit = async (values: UserFormValues) => {
     setIsLoading(true)
     try {
-      const submissionData: Partial<AdminUser> = {
+      const submissionData: Partial<AdminUser> & { password?: string } = {
         email: values.email,
         phone_number: values.phone_number,
         company_id: values.company_id,
