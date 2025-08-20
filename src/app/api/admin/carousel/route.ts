@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('获取轮播图列表失败:', error)
     return NextResponse.json({ 
-      error: error.message || '获取轮播图列表失败' 
+      error: error instanceof Error ? error.message : '获取轮播图列表失败' 
     }, { status: 500 })
   }
 }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('创建轮播图失败:', error)
     return NextResponse.json({ 
-      error: error.message || '创建轮播图失败' 
+      error: error instanceof Error ? error.message : '创建轮播图失败' 
     }, { status: 500 })
   }
 }
