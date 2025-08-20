@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit, Trash2, Building, Phone, Mail } from 'lucide-react'
-import { AdminCompany, PaginationParams, COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
+import { AdminCompany, AdminCountry, AdminProvince, AdminDevelopmentZone, PaginationParams, COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
 // 移除旧的导入，改用API调用
 import { DataTable } from '@/components/admin/data-table/data-table'
 import { CompanyForm } from './components/company-form'
