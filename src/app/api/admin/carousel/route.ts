@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { 
   getCarouselImagesPaginated,
-  createCarouselImage,
-  CreateCarouselImageData
+  createCarouselImage
 } from '@/lib/supabase/admin-carousel'
+import { CreateCarouselImageData } from '@/lib/types/admin'
 import { checkAdminAuth } from '@/lib/admin-auth'
 
 // GET - 获取轮播图列表（分页）
