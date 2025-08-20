@@ -180,10 +180,10 @@ export function HeroSection({ onOpenAuth }: HeroSectionProps) {
           <div className="text-center text-white max-w-4xl mx-auto px-4">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-relaxed">
               {currentImage?.title_zh ? (
-                currentImage.title_zh.split('\n').map((line, index) => (
+                currentImage.title_zh.split('\n').map((line, index, arr) => (
                   <span key={index}>
                     {line}
-                    {index < currentImage.title_zh.split('\n').length - 1 && <br />}
+                    {index < arr.length - 1 && <br />}
                   </span>
                 ))
               ) : (

@@ -214,7 +214,8 @@ export async function getTechnologyStatsByCategory(): Promise<Array<{ category: 
 
   const categoryCounts: Record<string, number> = {}
   data.forEach(tech => {
-    const categoryName = tech.category?.name_zh || '未分类'
+    const category = Array.isArray(tech.category) ? tech.category[0] : tech.category
+    const categoryName = category?.name_zh || '未分类'
     categoryCounts[categoryName] = (categoryCounts[categoryName] || 0) + 1
   })
 

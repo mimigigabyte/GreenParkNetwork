@@ -376,7 +376,7 @@ export default function AdminMessagesPage() {
                     id: 'admin-' + Date.now(),
                     email: 'admin@example.com',
                     name: '系统管理员',
-                    role: 'admin'
+                    role: 'admin' as const
                   };
                   AuthSync.setAdminMode(mockAdmin);
                   setAdminUser(mockAdmin);

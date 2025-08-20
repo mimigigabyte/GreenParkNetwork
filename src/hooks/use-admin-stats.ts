@@ -30,7 +30,7 @@ export function useAdminStats(refreshInterval: number = 30000) {
       setError(null)
     } catch (err) {
       console.error('获取管理员统计数据失败:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : '获取统计数据失败')
     } finally {
       setLoading(false)
     }

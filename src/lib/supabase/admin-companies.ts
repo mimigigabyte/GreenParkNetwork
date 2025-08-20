@@ -219,7 +219,8 @@ export async function getCompanyStatsByRegion(): Promise<Array<{ region: string;
 
   const regionCounts: Record<string, number> = {}
   data.forEach(company => {
-    const regionName = company.province?.name_zh || '未知地区'
+    const province = Array.isArray(company.province) ? company.province[0] : company.province
+    const regionName = province?.name_zh || '未知地区'
     regionCounts[regionName] = (regionCounts[regionName] || 0) + 1
   })
 

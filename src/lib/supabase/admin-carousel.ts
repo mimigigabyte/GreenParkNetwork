@@ -180,7 +180,7 @@ export async function updateCarouselImagesOrder(updates: { id: string; sort_orde
   }
 
   const updatePromises = updates.map(update => 
-    supabaseAdmin
+    supabaseAdmin!
       .from('admin_carousel_images')
       .update({ sort_order: update.sort_order })
       .eq('id', update.id)

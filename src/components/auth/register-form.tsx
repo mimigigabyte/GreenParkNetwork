@@ -74,7 +74,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         }, 1000);
         
         // 开发模式下显示验证码
-        if (result.data.devOTP) {
+        if ('devOTP' in result.data && result.data.devOTP) {
           alert(`验证码已发送！开发模式验证码：${result.data.devOTP}`);
         } else {
           alert(result.data.message || '验证码已发送');
