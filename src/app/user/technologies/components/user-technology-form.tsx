@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Upload, FileText, Trash2 } from 'lucide-react'
-import { AdminTechnology, AdminCategory, AdminSubcategory, TECH_SOURCE_OPTIONS, TechnologyAttachment } from '@/lib/types/admin'
+import { AdminTechnology, AdminCategory, AdminSubcategory, TECH_SOURCE_OPTIONS, TechnologyAttachment, TechSource, TechReviewStatus } from '@/lib/types/admin'
 import { getPublicCategoriesApi, getPublicSubcategoriesApi } from '@/lib/api/public-categories'
 import { createUserTechnologyApi, updateUserTechnologyApi } from '@/lib/api/user-technologies'
 import { CompactImageUpload } from '@/components/ui/compact-image-upload'
@@ -28,12 +28,13 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     name_en: technology?.name_en || '',
     description_zh: technology?.description_zh || '',
     description_en: technology?.description_en || '',
-    tech_source: technology?.tech_source || '',
+    tech_source: (technology?.tech_source || '') as TechSource,
     category_id: technology?.category_id || '',
     subcategory_id: technology?.subcategory_id || '',
     image_url: technology?.image_url || '',
     attachment_urls: technology?.attachment_urls || [],
-    attachments: technology?.attachments || []
+    attachments: technology?.attachments || [],
+    review_status: (technology?.review_status || 'pending_review') as TechReviewStatus
   })
 
   // 企业信息状态（用于显示，自动填充）
@@ -515,7 +516,7 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
                               <div className="flex flex-col">
                                 <span className="text-sm text-gray-700">{attachment.filename}</span>
                                 <span className="text-xs text-gray-500">
-                                  {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                                  {attachment.size ? (attachment.size / 1024 / 1024).toFixed(2) + ' MB' : '未知大小'}
                                 </span>
                               </div>
                             </div>

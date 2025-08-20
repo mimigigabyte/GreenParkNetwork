@@ -274,7 +274,7 @@ export default function UserTechnologiesPage() {
       key: 'attachments',
       title: '附件',
       width: '160px',
-      render: (_, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         // 优先使用新的attachments字段，fallback到attachment_urls
         let attachments: Array<{url: string, filename?: string}> = [];
         
@@ -322,7 +322,7 @@ export default function UserTechnologiesPage() {
       key: 'review_status',
       title: '审核状态',
       width: '100px',
-      render: (_, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         const status = record.review_status || 'published'
         return (
           <div className="space-y-1">

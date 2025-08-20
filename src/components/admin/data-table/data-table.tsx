@@ -9,7 +9,7 @@ interface Column<T> {
   title: string
   sortable?: boolean
   width?: string
-  render?: (value: any, record: T, index: number) => React.ReactNode
+  render?: (value: T[keyof T], record: T, index: number) => React.ReactNode
 }
 
 interface DataTableProps<T> {
