@@ -347,7 +347,7 @@ export default function TechnologiesPage() {
                 src={value as string} 
                 alt={record.name_zh}
                 className="w-16 h-12 object-cover rounded border border-gray-200 cursor-pointer hover:opacity-80"
-                onClick={() => handlePreviewImage(image_url)}
+                onClick={() => handlePreviewImage(value as string)}
               />
             </div>
           ) : (
