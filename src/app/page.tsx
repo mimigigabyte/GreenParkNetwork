@@ -130,7 +130,7 @@ export default function HomePage() {
         const response = await searchTechProducts(searchParams);
         if (response.success && response.data) {
           setProducts(response.data.products);
-          setTotalPages(response.data.totalPages);
+          setTotalPages(Math.ceil(response.data.total / response.data.pageSize));
           
           // 更新统计数据
           if (response.data.stats) {
