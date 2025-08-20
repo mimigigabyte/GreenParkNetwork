@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     const usersWithCompany = await Promise.all(
       users.map(async (user) => {
         // 查询用户关联的企业
-        const { data: company } = await supabaseAdmin
+        const { data: company } = await supabaseAdmin!
           .from('admin_companies')
           .select('id, name_zh, name_en')
           .eq('user_id', user.id)
