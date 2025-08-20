@@ -73,10 +73,10 @@ export function DataTable<T extends Record<string, any>>({
     onSearch?.(value)
   }
 
-  const getCellValue = (record: T, column: Column<T>) => {
+  const getCellValue = (record: T, column: Column<T>): T[keyof T] => {
     if (typeof column.key === 'string' && column.key.includes('.')) {
       // 支持嵌套属性 'user.name'
-      return column.key.split('.').reduce((obj, key) => obj?.[key], record)
+      return column.key.split('.').reduce((obj, key) => obj?.[key], record) as T[keyof T]
     }
     return record[column.key as keyof T]
   }
