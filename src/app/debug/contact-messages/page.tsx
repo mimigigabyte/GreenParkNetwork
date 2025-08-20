@@ -244,7 +244,7 @@ export default function DebugContactMessagesPage() {
                 <div>用户ID: {user.id}</div>
                 <div>邮箱: {user.email}</div>
                 <div>姓名: {user.name}</div>
-                <div>角色: {user.role}</div>
+                <div>角色: {(user as any).role || '未设置'}</div>
               </div>
             ) : (
               <p className="text-gray-600">用户未登录</p>
