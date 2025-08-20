@@ -57,7 +57,7 @@ export async function GET(_: NextRequest) {
     console.error('获取管理员统计数据失败:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error' 
     }, { status: 500 })
   }
 }
