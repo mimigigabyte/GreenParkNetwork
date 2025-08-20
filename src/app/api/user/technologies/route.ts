@@ -86,7 +86,15 @@ export async function POST(request: NextRequest) {
     console.log('用户创建技术数据:', technologyData)
     
     // 获取用户的企业信息
-    let companyData = {}
+    let companyData: {
+      company_id?: string;
+      company_name_zh?: string;
+      company_name_en?: string;
+      company_logo_url?: string;
+      company_country_id?: string;
+      company_province_id?: string;
+      company_development_zone_id?: string;
+    } = {}
     if (technologyData.company_id) {
       const { data: company, error: companyError } = await supabaseAdmin
         .from('admin_companies')
