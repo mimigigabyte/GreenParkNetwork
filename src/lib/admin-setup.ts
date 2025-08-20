@@ -126,9 +126,17 @@ export class AdminSetup {
     console.log('🔐 管理员尝试登录:', email);
 
     try {
+      // 输入验证
+      if (!email || !password) {
+        return {
+          success: false,
+          message: '邮箱和密码不能为空'
+        };
+      }
+      
       // 1. 使用 Supabase Auth 登录
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
+        email: email.trim(),
         password: password,
       });
 

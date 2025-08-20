@@ -113,8 +113,16 @@ export async function POST(request: NextRequest) {
     }
 
     // 使用普通客户端为新创建的用户生成会话
+    // 确保参数有效
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, error: '登录参数不完整' },
+        { status: 400 }
+      );
+    }
+    
     const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password
     });
 

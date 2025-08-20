@@ -143,8 +143,14 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       if (result.success && 'data' in result && result.data) {
         try {
           // 用户创建成功，现在使用客户端登录以建立正确的会话
+          // 确保参数有效
+          if (!formData.email || !formData.password) {
+            alert('注册成功，但登录信息不完整，请手动登录');
+            return;
+          }
+          
           const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-            email: formData.email,
+            email: formData.email.trim(),
             password: formData.password
           });
           

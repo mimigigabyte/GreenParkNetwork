@@ -68,10 +68,61 @@ export const supabaseAuthApi = {
    */
   async passwordLogin(data: { account: string; password: string; type: 'email' | 'phone' }): Promise<ApiResponse<AuthResponse>> {
     try {
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.account,
-        password: data.password
-      })
+      // 输入验证
+      if (!data.account || !data.password) {
+        return {
+          success: false,
+          error: '账号和密码不能为空'
+        }
+      }
+
+      // 根据类型确定登录方式
+      let loginData: { email?: string; phone?: string; password: string }
+      
+      if (data.type === 'phone') {
+        // 手机号登录，确保包含国家代码
+        const phoneWithCountryCode = data.account.startsWith('+') 
+          ? data.account 
+          : `+86${data.account}`
+        
+        // 验证手机号格式
+        const phoneRegex = /^\+\d{1,4}\d{7,15}$/
+        if (!phoneRegex.test(phoneWithCountryCode)) {
+          return {
+            success: false,
+            error: '手机号格式不正确'
+          }
+        }
+        
+        loginData = {
+          phone: phoneWithCountryCode,
+          password: data.password
+        }
+      } else {
+        // 邮箱登录
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(data.account)) {
+          return {
+            success: false,
+            error: '邮箱格式不正确'
+          }
+        }
+        
+        loginData = {
+          email: data.account,
+          password: data.password
+        }
+      }
+
+      // 确保所有字段都有有效值
+      if (!loginData.password || (!loginData.email && !loginData.phone)) {
+        return {
+          success: false,
+          error: '登录参数不完整'
+        }
+      }
+
+      const { data: authData, error } = await supabase.auth.signInWithPassword(loginData)
       
       if (error) {
         return {
