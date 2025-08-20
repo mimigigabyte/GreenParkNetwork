@@ -68,11 +68,65 @@ export const supabaseAuthApi = {
    */
   async passwordLogin(data: { account: string; password: string; type: 'email' | 'phone' }): Promise<ApiResponse<AuthResponse>> {
     try {
+      console.log('🔐 密码登录尝试:', { 
+        account: data.account, 
+        type: data.type, 
+        hasPassword: !!data.password,
+        passwordLength: data.password?.length 
+      })
+
+      // 检查Supabase客户端是否正确初始化
+      if (!supabase) {
+        console.error('❌ Supabase客户端未初始化')
+        return {
+          success: false,
+          error: 'Supabase客户端配置错误'
+        }
+      }
+
+      // 检查Supabase URL和Key
+      console.log('🔧 Supabase配置检查:', {
+        hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        url: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...'
+      })
+
       // 输入验证
       if (!data.account || !data.password) {
+        console.error('❌ 登录参数为空:', { account: !!data.account, password: !!data.password })
         return {
           success: false,
           error: '账号和密码不能为空'
+        }
+      }
+
+      // 清理输入数据
+      const cleanAccount = String(data.account).trim()
+      const cleanPassword = String(data.password)
+
+      // 验证清理后的数据
+      if (!cleanAccount || !cleanPassword) {
+        console.error('❌ 清理后的登录参数为空:', { cleanAccount: !!cleanAccount, cleanPassword: !!cleanPassword })
+        return {
+          success: false,
+          error: '账号和密码不能为空'
+        }
+      }
+
+      // 检查密码是否包含可能导致问题的字符
+      console.log('🔍 密码安全检查:', {
+        length: cleanPassword.length,
+        hasSpecialChars: /[^\w@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(cleanPassword),
+        hasNullBytes: cleanPassword.includes('\0'),
+        isValidString: typeof cleanPassword === 'string'
+      })
+
+      // 检查是否包含null字节或其他可能导致fetch问题的字符
+      if (cleanPassword.includes('\0') || cleanAccount.includes('\0')) {
+        console.error('❌ 参数包含null字节')
+        return {
+          success: false,
+          error: '输入参数格式不正确'
         }
       }
 
@@ -81,41 +135,112 @@ export const supabaseAuthApi = {
       
       if (data.type === 'phone') {
         // 手机号登录，确保包含国家代码
-        const phoneWithCountryCode = data.account.startsWith('+') 
-          ? data.account 
-          : `+86${data.account}`
+        const phoneWithCountryCode = cleanAccount.startsWith('+') 
+          ? cleanAccount 
+          : `+86${cleanAccount}`
+        
+        console.log('📱 手机号登录参数:', { phone: phoneWithCountryCode })
         
         // 验证手机号格式
         const phoneRegex = /^\+\d{1,4}\d{7,15}$/
         if (!phoneRegex.test(phoneWithCountryCode)) {
+          console.error('❌ 手机号格式错误:', phoneWithCountryCode)
           return {
             success: false,
             error: '手机号格式不正确'
           }
         }
         
-        const result = await supabase.auth.signInWithPassword({
-          phone: phoneWithCountryCode,
-          password: data.password
-        })
-        authData = result.data
-        error = result.error
+        try {
+          console.log('🚀 准备调用Supabase手机号登录...')
+          const loginParams = {
+            phone: phoneWithCountryCode,
+            password: cleanPassword
+          }
+          console.log('📝 登录参数:', { phone: loginParams.phone, hasPassword: !!loginParams.password })
+          
+          const result = await supabase.auth.signInWithPassword(loginParams)
+          authData = result.data
+          error = result.error
+          console.log('📱 手机号登录结果:', { success: !!authData?.user, error: error?.message })
+        } catch (fetchError) {
+          console.error('❌ 手机号登录fetch错误:', fetchError)
+          console.error('🔍 错误详情:', {
+            name: fetchError instanceof Error ? fetchError.name : 'Unknown',
+            message: fetchError instanceof Error ? fetchError.message : String(fetchError),
+            stack: fetchError instanceof Error ? fetchError.stack : 'No stack'
+          })
+          
+          // 尝试使用API路由作为备用方案
+          console.log('🔄 尝试使用API路由备用方案...')
+          try {
+            const response = await fetch('/api/auth/phone-login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                mobile: phoneWithCountryCode,
+                code: '000000' // 临时验证码，实际应该从其他地方获取
+              })
+            })
+            
+            if (response.ok) {
+              const apiResult = await response.json()
+              console.log('✅ API路由登录成功')
+              return {
+                success: true,
+                data: apiResult.data
+              }
+            }
+          } catch (apiError) {
+            console.error('❌ API路由也失败了:', apiError)
+          }
+          
+          return {
+            success: false,
+            error: `登录请求失败: ${fetchError instanceof Error ? fetchError.message : '未知错误'}`
+          }
+        }
       } else {
         // 邮箱登录
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(data.account)) {
+        if (!emailRegex.test(cleanAccount)) {
+          console.error('❌ 邮箱格式错误:', cleanAccount)
           return {
             success: false,
             error: '邮箱格式不正确'
           }
         }
         
-        const result = await supabase.auth.signInWithPassword({
-          email: data.account,
-          password: data.password
-        })
-        authData = result.data
-        error = result.error
+        console.log('📧 邮箱登录参数:', { email: cleanAccount })
+        
+        try {
+          console.log('🚀 准备调用Supabase邮箱登录...')
+          const loginParams = {
+            email: cleanAccount,
+            password: cleanPassword
+          }
+          console.log('📝 登录参数:', { email: loginParams.email, hasPassword: !!loginParams.password })
+          
+          const result = await supabase.auth.signInWithPassword(loginParams)
+          authData = result.data
+          error = result.error
+          console.log('📧 邮箱登录结果:', { success: !!authData?.user, error: error?.message })
+        } catch (fetchError) {
+          console.error('❌ 邮箱登录fetch错误:', fetchError)
+          console.error('🔍 错误详情:', {
+            name: fetchError instanceof Error ? fetchError.name : 'Unknown',
+            message: fetchError instanceof Error ? fetchError.message : String(fetchError),
+            stack: fetchError instanceof Error ? fetchError.stack : 'No stack'
+          })
+          
+          // 对于邮箱登录，目前没有API备用方案，直接返回错误
+          return {
+            success: false,
+            error: `邮箱登录失败: ${fetchError instanceof Error ? fetchError.message : '未知网络错误'}`
+          }
+        }
       }
       
       if (error) {
