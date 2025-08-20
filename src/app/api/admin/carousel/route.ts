@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10')
     const search = searchParams.get('search') || ''
     const sortBy = searchParams.get('sortBy') || 'sort_order'
-    const sortOrder = searchParams.get('sortOrder') || 'asc'
+    const sortOrder = (searchParams.get('sortOrder') || 'asc') as 'asc' | 'desc'
 
     console.log('📷 管理员获取轮播图列表:', { page, pageSize, search, sortBy, sortOrder })
 
