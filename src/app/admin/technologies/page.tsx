@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, Lightbulb, Tag, FileText, Image as ImageIcon, Download, Check, X, MessageSquare, Eye } from 'lucide-react'
-import { AdminTechnology, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus } from '@/lib/types/admin'
+import { AdminTechnology, AdminCategory, AdminSubcategory, AdminCountry, AdminProvince, AdminDevelopmentZone, AdminCompany, TechnologyAttachment, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus } from '@/lib/types/admin'
 import { DataTable } from '@/components/admin/data-table/data-table'
 import { TechnologyForm } from './components/technology-form'
 import { getTechnologiesApi, deleteTechnologyApi, reviewTechnologyApi } from '@/lib/api/admin-technologies'
@@ -339,12 +339,12 @@ export default function TechnologiesPage() {
       key: 'image_url',
       title: '图片',
       width: '100px',
-      render: (image_url: string, record: AdminTechnology) => (
+      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <div className="flex items-center space-x-2">
-          {image_url ? (
+          {value ? (
             <div className="relative">
               <img 
-                src={image_url} 
+                src={value as string} 
                 alt={record.name_zh}
                 className="w-16 h-12 object-cover rounded border border-gray-200 cursor-pointer hover:opacity-80"
                 onClick={() => handlePreviewImage(image_url)}
@@ -362,9 +362,9 @@ export default function TechnologiesPage() {
       key: 'name_zh',
       title: '技术名称',
       sortable: true,
-      render: (name_zh: string, record: AdminTechnology) => (
+      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <div className="max-w-xs">
-          <div className="font-medium text-gray-900 truncate">{name_zh}</div>
+          <div className="font-medium text-gray-900 truncate">{value as string}</div>
           {record.name_en && (
             <div className="text-sm text-gray-500 truncate">{record.name_en}</div>
           )}
@@ -543,13 +543,13 @@ export default function TechnologiesPage() {
       key: 'is_active',
       title: '启用状态',
       width: '80px',
-      render: (is_active: boolean) => (
+      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          is_active 
+          value as boolean 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
-          {is_active ? '启用' : '禁用'}
+          {value as boolean ? '启用' : '禁用'}
         </span>
       )
     },
@@ -557,9 +557,9 @@ export default function TechnologiesPage() {
       key: 'created_at',
       title: '创建时间',
       sortable: true,
-      render: (created_at: string) => (
+      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <span className="text-sm text-gray-500">
-          {new Date(created_at).toLocaleDateString('zh-CN')}
+          {new Date(value as string).toLocaleDateString('zh-CN')}
         </span>
       )
     },
