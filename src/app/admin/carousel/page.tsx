@@ -198,9 +198,9 @@ export default function CarouselPage() {
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 truncate max-w-xs block"
-            title={link_url}
+            title={value as string}
           >
-            {link_url}
+            {value as string}
           </a>
         ) : (
           <span className="text-gray-400">无链接</span>
