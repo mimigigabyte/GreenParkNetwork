@@ -133,8 +133,30 @@ export const supabaseAuthApi = {
    */
   async sendPhoneCode(data: SendPhoneCodeRequest): Promise<ApiResponse<{ message: string }>> {
     try {
+      // 输入验证
+      if (!data.phone) {
+        return {
+          success: false,
+          error: '手机号不能为空'
+        }
+      }
+
+      // 确保手机号包含国家代码
+      const phoneWithCountryCode = data.phone.startsWith('+') 
+        ? data.phone 
+        : `${data.countryCode || '+86'}${data.phone}`
+      
+      // 验证手机号格式
+      const phoneRegex = /^\+\d{1,4}\d{7,15}$/
+      if (!phoneRegex.test(phoneWithCountryCode)) {
+        return {
+          success: false,
+          error: '手机号格式不正确'
+        }
+      }
+      
       const { error } = await supabase.auth.signInWithOtp({
-        phone: data.phone,
+        phone: phoneWithCountryCode,
         options: {
           shouldCreateUser: data.purpose === 'register'
         }
@@ -268,8 +290,38 @@ export const supabaseAuthApi = {
    */
   async phoneRegister(data: PhoneRegisterRequest): Promise<ApiResponse<AuthResponse>> {
     try {
+      // 输入验证
+      if (!data.phone || !data.phoneCode) {
+        return {
+          success: false,
+          error: '手机号和验证码不能为空'
+        }
+      }
+
+      // 确保手机号包含国家代码
+      const phoneWithCountryCode = data.phone.startsWith('+') 
+        ? data.phone 
+        : `${data.countryCode || '+86'}${data.phone}`
+      
+      // 验证手机号格式
+      const phoneRegex = /^\+\d{1,4}\d{7,15}$/
+      if (!phoneRegex.test(phoneWithCountryCode)) {
+        return {
+          success: false,
+          error: '手机号格式不正确'
+        }
+      }
+
+      // 验证验证码格式
+      if (!/^\d{6}$/.test(data.phoneCode)) {
+        return {
+          success: false,
+          error: '验证码格式不正确'
+        }
+      }
+      
       const { data: authData, error } = await supabase.auth.verifyOtp({
-        phone: data.phone,
+        phone: phoneWithCountryCode,
         token: data.phoneCode,
         type: 'sms'
       })
@@ -322,8 +374,38 @@ export const supabaseAuthApi = {
    */
   async phoneCodeLogin(data: PhoneCodeLoginRequest): Promise<ApiResponse<AuthResponse>> {
     try {
+      // 输入验证
+      if (!data.phone || !data.code) {
+        return {
+          success: false,
+          error: '手机号和验证码不能为空'
+        }
+      }
+
+      // 确保手机号包含国家代码
+      const phoneWithCountryCode = data.phone.startsWith('+') 
+        ? data.phone 
+        : `${data.countryCode || '+86'}${data.phone}`
+      
+      // 验证手机号格式
+      const phoneRegex = /^\+\d{1,4}\d{7,15}$/
+      if (!phoneRegex.test(phoneWithCountryCode)) {
+        return {
+          success: false,
+          error: '手机号格式不正确'
+        }
+      }
+
+      // 验证验证码格式
+      if (!/^\d{6}$/.test(data.code)) {
+        return {
+          success: false,
+          error: '验证码格式不正确'
+        }
+      }
+      
       const { data: authData, error } = await supabase.auth.verifyOtp({
-        phone: data.phone,
+        phone: phoneWithCountryCode,
         token: data.code,
         type: 'sms'
       })
