@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, Users, Building2, Mail, Phone } from 'lucide-react'
-import { AdminUser, AdminCompany, PaginationParams } from '@/lib/types/admin'
+import { AdminUser, PaginationParams } from '@/lib/types/admin'
 import { DataTable } from '@/components/admin/data-table/data-table'
 import { UserForm } from './components/user-form'
 import { getUsersApi, deleteUserApi } from '@/api/admin-users'
@@ -87,7 +87,7 @@ export default function UsersPage() {
     {
       key: 'identifier',
       title: '用户标识',
-      render: (value: string | AdminCompany | undefined, record: AdminUser, index: number) => (
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (
         <div>
           {record.email && <div className="flex items-center"><Mail className="w-4 h-4 mr-2 text-gray-400" />{record.email}</div>}
           {record.phone_number && <div className="flex items-center"><Phone className="w-4 h-4 mr-2 text-gray-400" />{record.phone_number}</div>}
@@ -97,7 +97,7 @@ export default function UsersPage() {
     {
       key: 'company',
       title: '所属企业',
-      render: (value: string | AdminCompany | undefined, record: AdminUser, index: number) => (
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (
         <div className="flex items-center">
           <Building2 className="w-4 h-4 mr-2 text-gray-400" />
           {record.company?.name_zh || '未关联'}
@@ -113,7 +113,7 @@ export default function UsersPage() {
       key: 'actions',
       title: '操作',
       width: '120px',
-      render: (value: string | AdminCompany | undefined, record: AdminUser, index: number) => (
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleEdit(record)}
