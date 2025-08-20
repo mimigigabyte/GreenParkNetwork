@@ -21,15 +21,11 @@ interface VerificationData {
   attempts: number;
 }
 
-declare global {
-  let __verificationCodes: Map<string, VerificationData> | undefined;
+if (!(global as any).__verificationCodes) {
+  (global as any).__verificationCodes = new Map();
 }
 
-if (!global.__verificationCodes) {
-  global.__verificationCodes = new Map();
-}
-
-const verificationCodes = global.__verificationCodes;
+const verificationCodes = (global as any).__verificationCodes as Map<string, VerificationData>;
 
 export async function POST(request: NextRequest) {
   try {
