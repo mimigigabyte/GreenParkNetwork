@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('批量更新轮播图排序失败:', error)
     return NextResponse.json({ 
-      error: error.message || '排序更新失败' 
+      error: error instanceof Error ? error.message : '排序更新失败' 
     }, { status: 500 })
   }
 }
