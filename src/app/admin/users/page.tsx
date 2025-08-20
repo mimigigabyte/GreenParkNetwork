@@ -107,7 +107,7 @@ export default function UsersPage() {
     {
       key: 'created_at',
       title: '注册时间',
-      render: (value: string | AdminCompany | undefined, record: AdminUser, index: number) => new Date(value as string).toLocaleString('zh-CN'),
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => new Date(value as string).toLocaleString('zh-CN'),
     },
     {
       key: 'actions',
