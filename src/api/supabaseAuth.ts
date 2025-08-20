@@ -76,8 +76,8 @@ export const supabaseAuthApi = {
         }
       }
 
-      // 根据类型确定登录方式
-      let loginData: { email?: string; phone?: string; password: string }
+      // 根据类型确定登录方式并调用相应的API
+      let authData: any, error: any
       
       if (data.type === 'phone') {
         // 手机号登录，确保包含国家代码
@@ -94,10 +94,12 @@ export const supabaseAuthApi = {
           }
         }
         
-        loginData = {
+        const result = await supabase.auth.signInWithPassword({
           phone: phoneWithCountryCode,
           password: data.password
-        }
+        })
+        authData = result.data
+        error = result.error
       } else {
         // 邮箱登录
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -108,21 +110,13 @@ export const supabaseAuthApi = {
           }
         }
         
-        loginData = {
+        const result = await supabase.auth.signInWithPassword({
           email: data.account,
           password: data.password
-        }
+        })
+        authData = result.data
+        error = result.error
       }
-
-      // 确保所有字段都有有效值
-      if (!loginData.password || (!loginData.email && !loginData.phone)) {
-        return {
-          success: false,
-          error: '登录参数不完整'
-        }
-      }
-
-      const { data: authData, error } = await supabase.auth.signInWithPassword(loginData)
       
       if (error) {
         return {
