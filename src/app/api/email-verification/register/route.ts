@@ -15,17 +15,12 @@ const supabaseAdmin = createClient(
 );
 
 // 使用与其他API相同的全局变量
-interface VerificationData {
-  code: string;
-  expiresAt: number;
-  attempts: number;
+
+if (!global.__verificationCodes) {
+  global.__verificationCodes = new Map();
 }
 
-if (!(global as any).__verificationCodes) {
-  (global as any).__verificationCodes = new Map();
-}
-
-const verificationCodes = (global as any).__verificationCodes as Map<string, VerificationData>;
+const verificationCodes = global.__verificationCodes;
 
 export async function POST(request: NextRequest) {
   try {

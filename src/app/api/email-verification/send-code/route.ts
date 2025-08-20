@@ -4,16 +4,6 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 内存存储验证码（与其他API共享数据）
-interface VerificationData {
-  code: string;
-  expiresAt: number;
-  attempts: number;
-}
-
-// 使用全局变量共享验证码数据
-declare global {
-  let __verificationCodes: Map<string, VerificationData> | undefined;
-}
 
 if (!global.__verificationCodes) {
   global.__verificationCodes = new Map();

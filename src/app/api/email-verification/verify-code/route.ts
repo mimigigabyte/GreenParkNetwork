@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // 内存存储验证码（需要与 send-code 共享数据）
-interface VerificationData {
-  code: string;
-  expiresAt: number;
-  attempts: number;
-}
-
-// 创建一个简单的共享存储
-declare global {
-  let __verificationCodes: Map<string, VerificationData> | undefined;
-}
 
 if (!global.__verificationCodes) {
   global.__verificationCodes = new Map();
