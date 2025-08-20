@@ -150,10 +150,10 @@ export default function CarouselPage() {
       key: 'image_url',
       title: '预览',
       width: '120px',
-      render: (url: string, record: AdminCarouselImage) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <div className="flex items-center space-x-2">
           <img 
-            src={url} 
+            src={value as string} 
             alt={record.title_zh || '轮播图'}
             className="w-16 h-10 object-cover rounded border border-gray-200"
           />
@@ -171,9 +171,9 @@ export default function CarouselPage() {
       key: 'title_zh',
       title: '标题',
       sortable: true,
-      render: (title_zh: string, record: AdminCarouselImage) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <div>
-          <div className="font-medium text-gray-900">{title_zh || '无标题'}</div>
+          <div className="font-medium text-gray-900">{value as string || '无标题'}</div>
           <div className="text-sm text-gray-500">{record.title_en || '无英文标题'}</div>
         </div>
       )
@@ -181,9 +181,9 @@ export default function CarouselPage() {
     {
       key: 'description_zh',
       title: '描述',
-      render: (description_zh: string, record: AdminCarouselImage) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <div className="max-w-xs">
-          <div className="text-sm text-gray-900 truncate">{description_zh || '无描述'}</div>
+          <div className="text-sm text-gray-900 truncate">{value as string || '无描述'}</div>
           <div className="text-xs text-gray-500 truncate">{record.description_en || '无英文描述'}</div>
         </div>
       )
@@ -191,10 +191,10 @@ export default function CarouselPage() {
     {
       key: 'link_url',
       title: '链接',
-      render: (link_url: string) => (
-        link_url ? (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
+        value ? (
           <a 
-            href={link_url} 
+            href={value as string} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 truncate max-w-xs block"
@@ -212,10 +212,10 @@ export default function CarouselPage() {
       title: '排序',
       width: '80px',
       sortable: true,
-      render: (sort_order: number) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <div className="flex items-center space-x-1">
           <GripVertical className="w-4 h-4 text-gray-400" />
-          <span>{sort_order}</span>
+          <span>{value as number}</span>
         </div>
       )
     },
@@ -223,9 +223,9 @@ export default function CarouselPage() {
       key: 'is_active',
       title: '状态',
       width: '80px',
-      render: (is_active: boolean) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          is_active 
+          value as boolean 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
@@ -237,9 +237,9 @@ export default function CarouselPage() {
       key: 'created_at',
       title: '创建时间',
       sortable: true,
-      render: (created_at: string) => (
+      render: (value: string | number | boolean | undefined, record: AdminCarouselImage, index: number) => (
         <span className="text-sm text-gray-500">
-          {new Date(created_at).toLocaleDateString('zh-CN')}
+          {new Date(value as string).toLocaleDateString('zh-CN')}
         </span>
       )
     },
