@@ -36,7 +36,7 @@ export async function GET(
   } catch (error) {
     console.error('获取轮播图详情失败:', error)
     return NextResponse.json({ 
-      error: error.message || '获取轮播图详情失败' 
+      error: error instanceof Error ? error.message : '获取轮播图详情失败' 
     }, { status: 500 })
   }
 }
@@ -86,7 +86,7 @@ export async function PUT(
   } catch (error) {
     console.error('更新轮播图失败:', error)
     return NextResponse.json({ 
-      error: error.message || '更新轮播图失败' 
+      error: error instanceof Error ? error.message : '更新轮播图失败' 
     }, { status: 500 })
   }
 }
@@ -114,7 +114,7 @@ export async function DELETE(
   } catch (error) {
     console.error('删除轮播图失败:', error)
     return NextResponse.json({ 
-      error: error.message || '删除轮播图失败' 
+      error: error instanceof Error ? error.message : '删除轮播图失败' 
     }, { status: 500 })
   }
 }
