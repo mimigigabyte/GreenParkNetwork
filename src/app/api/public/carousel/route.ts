@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     console.error('获取轮播图失败:', error)
     return NextResponse.json({
       success: false,
-      error: error.message || '获取轮播图失败'
+      error: error instanceof Error ? error.message : '获取轮播图失败'
     }, { status: 500 })
   }
 }
