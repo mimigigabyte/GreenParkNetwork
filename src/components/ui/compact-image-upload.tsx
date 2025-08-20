@@ -101,7 +101,7 @@ export function CompactImageUpload({
               src={value}
               alt="Logo"
               className="w-full h-full object-cover"
-              onError={(e) => {
+              onError={() => {
                 console.error('图片加载失败:', value);
               }}
             />

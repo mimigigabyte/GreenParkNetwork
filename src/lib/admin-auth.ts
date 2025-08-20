@@ -31,8 +31,8 @@ export function checkAdminAuth(request: NextRequest): boolean {
 /**
  * 管理员认证中间件
  */
-export function withAdminAuth(handler: (request: NextRequest, context?: any) => Promise<Response>) {
-  return async (request: NextRequest, context?: any) => {
+export function withAdminAuth(handler: (request: NextRequest, context?: { params?: Record<string, string> }) => Promise<Response>) {
+  return async (request: NextRequest, context?: { params?: Record<string, string> }) => {
     if (!checkAdminAuth(request)) {
       return new Response(JSON.stringify({ error: '需要管理员权限' }), {
         status: 401,

@@ -76,7 +76,7 @@ export function DevelopmentZoneForm({ provinceId, zone, onSuccess, onCancel, isU
     }
   }
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -179,7 +179,7 @@ export function DevelopmentZoneForm({ provinceId, zone, onSuccess, onCancel, isU
               <input
                 type="checkbox"
                 checked={formData.is_active}
-                onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
                 className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
               />
               <span className="ml-2 text-sm text-gray-700">启用状态</span>

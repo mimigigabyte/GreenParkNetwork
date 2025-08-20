@@ -1,20 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   MessageSquare, 
-  Eye, 
   Send, 
-  Clock, 
   CheckCircle, 
   User, 
   Phone, 
   Mail,
   Building2,
-  Settings,
   Search,
   Filter,
-  Trash2
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,8 +31,7 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogFooter,
-  DialogClose
+  DialogFooter
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -70,10 +66,10 @@ export default function AdminMessagesPage() {
   });
   const [replySending, setReplySending] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
-  const [adminUser, setAdminUser] = useState<any>(null);
+  const [adminUser, setAdminUser] = useState<{ id: string; name: string; email: string } | null>(null);
 
   // 加载消息列表
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     setLoading(true);
     try {
       console.log('管理员页面 - 开始加载消息列表...');
@@ -130,7 +126,7 @@ export default function AdminMessagesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.status, pagination.page, pagination.pageSize, debugMode, toast]);
 
   // 检查管理员模式
   useEffect(() => {
@@ -139,7 +135,11 @@ export default function AdminMessagesPage() {
       
       if (isAdmin && adminModeUser) {
         console.log('🔑 检测到管理员模式:', adminModeUser);
-        setAdminUser(adminModeUser);
+        setAdminUser({
+          id: adminModeUser.id,
+          name: adminModeUser.name || adminModeUser.email || 'Admin',
+          email: adminModeUser.email || ''
+        });
       } else if (!user && !authLoading) {
         // 尝试同步认证状态
         console.log('🔄 尝试同步认证状态');
@@ -147,7 +147,11 @@ export default function AdminMessagesPage() {
         if (syncedUser) {
           console.log('✅ 认证同步成功:', syncedUser);
           AuthSync.setAdminMode(syncedUser);
-          setAdminUser(syncedUser);
+          setAdminUser({
+            id: syncedUser.id,
+            name: syncedUser.name || syncedUser.email || 'Admin',
+            email: syncedUser.email || ''
+          });
         }
       }
     };
@@ -160,7 +164,7 @@ export default function AdminMessagesPage() {
     if (!authLoading) {
       loadMessages();
     }
-  }, [pagination.page, filters.status, authLoading]);
+  }, [pagination.page, filters.status, authLoading, loadMessages]);
 
   // 检查用户认证状态
   if (authLoading) {

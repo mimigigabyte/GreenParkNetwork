@@ -9,7 +9,7 @@ interface VerificationData {
 
 // 创建一个简单的共享存储
 declare global {
-  var __verificationCodes: Map<string, VerificationData> | undefined;
+  let __verificationCodes: Map<string, VerificationData> | undefined;
 }
 
 if (!global.__verificationCodes) {

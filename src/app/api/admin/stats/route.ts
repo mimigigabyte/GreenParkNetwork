@@ -14,7 +14,7 @@ export interface AdminStats {
 }
 
 // GET - 获取管理员控制台统计数据
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
   try {
     console.log('📊 开始获取管理员统计数据...')
 

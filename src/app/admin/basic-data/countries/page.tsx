@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Globe, Upload } from 'lucide-react'
+import { Plus, Edit, Trash2, Globe } from 'lucide-react'
 import { AdminCountry } from '@/lib/types/admin'
 // 不再需要导入模拟数据相关的函数
 import { CountryForm } from './components/country-form'

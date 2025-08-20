@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Eye, Move, GripVertical } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Plus, Edit, Trash2, Eye, GripVertical } from 'lucide-react'
 import { AdminCarouselImage, PaginationParams } from '@/lib/types/admin'
 // 移除直接的数据库导入，改用API调用
 import { DataTable } from '@/components/admin/data-table/data-table'
@@ -20,11 +20,7 @@ export default function CarouselPage() {
     total: 0
   })
 
-  useEffect(() => {
-    loadImages()
-  }, [pagination.current, pagination.pageSize])
-
-  const loadImages = async (params?: Partial<PaginationParams>) => {
+  const loadImages = useCallback(async (params?: Partial<PaginationParams>) => {
     try {
       setIsLoading(true)
       
@@ -55,7 +51,11 @@ export default function CarouselPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadImages()
+  }, [loadImages, pagination.current, pagination.pageSize])
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
@@ -247,7 +247,7 @@ export default function CarouselPage() {
       key: 'actions',
       title: '操作',
       width: '120px',
-      render: (_: any, record: AdminCarouselImage) => (
+      render: (_: unknown, record: AdminCarouselImage) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleEdit(record)}

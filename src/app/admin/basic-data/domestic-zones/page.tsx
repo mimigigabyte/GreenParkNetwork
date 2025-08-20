@@ -1,29 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, MapPin, Building } from 'lucide-react'
 import { AdminProvince, AdminDevelopmentZone } from '@/lib/types/admin'
-import { 
-  getProvincesByCountryId, 
-  getDevelopmentZonesByProvinceId
-} from '@/lib/supabase/admin-locations'
+// Removed unused imports
 import {
   getDevelopmentZonesApi,
   deleteDevelopmentZoneApi
 } from '@/lib/api/admin-development-zones'
 import {
   getProvincesApi,
-  createProvinceApi,
-  updateProvinceApi,
   deleteProvinceApi
 } from '@/lib/api/admin-provinces'
 import { 
   getMockProvincesByCountryId,
   getMockDevelopmentZonesByProvinceId,
-  createMockProvince,
-  createMockDevelopmentZone,
-  updateMockProvince,
-  updateMockDevelopmentZone,
   deleteMockProvince,
   deleteMockDevelopmentZone
 } from '@/lib/supabase/admin-locations-mock'
@@ -53,11 +44,7 @@ export default function DomesticZonesPage() {
   // 中国ID常量 - 使用从脚本中获得的实际ID
   const CHINA_ID = 'f60beb71-056e-4878-8d9d-655a11c03eaa'
 
-  useEffect(() => {
-    loadProvinces()
-  }, [])
-
-  const loadProvinces = async () => {
+  const loadProvinces = useCallback(async () => {
     try {
       setIsLoading(true)
       
@@ -90,7 +77,11 @@ export default function DomesticZonesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadProvinces()
+  }, [loadProvinces])
 
   // 预加载所有省份的经开区数据以显示数量
   const loadAllDevelopmentZonesCounts = async (provincesList: AdminProvince[], useMockData: boolean) => {

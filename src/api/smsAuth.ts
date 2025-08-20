@@ -1,4 +1,4 @@
-import { apiClient, ApiResponse } from './index'
+import { ApiResponse } from './index'
 
 // ========================= 类型定义 =========================
 

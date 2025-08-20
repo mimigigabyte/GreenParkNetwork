@@ -1,5 +1,5 @@
-import { supabase, SupabaseUser, SupabaseAuthResponse } from '@/lib/supabase'
-import { apiClient, ApiResponse } from './index'
+import { supabase } from '@/lib/supabase'
+import { ApiResponse } from './index'
 
 // 类型定义（与后端保持一致）
 export interface User {
@@ -120,7 +120,7 @@ export const supabaseAuthApi = {
   /**
    * 发送邮箱验证码（已禁用 - 使用Resend替代）
    */
-  async sendEmailCode(data: SendEmailCodeRequest): Promise<ApiResponse<any>> {
+  async sendEmailCode(): Promise<ApiResponse<{ message: string }>> {
     // 不再使用Supabase发送邮件，返回提示信息
     return {
       success: false,
@@ -131,7 +131,7 @@ export const supabaseAuthApi = {
   /**
    * 发送手机验证码
    */
-  async sendPhoneCode(data: SendPhoneCodeRequest): Promise<ApiResponse<any>> {
+  async sendPhoneCode(data: SendPhoneCodeRequest): Promise<ApiResponse<{ message: string }>> {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         phone: data.phone,
@@ -162,7 +162,7 @@ export const supabaseAuthApi = {
   /**
    * 验证码验证
    */
-  async verifyCode(data: VerifyCodeRequest): Promise<ApiResponse<any>> {
+  async verifyCode(data: VerifyCodeRequest): Promise<ApiResponse<{ valid: boolean; message: string }>> {
     try {
       let result
       
@@ -419,7 +419,7 @@ export const supabaseAuthApi = {
   /**
    * 用户登出
    */
-  async logout(): Promise<ApiResponse<any>> {
+  async logout(): Promise<ApiResponse<{ message: string }>> {
     try {
       const { error } = await supabase.auth.signOut()
       
@@ -445,7 +445,7 @@ export const supabaseAuthApi = {
   /**
    * 监听认证状态变化
    */
-  onAuthStateChange(callback: (user: User | null, session: any) => void) {
+  onAuthStateChange(callback: (user: User | null, session: unknown) => void) {
     return supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         const user: User = {

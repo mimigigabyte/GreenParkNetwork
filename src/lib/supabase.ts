@@ -48,6 +48,6 @@ export interface SupabaseUser {
 
 export interface SupabaseAuthResponse {
   user: SupabaseUser | null
-  session: any | null
-  error: any | null
+  session: { access_token: string; refresh_token: string; user: SupabaseUser } | null
+  error: { message: string; status?: number } | null
 }

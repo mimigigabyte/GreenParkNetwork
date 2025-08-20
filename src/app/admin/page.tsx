@@ -7,13 +7,10 @@ import {
   Building2, 
   Lightbulb, 
   Settings,
-  TrendingUp,
   Calendar,
   BarChart3,
-  Activity,
   MessageSquare,
-  CheckCircle,
-  Clock
+  CheckCircle
 } from 'lucide-react'
 
 interface DashboardStats {

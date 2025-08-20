@@ -206,7 +206,7 @@ export function DragDropCarouselList({
         <div className="text-center text-gray-500">
           <GripVertical className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <p>暂无轮播图数据</p>
-          <p className="text-sm mt-1">点击上方"新增轮播图"按钮添加第一张轮播图</p>
+          <p className="text-sm mt-1">点击上方&quot;新增轮播图&quot;按钮添加第一张轮播图</p>
         </div>
       </div>
     )

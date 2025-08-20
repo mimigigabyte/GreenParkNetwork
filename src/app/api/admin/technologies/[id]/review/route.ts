@@ -24,7 +24,7 @@ export async function POST(
     }
 
     // 准备更新数据
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       reviewed_at: new Date().toISOString()
     }
 
@@ -74,7 +74,7 @@ export async function POST(
 // 发送审核通知的辅助函数
 async function sendReviewNotification(
   userId: string, 
-  technology: any, 
+  technology: { name_zh: string; id: string }, 
   action: string, 
   reason?: string
 ) {

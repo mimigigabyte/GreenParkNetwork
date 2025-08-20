@@ -245,10 +245,10 @@ export const sendVerificationCode = async (phoneNumber: string, countryCode: str
   });
   
   if (!result.success) {
-    throw new Error((result as any).error || '发送验证码失败');
+    throw new Error('error' in result ? result.error : result.message || '发送验证码失败');
   }
   
-  return (result as any).data;
+  return 'data' in result ? result.data : result;
 };
 
 /**
@@ -263,8 +263,8 @@ export const loginWithVerificationCode = async (phoneNumber: string, verificatio
   });
   
   if (!result.success) {
-    throw new Error((result as any).error || '验证码登录失败');
+    throw new Error('error' in result ? result.error : result.message || '验证码登录失败');
   }
   
-  return (result as any).data;
+  return 'data' in result ? result.data : result;
 }; 

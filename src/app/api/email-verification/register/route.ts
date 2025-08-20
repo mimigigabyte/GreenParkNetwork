@@ -22,7 +22,7 @@ interface VerificationData {
 }
 
 declare global {
-  var __verificationCodes: Map<string, VerificationData> | undefined;
+  let __verificationCodes: Map<string, VerificationData> | undefined;
 }
 
 if (!global.__verificationCodes) {

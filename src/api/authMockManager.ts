@@ -166,7 +166,7 @@ export class AuthMockManager {
   static async phoneCodeLogin(data: PhoneCodeLoginRequest) {
     await mockDelay();
 
-    const { phone, code, countryCode = '+86' } = data;
+    const { phone, code } = data;
 
     if (!phone || !code) {
       return createErrorResponse('请填写完整的登录信息');
@@ -292,7 +292,7 @@ export class AuthMockManager {
   static async phoneRegister(data: PhoneRegisterRequest) {
     await mockDelay();
 
-    const { phone, phoneCode, password, name, countryCode = '+86' } = data;
+    const { phone, phoneCode, password, name } = data;
 
     if (!phone || !phoneCode || !password) {
       return createErrorResponse('请填写完整的注册信息');
@@ -555,7 +555,7 @@ export class AuthMockManager {
   static async resetPasswordByPhone(data: ResetPasswordByPhoneRequest) {
     await mockDelay();
 
-    const { phone, phoneCode, newPassword, countryCode = '+86' } = data;
+    const { phone, phoneCode, newPassword } = data;
 
     if (!phone || !phoneCode || !newPassword) {
       return createErrorResponse('请填写完整信息');

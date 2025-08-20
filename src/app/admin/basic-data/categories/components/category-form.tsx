@@ -105,7 +105,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
 
       if (category) {
         // 更新
-        const updateData: UpdateCategoryData = {
+        const updateData = {
           name_zh: formData.name_zh.trim(),
           name_en: formData.name_en.trim(),
           slug: formData.slug.trim(),

@@ -12,7 +12,7 @@ interface VerificationData {
 
 // 使用全局变量共享验证码数据
 declare global {
-  var __verificationCodes: Map<string, VerificationData> | undefined;
+  let __verificationCodes: Map<string, VerificationData> | undefined;
 }
 
 if (!global.__verificationCodes) {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     let body;
     try {
       body = await request.json();
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, error: '无效的JSON数据' },
         { status: 400 }

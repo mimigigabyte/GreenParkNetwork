@@ -17,7 +17,7 @@ const formSchema = z.object({
   email: z.string().email({ message: '请输入有效的邮箱地址' }).optional().or(z.literal('')),
   phone_number: z.string().optional().or(z.literal('')),
   password: z.string().min(6, { message: '密码至少需要6位' }).optional().or(z.literal('')),
-  company_id: z.string({ required_error: '请选择一个企业' }),
+  company_id: z.string({ message: '请选择一个企业' }),
 }).refine(data => data.email || data.phone_number, {
   message: '邮箱和手机号至少需要填写一个',
   path: ['email'],

@@ -183,7 +183,7 @@ export function generateOTP(): string {
 export async function sendEmail(
   to: string,
   template: EmailTemplate
-): Promise<{ success: boolean; data?: any; error?: string }> {
+): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
   try {
     console.log(`开始发送邮件到: ${to}`);
     const result = await resend.emails.send({
@@ -222,7 +222,7 @@ export async function sendEmail(
 export async function sendResetPasswordCode(email: string): Promise<{
   success: boolean;
   code?: string;
-  data?: any;
+  data?: { id: string };
   error?: string;
 }> {
   const code = generateOTP();
@@ -251,7 +251,7 @@ export async function sendResetPasswordCode(email: string): Promise<{
 export async function sendRegisterCode(email: string): Promise<{
   success: boolean;
   code?: string;
-  data?: any;
+  data?: { id: string };
   error?: string;
 }> {
   const code = generateOTP();
@@ -277,7 +277,7 @@ export async function sendRegisterCode(email: string): Promise<{
 export async function sendLoginCode(email: string): Promise<{
   success: boolean;
   code?: string;
-  data?: any;
+  data?: { id: string };
   error?: string;
 }> {
   const code = generateOTP();

@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { getAllContactMessagesDebug } from '@/lib/supabase/contact-messages-debug';
+import { ContactMessage } from '@/lib/supabase/contact-messages';
 
 export default function AdminMessagesSimplePage() {
   const { toast } = useToast();
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<{ timestamp: string; parameters: object; steps: string[]; auth?: object; connection?: object } | null>(null);
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     setLoading(true);
     try {
       console.log('🚀 简化管理员页面 - 开始加载消息');
@@ -37,11 +38,11 @@ export default function AdminMessagesSimplePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     loadMessages();
-  }, []);
+  }, [loadMessages]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">

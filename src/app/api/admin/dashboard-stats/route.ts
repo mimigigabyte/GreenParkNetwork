@@ -16,7 +16,7 @@ export interface DashboardStats {
 }
 
 // GET - 获取管理员控制台首页统计数据
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
   try {
     console.log('📊 开始获取控制台统计数据...')
 

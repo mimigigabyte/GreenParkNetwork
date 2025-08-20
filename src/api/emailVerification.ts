@@ -1,4 +1,4 @@
-import { apiClient, ApiResponse } from './index'
+import { ApiResponse } from './index'
 
 // 邮件验证码相关接口类型定义
 export interface SendEmailCodeRequest {

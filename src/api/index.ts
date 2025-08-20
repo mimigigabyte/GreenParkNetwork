@@ -4,7 +4,7 @@ const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true' || false
 const USE_SUPABASE = process.env.NEXT_PUBLIC_USE_SUPABASE === 'true' || true // 默认使用 Supabase
 const USE_SMS_SERVICE = process.env.NEXT_PUBLIC_USE_SMS_SERVICE === 'true' || false // 使用短信服务
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   message?: string
@@ -58,14 +58,14 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     })
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,

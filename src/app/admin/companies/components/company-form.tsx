@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { AdminCompany, CreateCompanyData, UpdateCompanyData, COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
+import { AdminCompany, COMPANY_TYPE_OPTIONS, CompanyType } from '@/lib/types/admin'
 // 移除旧的导入，改用API调用
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
@@ -21,7 +21,7 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
     logo_url: '',
     address_zh: '',
     address_en: '',
-    company_type: 'private' as const,
+    company_type: 'private_company' as CompanyType,
     country_id: '',
     province_id: '',
     development_zone_id: '',
@@ -49,7 +49,7 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
         logo_url: company.logo_url || '',
         address_zh: company.address_zh || '',
         address_en: company.address_en || '',
-        company_type: company.company_type || 'private',
+        company_type: company.company_type || 'private_company',
         country_id: company.country_id || '',
         province_id: company.province_id || '',
         development_zone_id: company.development_zone_id || '',
@@ -333,7 +333,7 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
                 </label>
                 <select
                   value={formData.company_type}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company_type: e.target.value as any }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, company_type: e.target.value as CompanyType }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   {COMPANY_TYPE_OPTIONS.map(option => (

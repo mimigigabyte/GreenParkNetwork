@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
     
     // 过滤掉undefined和null值
     const filteredData = Object.fromEntries(
-      Object.entries(insertData).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+      Object.entries(insertData).filter(([, value]) => value !== undefined && value !== null && value !== '')
     )
     
     console.log('准备插入的数据:', filteredData)

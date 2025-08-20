@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { AdminCarouselImage, CreateCarouselImageData, UpdateCarouselImageData } from '@/lib/types/admin'
+import { AdminCarouselImage } from '@/lib/types/admin'
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 
@@ -49,7 +49,7 @@ export function CarouselForm({ image, onSuccess, onCancel }: CarouselFormProps) 
       const response = await fetch('/api/admin/carousel')
       const result = await response.json()
       if (result.data && result.data.length > 0) {
-        const maxSortOrder = Math.max(...result.data.map((item: any) => item.sort_order || 0))
+        const maxSortOrder = Math.max(...result.data.map((item: AdminCarouselImage) => item.sort_order || 0))
         setFormData(prev => ({ ...prev, sort_order: maxSortOrder + 1 }))
       } else {
         setFormData(prev => ({ ...prev, sort_order: 1 }))

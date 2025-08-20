@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Building, MapPin, Phone, Mail } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Plus, Edit, Trash2, Building, Phone, Mail } from 'lucide-react'
 import { AdminCompany, PaginationParams, COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
 // 移除旧的导入，改用API调用
 import { DataTable } from '@/components/admin/data-table/data-table'
@@ -24,12 +24,7 @@ export default function CompaniesPage() {
     foreign: 0
   })
 
-  useEffect(() => {
-    loadCompanies()
-    loadStats()
-  }, [pagination.current, pagination.pageSize])
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       // 加载总统计数据
       const dashboardResponse = await fetch('/api/admin/dashboard-stats')
@@ -66,9 +61,9 @@ export default function CompaniesPage() {
     } catch (error) {
       console.error('加载统计数据失败:', error)
     }
-  }
+  }, [])
 
-  const loadCompanies = async (params?: Partial<PaginationParams>) => {
+  const loadCompanies = useCallback(async (params?: Partial<PaginationParams>) => {
     try {
       setIsLoading(true)
       
@@ -97,7 +92,12 @@ export default function CompaniesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadCompanies()
+    loadStats()
+  }, [loadCompanies, loadStats, pagination.current, pagination.pageSize])
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
@@ -207,7 +207,7 @@ export default function CompaniesPage() {
     {
       key: 'country',
       title: '国别',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <span className="text-sm text-gray-900">
           {record.country?.name_zh || '-'}
         </span>
@@ -216,7 +216,7 @@ export default function CompaniesPage() {
     {
       key: 'province',
       title: '省份',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <span className="text-sm text-gray-700">
           {record.province?.name_zh || '-'}
         </span>
@@ -225,7 +225,7 @@ export default function CompaniesPage() {
     {
       key: 'development_zone',
       title: '经开区',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <span className="text-sm text-gray-600">
           {record.development_zone?.name_zh || (record.country?.code === 'china' && record.province ? '不在经开区内' : '-')}
         </span>
@@ -234,9 +234,9 @@ export default function CompaniesPage() {
     {
       key: 'address',
       title: '地址',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <div className="text-sm">
-          <div className="text-gray-900">{record.address || '-'}</div>
+          <div className="text-gray-900">{record.address_zh || record.address_en || '-'}</div>
         </div>
       )
     },
@@ -266,7 +266,7 @@ export default function CompaniesPage() {
     {
       key: 'contact_info',
       title: '联系信息',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <div className="text-xs space-y-1">
           {record.contact_person && (
             <div className="text-gray-900">{record.contact_person}</div>
@@ -314,7 +314,7 @@ export default function CompaniesPage() {
       key: 'actions',
       title: '操作',
       width: '120px',
-      render: (_: any, record: AdminCompany) => (
+      render: (_: unknown, record: AdminCompany) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleEdit(record)}

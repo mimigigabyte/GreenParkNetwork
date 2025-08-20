@@ -5,7 +5,7 @@ import { X } from 'lucide-react'
 import { AdminTechnology, TECH_SOURCE_OPTIONS, AdminCategory, AdminSubcategory, AdminCompany, AdminCountry, AdminProvince, AdminDevelopmentZone, TechSource, TechnologyAttachment } from '@/lib/types/admin'
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
-import { uploadMultipleFilesWithInfo, FileAttachment } from '@/lib/supabase-storage'
+import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
 import { FileText, Trash2, Upload } from 'lucide-react'
 
 interface TechnologyFormProps {
@@ -725,7 +725,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                           <div className="flex flex-col">
                             <span className="text-sm text-gray-700">{attachment.filename}</span>
                             <span className="text-xs text-gray-500">
-                              {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                              {attachment.size ? (attachment.size / 1024 / 1024).toFixed(2) : '0'} MB
                             </span>
                           </div>
                         </div>

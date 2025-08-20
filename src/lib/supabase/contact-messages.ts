@@ -354,10 +354,11 @@ async function notifyAdminNewContactMessage(contactMessage: ContactMessage): Pro
   
   // 尝试获取所有管理员用户
   const client = supabaseAdmin || supabase;
-  let { data: admins, error: adminError } = await client
+  const { data: adminData, error: adminError } = await client
     .from('users')
     .select('id')
     .eq('role', 'admin');
+  let admins = adminData;
   
   // 如果没有角色字段或没有管理员，使用备用方案
   if (adminError || !admins || admins.length === 0) {
@@ -414,7 +415,7 @@ ${contactMessage.message}
   
   console.log('准备发送的通知数量:', notifications.length);
   
-  const { data, error } = await client
+  const { error } = await client
     .from('internal_messages')
     .insert(notifications);
   

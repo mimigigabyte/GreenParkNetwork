@@ -1,4 +1,4 @@
-import { apiClient, ApiResponse } from './index'
+import { ApiResponse } from './index'
 
 // 接口类型定义，与现有的保持一致
 export interface SendEmailCodeRequest {
@@ -26,7 +26,7 @@ export const resendAuthApi = {
   /**
    * 发送邮箱验证码（使用Resend）
    */
-  async sendEmailCode(data: SendEmailCodeRequest): Promise<ApiResponse<any>> {
+  async sendEmailCode(data: SendEmailCodeRequest): Promise<ApiResponse<{ message: string; devOTP?: string }>> {
     try {
       const response = await fetch('/api/auth/send-email-code', {
         method: 'POST',
@@ -60,7 +60,7 @@ export const resendAuthApi = {
   /**
    * 验证邮箱验证码
    */
-  async verifyCode(data: VerifyCodeRequest): Promise<ApiResponse<any>> {
+  async verifyCode(data: VerifyCodeRequest): Promise<ApiResponse<{ message: string; valid?: boolean }>> {
     try {
       const response = await fetch('/api/auth/send-email-code', {
         method: 'PUT',
@@ -98,7 +98,7 @@ export const resendAuthApi = {
   /**
    * 通过邮箱重置密码
    */
-  async resetPasswordByEmail(data: ResetPasswordByEmailRequest): Promise<ApiResponse<any>> {
+  async resetPasswordByEmail(data: ResetPasswordByEmailRequest): Promise<ApiResponse<{ message: string }>> {
     try {
       // 注意：验证码已在前面的步骤中验证过，这里直接调用密码重置API
       const resetResponse = await fetch('/api/auth/reset-password', {
@@ -141,7 +141,7 @@ export const resendAuthApi = {
     emailCode: string
     password: string
     name?: string
-  }): Promise<ApiResponse<any>> {
+  }): Promise<ApiResponse<{ message: string }>> {
     try {
       // 首先验证验证码
       const verifyResult = await this.verifyCode({

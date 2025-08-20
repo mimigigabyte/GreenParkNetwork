@@ -91,7 +91,7 @@ export function CountryForm({ country, onSuccess, onCancel }: CountryFormProps) 
     }
   }
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -174,7 +174,7 @@ export function CountryForm({ country, onSuccess, onCancel }: CountryFormProps) 
           {/* 说明提示 */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-700">
-              💡 此处管理除中国以外的其他国家信息。中国的省份和经开区请在"国内省份/经开区管理"中操作。
+              💡 此处管理除中国以外的其他国家信息。中国的省份和经开区请在&quot;国内省份/经开区管理&quot;中操作。
             </p>
           </div>
 
@@ -236,7 +236,7 @@ export function CountryForm({ country, onSuccess, onCancel }: CountryFormProps) 
                   )}
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  支持 JPG、PNG 格式，建议尺寸 2:3 比例，或点击"自动获取国旗"
+                  支持 JPG、PNG 格式，建议尺寸 2:3 比例，或点击&quot;自动获取国旗&quot;
                 </p>
               </div>
             </div>
@@ -327,7 +327,7 @@ export function CountryForm({ country, onSuccess, onCancel }: CountryFormProps) 
               <input
                 type="checkbox"
                 checked={formData.is_active}
-                onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
                 className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
               />
               <span className="ml-2 text-sm text-gray-700">启用状态</span>

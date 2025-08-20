@@ -1,4 +1,3 @@
-import { apiClient } from './index'
 import { AdminUser, PaginationParams, PaginatedResponse, AdminCompany } from '@/lib/types/admin'
 
 /**
@@ -172,7 +171,7 @@ export const getCompaniesForSelectApi = async (): Promise<AdminCompany[]> => {
     }
 
     // 转换数据格式以匹配前端期望的结构
-    return result.data.map((company: any) => ({
+    return result.data.map((company: AdminCompany) => ({
       id: company.id,
       name_zh: company.name_zh,
       name_en: company.name_en,

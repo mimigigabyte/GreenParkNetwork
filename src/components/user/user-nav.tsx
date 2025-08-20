@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useAuthContext } from '../auth/auth-provider'
 import { User as UserIcon } from 'lucide-react';
 import type { User } from '@/types';

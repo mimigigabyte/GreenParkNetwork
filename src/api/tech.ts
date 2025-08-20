@@ -111,14 +111,14 @@ export const getProductCategories = async (): Promise<ApiResponse<ProductCategor
     return {
       success: true,
       data: result.data,
-      error: null
+      error: undefined
     };
 
   } catch (error) {
     console.error('Error fetching categories:', error);
     return {
       success: false,
-      data: null,
+      data: undefined,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
@@ -159,14 +159,14 @@ export const searchTechProducts = async (params: SearchParams): Promise<ApiRespo
     return {
       success: true,
       data: result.data,
-      error: null
+      error: undefined
     };
 
   } catch (error) {
     console.error('Error searching technologies:', error);
     return {
       success: false,
-      data: null,
+      data: undefined,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
@@ -202,21 +202,28 @@ export const getSearchStats = async (params: SearchParams): Promise<ApiResponse<
     return {
       success: true,
       data: result.data,
-      error: null
+      error: undefined
     };
 
   } catch (error) {
     console.error('Error getting search stats:', error);
     return {
       success: false,
-      data: null,
+      data: undefined,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 };
 
 // 获取筛选选项
-export const getFilterOptions = async (): Promise<ApiResponse<any>> => {
+interface FilterData {
+  categories: unknown[]
+  countries: unknown[]
+  provinces: unknown[]
+  developmentZones: unknown[]
+}
+
+export const getFilterOptions = async (): Promise<ApiResponse<FilterData>> => {
   try {
     const response = await fetch('/api/tech/filter-options', {
       method: 'GET',
@@ -238,14 +245,14 @@ export const getFilterOptions = async (): Promise<ApiResponse<any>> => {
     return {
       success: true,
       data: result.data,
-      error: null
+      error: undefined
     };
 
   } catch (error) {
     console.error('Error getting filter options:', error);
     return {
       success: false,
-      data: null,
+      data: undefined,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }

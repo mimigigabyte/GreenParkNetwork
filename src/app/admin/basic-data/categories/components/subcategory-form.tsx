@@ -106,14 +106,15 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
 
       if (subcategory) {
         // 更新
-        const updateData: UpdateSubcategoryData = {
+        const updateData = {
           name_zh: formData.name_zh.trim(),
           name_en: formData.name_en.trim(),
           slug: formData.slug.trim(),
           sort_order: formData.sort_order,
-          is_active: formData.is_active
+          is_active: formData.is_active,
+          category_id: categoryId
         }
-        await updateSubcategoryApi(subcategory.id, { ...updateData, category_id: categoryId })
+        await updateSubcategoryApi(subcategory.id, updateData)
       } else {
         // 创建
         const createData: CreateSubcategoryData = {

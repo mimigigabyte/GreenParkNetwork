@@ -55,7 +55,7 @@ export default function TechnologiesPage() {
         
         // 计算唯一技术供应商数量（基于已发布技术的企业ID去重）
         const uniqueSuppliers = new Set()
-        technologies.forEach((tech: any) => {
+        technologies.forEach((tech: AdminTechnology) => {
           // 根据企业ID或企业名称去重，优先使用company_id
           if (tech.company_id) {
             uniqueSuppliers.add(tech.company_id)
@@ -68,7 +68,7 @@ export default function TechnologiesPage() {
         
         // 计算唯一国别数量（基于已发布技术的企业国别）
         const uniqueCountries = new Set()
-        technologies.forEach((tech: any) => {
+        technologies.forEach((tech: AdminTechnology) => {
           if (tech.company_country_id) {
             uniqueCountries.add(tech.company_country_id)
           }
@@ -76,7 +76,7 @@ export default function TechnologiesPage() {
         
         // 计算唯一经开区数量（基于已发布技术的企业经开区）
         const uniqueDevZones = new Set()
-        technologies.forEach((tech: any) => {
+        technologies.forEach((tech: AdminTechnology) => {
           if (tech.company_development_zone_id) {
             uniqueDevZones.add(tech.company_development_zone_id)
           }
@@ -177,10 +177,6 @@ export default function TechnologiesPage() {
     loadTechnologies({ search })
   }
 
-  const handleReviewStatusChange = (status: TechReviewStatus) => {
-    setReviewStatusFilter(status)
-    setPagination(prev => ({ ...prev, current: 1 }))
-  }
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
     loadTechnologies({ sortBy: field, sortOrder: order })
@@ -378,7 +374,7 @@ export default function TechnologiesPage() {
     {
       key: 'category',
       title: '分类',
-      render: (_: any, record: AdminTechnology) => (
+      render: (_: unknown, record: AdminTechnology) => (
         <div className="text-sm">
           {record.category && (
             <div className="flex items-center text-blue-600 mb-1">
@@ -401,7 +397,7 @@ export default function TechnologiesPage() {
       key: 'country_info',
       title: '国别',
       width: '120px',
-      render: (_: any, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         if (!record.company_country) {
           return <span className="text-gray-400 text-sm">-</span>
         }
@@ -425,7 +421,7 @@ export default function TechnologiesPage() {
       key: 'company_info',
       title: '所属企业',
       width: '200px',
-      render: (_: any, record: AdminTechnology) => (
+      render: (_: unknown, record: AdminTechnology) => (
         <div className="flex items-center space-x-3">
           {record.company_logo_url ? (
             <img 
@@ -461,7 +457,7 @@ export default function TechnologiesPage() {
       key: 'location_info',
       title: '省份和经开区',
       width: '180px',
-      render: (_: any, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         // 只显示省份和国家级经开区
         if (!record.company_province && !record.company_development_zone) {
           return <span className="text-gray-400 text-sm">-</span>
@@ -483,7 +479,7 @@ export default function TechnologiesPage() {
       key: 'attachments',
       title: '附件',
       width: '160px',
-      render: (_, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         // 优先使用新的attachments字段，fallback到attachment_urls
         let attachments: Array<{url: string, filename?: string}> = [];
         
@@ -532,7 +528,7 @@ export default function TechnologiesPage() {
       key: 'review_status',
       title: '审核状态',
       width: '100px',
-      render: (_, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         const status = record.review_status || 'published'
         return (
           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -571,7 +567,7 @@ export default function TechnologiesPage() {
       key: 'actions',
       title: '操作',
       width: '200px',
-      render: (_: any, record: AdminTechnology) => {
+      render: (_: unknown, record: AdminTechnology) => {
         const status = record.review_status || 'published'
         return (
           <div className="flex items-center space-x-1">
