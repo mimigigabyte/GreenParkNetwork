@@ -168,10 +168,10 @@ export default function CompaniesPage() {
       key: 'logo_url',
       title: 'Logo',
       width: '80px',
-      render: (logo_url: string, record: AdminCompany) => (
-        logo_url ? (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
+        value ? (
           <img 
-            src={logo_url} 
+            src={value as string} 
             alt={record.name_zh}
             className="w-12 h-12 object-cover rounded border border-gray-200"
           />
@@ -186,9 +186,9 @@ export default function CompaniesPage() {
       key: 'name_zh',
       title: '企业名称',
       sortable: true,
-      render: (name_zh: string, record: AdminCompany) => (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
         <div>
-          <div className="font-medium text-gray-900">{name_zh}</div>
+          <div className="font-medium text-gray-900">{value as string}</div>
           {record.name_en && (
             <div className="text-sm text-gray-500">{record.name_en}</div>
           )}
@@ -198,9 +198,9 @@ export default function CompaniesPage() {
     {
       key: 'company_type',
       title: '企业性质',
-      render: (type: string) => (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-          {getCompanyTypeLabel(type)}
+          {getCompanyTypeLabel(value as string)}
         </span>
       )
     },
@@ -243,10 +243,10 @@ export default function CompaniesPage() {
     {
       key: 'industry_code',
       title: '行业代码',
-      render: (code: string) => (
-        code ? (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
+        value ? (
           <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
-            {code}
+            {value as string}
           </span>
         ) : (
           <span className="text-gray-400">-</span>
@@ -257,9 +257,9 @@ export default function CompaniesPage() {
       key: 'annual_output_value',
       title: '年产值',
       sortable: true,
-      render: (value: number) => (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
         <span className="text-sm font-medium text-green-600">
-          {formatOutputValue(value)}
+          {formatOutputValue(value as number)}
         </span>
       )
     },
@@ -290,13 +290,13 @@ export default function CompaniesPage() {
       key: 'is_active',
       title: '状态',
       width: '80px',
-      render: (is_active: boolean) => (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          is_active 
+          value as boolean 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
-          {is_active ? '启用' : '禁用'}
+          {value as boolean ? '启用' : '禁用'}
         </span>
       )
     },
@@ -304,9 +304,9 @@ export default function CompaniesPage() {
       key: 'created_at',
       title: '创建时间',
       sortable: true,
-      render: (created_at: string) => (
+      render: (value: string | number | boolean | AdminCountry | AdminProvince | AdminDevelopmentZone | undefined, record: AdminCompany, index: number) => (
         <span className="text-sm text-gray-500">
-          {new Date(created_at).toLocaleDateString('zh-CN')}
+          {new Date(value as string).toLocaleDateString('zh-CN')}
         </span>
       )
     },
