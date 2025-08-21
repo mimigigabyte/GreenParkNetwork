@@ -5,7 +5,9 @@ import {
   Bell, 
   Search,
   Dot,
-  ChevronRight
+  ChevronRight,
+  Trash2,
+  CheckSquare
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +16,10 @@ import {
   InternalMessage, 
   getReceivedInternalMessages, 
   markInternalMessageAsRead,
-  getUnreadInternalMessageCount
+  getUnreadInternalMessageCount,
+  markInternalMessagesAsRead,
+  markAllInternalMessagesAsRead,
+  deleteInternalMessages
 } from '@/lib/supabase/contact-messages';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuthContext } from '@/components/auth/auth-provider';
@@ -33,6 +38,9 @@ export default function MessageCenterPage() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [selectedMessageIds, setSelectedMessageIds] = useState<Set<string>>(new Set());
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
   const [filters, setFilters] = useState<MessageFilters>({
     category: 'all',
     status: 'all',
@@ -131,6 +139,10 @@ export default function MessageCenterPage() {
     }
 
     setFilteredMessages(filtered);
+    
+    // 重置选择状态
+    setSelectedMessageIds(new Set());
+    setIsAllSelected(false);
   }, [messages, filters]);
 
   // 选中消息并标记为已读
@@ -153,6 +165,171 @@ export default function MessageCenterPage() {
       } catch (error) {
         console.error('标记已读失败:', error);
       }
+    }
+  };
+
+  // 处理单个消息的选择
+  const handleMessageSelect = (messageId: string, checked: boolean) => {
+    const newSelected = new Set(selectedMessageIds);
+    if (checked) {
+      newSelected.add(messageId);
+    } else {
+      newSelected.delete(messageId);
+    }
+    setSelectedMessageIds(newSelected);
+    setIsAllSelected(newSelected.size === filteredMessages.length && filteredMessages.length > 0);
+  };
+
+  // 处理全选/取消全选
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredMessages.map(msg => msg.id));
+      setSelectedMessageIds(allIds);
+      setIsAllSelected(true);
+    } else {
+      setSelectedMessageIds(new Set());
+      setIsAllSelected(false);
+    }
+  };
+
+  // 批量标记为已读
+  const handleBatchMarkAsRead = async () => {
+    if (selectedMessageIds.size === 0) {
+      toast({
+        title: "提示",
+        description: "请先选择要标记的消息",
+        variant: "default"
+      });
+      return;
+    }
+
+    setBatchLoading(true);
+    try {
+      const messageIdsArray = Array.from(selectedMessageIds);
+      await markInternalMessagesAsRead(messageIdsArray);
+
+      // 更新本地状态
+      setMessages(prev => 
+        prev.map(msg => 
+          selectedMessageIds.has(msg.id)
+            ? { ...msg, is_read: true, read_at: new Date().toISOString() }
+            : msg
+        )
+      );
+
+      // 更新未读数量
+      const markedUnreadCount = Array.from(selectedMessageIds)
+        .filter(id => {
+          const msg = messages.find(m => m.id === id);
+          return msg && !msg.is_read;
+        }).length;
+      setUnreadCount(prev => Math.max(0, prev - markedUnreadCount));
+
+      // 清空选择
+      setSelectedMessageIds(new Set());
+      setIsAllSelected(false);
+
+      toast({
+        title: "操作成功",
+        description: `已标记 ${messageIdsArray.length} 条消息为已读`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('批量标记已读失败:', error);
+      toast({
+        title: "操作失败",
+        description: "批量标记已读失败，请重试",
+        variant: "destructive"
+      });
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  // 批量删除
+  const handleBatchDelete = async () => {
+    if (selectedMessageIds.size === 0) {
+      toast({
+        title: "提示",
+        description: "请先选择要删除的消息",
+        variant: "default"
+      });
+      return;
+    }
+
+    setBatchLoading(true);
+    try {
+      const messageIdsArray = Array.from(selectedMessageIds);
+      await deleteInternalMessages(messageIdsArray);
+
+      // 更新本地状态
+      setMessages(prev => prev.filter(msg => !selectedMessageIds.has(msg.id)));
+
+      // 更新未读数量
+      const deletedUnreadCount = Array.from(selectedMessageIds)
+        .filter(id => {
+          const msg = messages.find(m => m.id === id);
+          return msg && !msg.is_read;
+        }).length;
+      setUnreadCount(prev => Math.max(0, prev - deletedUnreadCount));
+
+      // 清空选择
+      setSelectedMessageIds(new Set());
+      setIsAllSelected(false);
+
+      // 如果删除的是当前查看的消息，清空选择
+      if (selectedMessageId && selectedMessageIds.has(selectedMessageId)) {
+        setSelectedMessageId(null);
+      }
+
+      toast({
+        title: "操作成功",
+        description: `已删除 ${messageIdsArray.length} 条消息`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('批量删除失败:', error);
+      toast({
+        title: "操作失败",
+        description: "批量删除失败，请重试",
+        variant: "destructive"
+      });
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  // 全部已读
+  const handleMarkAllAsRead = async () => {
+    setBatchLoading(true);
+    try {
+      const updatedCount = await markAllInternalMessagesAsRead();
+
+      // 更新本地状态
+      setMessages(prev => 
+        prev.map(msg => ({ 
+          ...msg, 
+          is_read: true, 
+          read_at: new Date().toISOString() 
+        }))
+      );
+
+      setUnreadCount(0);
+
+      toast({
+        title: "操作成功",
+        description: `已标记 ${updatedCount} 条消息为已读`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('全部标记已读失败:', error);
+      toast({
+        title: "操作失败",
+        description: "全部标记已读失败，请重试",
+        variant: "destructive"
+      });
+    } finally {
+      setBatchLoading(false);
     }
   };
 
@@ -283,36 +460,58 @@ export default function MessageCenterPage() {
         </div>
       </div>
 
-      {/* 筛选器 */}
+      {/* 批量操作栏 */}
       <div className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <input type="checkbox" className="rounded border-gray-300" />
-            <span className="text-sm text-gray-600">全选</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                className="rounded border-gray-300"
+                checked={isAllSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                disabled={filteredMessages.length === 0}
+              />
+              <span className="text-sm text-gray-600">全选</span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleBatchMarkAsRead}
+                disabled={selectedMessageIds.size === 0 || batchLoading}
+                className="px-3 py-1 text-sm rounded bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                {batchLoading ? '处理中...' : '标记已读'}
+              </button>
+              <button
+                onClick={handleBatchDelete}
+                disabled={selectedMessageIds.size === 0 || batchLoading}
+                className="px-3 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                删除
+              </button>
+              <button
+                onClick={handleMarkAllAsRead}
+                disabled={batchLoading || unreadCount === 0}
+                className="px-3 py-1 text-sm rounded bg-green-100 text-green-700 hover:bg-green-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                全部已读
+              </button>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">标记已读</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
-              className={`px-3 py-1 text-sm rounded ${
-                filters.status === 'all'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              全部已读
-            </button>
-            <button
-              onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
-              className="px-3 py-1 text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 rounded"
-            >
-              全部删除
-            </button>
-          </div>
-          <div className="text-sm text-gray-500">
-            总条数: {filteredMessages.length}
+          
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-500">
+              已选择: {selectedMessageIds.size} 条
+            </div>
+            <div className="text-sm text-gray-500">
+              总条数: {filteredMessages.length}
+            </div>
+            {unreadCount > 0 && (
+              <div className="text-sm text-red-600">
+                未读: {unreadCount} 条
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -346,6 +545,11 @@ export default function MessageCenterPage() {
                       <input 
                         type="checkbox" 
                         className="rounded border-gray-300"
+                        checked={selectedMessageIds.has(message.id)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleMessageSelect(message.id, e.target.checked);
+                        }}
                         onClick={(e) => e.stopPropagation()}
                       />
                     </div>

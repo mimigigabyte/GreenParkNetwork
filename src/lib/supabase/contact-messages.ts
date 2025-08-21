@@ -347,6 +347,97 @@ export async function getUnreadInternalMessageCount(): Promise<number> {
 }
 
 /**
+ * 批量标记站内信为已读
+ */
+export async function markInternalMessagesAsRead(messageIds: string[]): Promise<InternalMessage[]> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('用户未登录');
+  }
+
+  if (messageIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .update({ 
+      is_read: true,
+      read_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .in('id', messageIds)
+    .eq('to_user_id', user.id) // 确保只能更新发给自己的消息
+    .select();
+
+  if (error) {
+    console.error('批量标记站内信为已读失败:', error);
+    throw new Error(error.message || '批量标记站内信为已读失败');
+  }
+
+  return data || [];
+}
+
+/**
+ * 标记所有站内信为已读
+ */
+export async function markAllInternalMessagesAsRead(): Promise<number> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('用户未登录');
+  }
+
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .update({ 
+      is_read: true,
+      read_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('to_user_id', user.id)
+    .eq('is_read', false)
+    .select('id');
+
+  if (error) {
+    console.error('标记所有站内信为已读失败:', error);
+    throw new Error(error.message || '标记所有站内信为已读失败');
+  }
+
+  return data?.length || 0;
+}
+
+/**
+ * 批量删除站内信
+ */
+export async function deleteInternalMessages(messageIds: string[]): Promise<number> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('用户未登录');
+  }
+
+  if (messageIds.length === 0) {
+    return 0;
+  }
+
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .delete()
+    .in('id', messageIds)
+    .eq('to_user_id', user.id) // 确保只能删除发给自己的消息
+    .select('id');
+
+  if (error) {
+    console.error('批量删除站内信失败:', error);
+    throw new Error(error.message || '批量删除站内信失败');
+  }
+
+  return data?.length || 0;
+}
+
+/**
  * 通知管理员有新的联系消息
  */
 async function notifyAdminNewContactMessage(contactMessage: ContactMessage): Promise<void> {
