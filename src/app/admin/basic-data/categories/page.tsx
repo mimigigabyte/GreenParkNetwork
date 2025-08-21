@@ -258,10 +258,26 @@ export default function CategoriesPage() {
                   <div className="mt-4 ml-6 space-y-2">
                     {category.subcategories.map((subcategory) => (
                       <div key={subcategory.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-800">{subcategory.name_zh}</h4>
-                          <p className="text-xs text-gray-500">{subcategory.name_en}</p>
-                          <p className="text-xs text-gray-400">标识: {subcategory.slug}</p>
+                        <div className="flex items-center space-x-3">
+                          {/* 默认技术图片预览 */}
+                          <div className="flex-shrink-0">
+                            {subcategory.default_tech_image_url ? (
+                              <img
+                                src={subcategory.default_tech_image_url}
+                                alt={`${subcategory.name_zh}默认图片`}
+                                className="w-12 h-12 object-cover rounded border border-gray-200"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center border border-gray-200">
+                                <span className="text-xs text-gray-400">无图片</span>
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-800">{subcategory.name_zh}</h4>
+                            <p className="text-xs text-gray-500">{subcategory.name_en}</p>
+                            <p className="text-xs text-gray-400">标识: {subcategory.slug}</p>
+                          </div>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button

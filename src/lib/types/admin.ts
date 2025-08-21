@@ -34,6 +34,7 @@ export interface AdminSubcategory extends BaseEntity, MultiLanguageField {
   category_id: string
   slug: string
   sort_order: number
+  default_tech_image_url?: string // 默认技术图片URL
   category?: AdminCategory
 }
 

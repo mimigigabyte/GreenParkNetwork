@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { AdminSubcategory, CreateSubcategoryData, UpdateSubcategoryData } from '@/lib/types/admin'
 import { createSubcategoryApi, updateSubcategoryApi } from '@/lib/api/admin-categories'
+import { CompactImageUpload } from '@/components/ui/compact-image-upload'
 
 interface SubcategoryFormProps {
   categoryId: string
@@ -18,7 +19,8 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
     name_en: '',
     slug: '',
     sort_order: 0,
-    is_active: true
+    is_active: true,
+    default_tech_image_url: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -30,7 +32,8 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
         name_en: subcategory.name_en,
         slug: subcategory.slug,
         sort_order: subcategory.sort_order,
-        is_active: subcategory.is_active
+        is_active: subcategory.is_active,
+        default_tech_image_url: subcategory.default_tech_image_url || ''
       })
     }
   }, [subcategory])
@@ -112,7 +115,8 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
           slug: formData.slug.trim(),
           sort_order: formData.sort_order,
           is_active: formData.is_active,
-          category_id: categoryId
+          category_id: categoryId,
+          default_tech_image_url: formData.default_tech_image_url || undefined
         }
         await updateSubcategoryApi(subcategory.id, updateData)
       } else {
@@ -123,7 +127,8 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
           name_en: formData.name_en.trim(),
           slug: formData.slug.trim(),
           sort_order: formData.sort_order,
-          is_active: formData.is_active
+          is_active: formData.is_active,
+          default_tech_image_url: formData.default_tech_image_url || undefined
         }
         await createSubcategoryApi(createData)
       }
@@ -234,6 +239,23 @@ export function SubcategoryForm({ categoryId, subcategory, onSuccess, onCancel }
             )}
             <p className="text-gray-500 text-xs mt-1">
               数值越小排序越靠前
+            </p>
+          </div>
+
+          {/* 默认技术图片 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              默认技术图片
+            </label>
+            <CompactImageUpload
+              value={formData.default_tech_image_url}
+              onChange={(url) => setFormData(prev => ({ ...prev, default_tech_image_url: url }))}
+              bucket="images"
+              folder="subcategory-tech-images"
+              disabled={isSubmitting}
+            />
+            <p className="text-gray-500 text-xs mt-1">
+              当技术发布时未上传封面图片，将使用此默认图片作为封面
             </p>
           </div>
 

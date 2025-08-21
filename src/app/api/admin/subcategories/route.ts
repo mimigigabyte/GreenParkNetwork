@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 // POST - 创建新子分类
 export async function POST(request: NextRequest) {
   try {
-    const { name_zh, name_en, slug, sort_order, is_active, category_id } = await request.json()
+    const { name_zh, name_en, slug, sort_order, is_active, category_id, default_tech_image_url } = await request.json()
 
     // 基本验证
     if (!name_zh || !name_en || !slug || !category_id) {
@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
         slug,
         sort_order: sort_order || 0,
         is_active: is_active ?? true,
-        category_id
+        category_id,
+        default_tech_image_url
       })
       .select()
       .single()

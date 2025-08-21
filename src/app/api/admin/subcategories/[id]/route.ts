@@ -13,7 +13,7 @@ export async function PUT(
 ) {
   try {
     const { id } = params
-    const { name_zh, name_en, slug, sort_order, is_active, category_id } = await request.json()
+    const { name_zh, name_en, slug, sort_order, is_active, category_id, default_tech_image_url } = await request.json()
 
     // 基本验证
     if (!name_zh || !name_en || !slug || !category_id) {
@@ -53,6 +53,7 @@ export async function PUT(
         sort_order: sort_order || 0,
         is_active: is_active ?? true,
         category_id,
+        default_tech_image_url,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)

@@ -14,13 +14,32 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     console.log('更新技术数据:', technologyData)
     
+    // 如果没有技术图片且指定了子分类，获取子分类的默认技术图片
+    let finalImageUrl = technologyData.image_url
+    if (!finalImageUrl && technologyData.subcategory_id) {
+      try {
+        const { data: subcategory } = await supabase
+          .from('admin_subcategories')
+          .select('default_tech_image_url')
+          .eq('id', technologyData.subcategory_id)
+          .single()
+        
+        if (subcategory?.default_tech_image_url) {
+          finalImageUrl = subcategory.default_tech_image_url
+          console.log('使用子分类默认技术图片:', finalImageUrl)
+        }
+      } catch (error) {
+        console.warn('获取子分类默认图片失败:', error)
+      }
+    }
+    
     // 准备要更新的数据，只包含数据库表中存在的字段
     const updateData = {
       name_zh: technologyData.name_zh,
       name_en: technologyData.name_en,
       description_zh: technologyData.description_zh,
       description_en: technologyData.description_en,
-      image_url: technologyData.image_url,
+      image_url: finalImageUrl,
       tech_source: technologyData.tech_source,
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,

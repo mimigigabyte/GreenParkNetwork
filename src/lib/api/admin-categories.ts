@@ -116,6 +116,7 @@ export async function createSubcategoryApi(data: {
   sort_order?: number
   is_active?: boolean
   category_id: string
+  default_tech_image_url?: string
 }): Promise<AdminSubcategory> {
   const res = await fetch(SUBCATEGORY_API_BASE_URL, {
     method: 'POST',
@@ -141,6 +142,7 @@ export async function updateSubcategoryApi(id: string, data: {
   sort_order?: number
   is_active?: boolean
   category_id: string
+  default_tech_image_url?: string
 }): Promise<AdminSubcategory> {
   const res = await fetch(`${SUBCATEGORY_API_BASE_URL}/${id}`, {
     method: 'PUT',
