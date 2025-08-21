@@ -43,26 +43,12 @@ export const submitCompanyProfile = async (data: CompanyProfileData) => {
       creditCode: data.creditCode // 添加统一社会信用代码
     };
 
-    // 先尝试从Supabase获取session
-    const { supabase } = await import('@/lib/supabase');
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    let token = null;
-    if (session?.access_token) {
-      token = session.access_token;
-    } else {
-      // 回退到localStorage的token
-      token = localStorage.getItem('access_token');
-    }
     // 使用安全的fetch
     const { safeFetch, handleApiResponse } = await import('@/lib/safe-fetch');
     
     const response = await safeFetch('/api/company/profile', {
       method: hasExisting ? 'PUT' : 'POST',
-      body: JSON.stringify(requestData),
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      body: JSON.stringify(requestData)
     });
 
     return await handleApiResponse(response);
@@ -75,18 +61,6 @@ export const submitCompanyProfile = async (data: CompanyProfileData) => {
 // 获取用户企业信息
 export const getUserCompanyInfo = async () => {
   try {
-    // 先尝试从Supabase获取session
-    const { supabase } = await import('@/lib/supabase');
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    let token = null;
-    if (session?.access_token) {
-      token = session.access_token;
-    } else {
-      // 回退到localStorage的token
-      token = localStorage.getItem('access_token');
-    }
-    
     // 使用安全的fetch
     const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
     
@@ -102,11 +76,10 @@ export const getUserCompanyInfo = async () => {
 // 获取国家列表
 export const getCountries = async () => {
   try {
-    const response = await fetch('/api/company/countries');
-    if (!response.ok) {
-      throw new Error('获取国家列表失败');
-    }
-    return await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet('/api/company/countries');
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('获取国家列表错误:', error);
     throw error;
@@ -116,11 +89,10 @@ export const getCountries = async () => {
 // 获取省份列表
 export const getProvinces = async (country: string) => {
   try {
-    const response = await fetch(`/api/company/provinces?country=${encodeURIComponent(country)}`);
-    if (!response.ok) {
-      throw new Error('获取省份列表失败');
-    }
-    return await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet(`/api/company/provinces?country=${encodeURIComponent(country)}`);
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('获取省份列表错误:', error);
     throw error;
@@ -130,11 +102,10 @@ export const getProvinces = async (country: string) => {
 // 获取经开区列表
 export const getEconomicZones = async (province: string) => {
   try {
-    const response = await fetch(`/api/company/economic-zones?province=${encodeURIComponent(province)}`);
-    if (!response.ok) {
-      throw new Error('获取经开区列表失败');
-    }
-    return await response.json();
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    
+    const response = await safeGet(`/api/company/economic-zones?province=${encodeURIComponent(province)}`);
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('获取经开区列表错误:', error);
     throw error;
