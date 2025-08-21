@@ -410,7 +410,7 @@ export default function MessageCenterPage() {
               }`}
             >
               <span>发布审核</span>
-              <span className="text-orange-600">({messages.filter(msg => msg.category === '发布审核').length})</span>
+              <span className="text-blue-600">({messages.filter(msg => msg.category === '发布审核').length})</span>
             </button>
             <button
               onClick={() => setFilters(prev => ({ ...prev, category: 'following' }))}
@@ -421,7 +421,7 @@ export default function MessageCenterPage() {
               }`}
             >
               <span>我的关注</span>
-              <span className="text-green-600">({messages.filter(msg => msg.category === '我的关注').length})</span>
+              <span className="text-blue-600">({messages.filter(msg => msg.category === '我的关注').length})</span>
             </button>
             <button
               onClick={() => setFilters(prev => ({ ...prev, category: 'security' }))}
@@ -432,7 +432,7 @@ export default function MessageCenterPage() {
               }`}
             >
               <span>安全消息</span>
-              <span className="text-red-600">({messages.filter(msg => msg.category === '安全消息').length})</span>
+              <span className="text-blue-600">({messages.filter(msg => msg.category === '安全消息').length})</span>
             </button>
             <button
               onClick={() => setFilters(prev => ({ ...prev, category: 'other' }))}
@@ -443,7 +443,7 @@ export default function MessageCenterPage() {
               }`}
             >
               <span>其他</span>
-              <span className="text-gray-600">({messages.filter(msg => msg.category === '其他').length})</span>
+              <span className="text-blue-600">({messages.filter(msg => msg.category === '其他').length})</span>
             </button>
           </div>
 
