@@ -6,6 +6,8 @@ import { AdminTechnology, TECH_SOURCE_OPTIONS, AdminCategory, AdminSubcategory, 
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
+import { getCountries } from '@/lib/supabase/admin-locations'
+import { generateCompanyLogo } from '@/lib/logoGenerator'
 import { FileText, Trash2, Upload } from 'lucide-react'
 
 interface TechnologyFormProps {
@@ -40,6 +42,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
   
   // 分类数据状态
   const [categories, setCategories] = useState<AdminCategory[]>([])
@@ -52,6 +55,26 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
   const [provinces, setProvinces] = useState<AdminProvince[]>([])
   const [developmentZones, setDevelopmentZones] = useState<AdminDevelopmentZone[]>([])
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false)
+
+  // 生成企业logo预览
+  const generateLogoPreview = async (companyName: string) => {
+    if (companyName.length < 2) {
+      setLogoPreview(null)
+      return
+    }
+    
+    try {
+      const logoDataUrl = await generateCompanyLogo({
+        companyName,
+        size: 128, // 预览时使用较小尺寸
+      })
+      setLogoPreview(logoDataUrl)
+      console.log('✅ 技术表单-生成企业logo预览成功')
+    } catch (error) {
+      console.error('❌ 技术表单-生成企业logo预览失败:', error)
+      setLogoPreview(null)
+    }
+  }
 
   // 加载分类数据
   const loadCategories = async () => {
@@ -119,13 +142,12 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
   // 加载国家数据
   const loadCountries = async () => {
     try {
-      const response = await fetch('/api/admin/countries')
-      if (response.ok) {
-        const result = await response.json()
-        setCountries(result.data || [])
-      }
+      const countriesData = await getCountries()
+      setCountries(countriesData)
+      console.log('✅ 技术表单-加载国家数据成功:', countriesData.length, '个国家（包含中国）')
     } catch (error) {
-      console.error('加载国家数据失败:', error)
+      console.error('❌ 技术表单-加载国家数据失败:', error)
+      setCountries([])
     }
   }
 
@@ -137,13 +159,24 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     }
     
     try {
-      const response = await fetch(`/api/admin/provinces?country_id=${countryId}`)
+      // 使用与企业管理表单相同的参数名和响应处理逻辑
+      console.log('🔍 技术表单-开始加载省份数据，国家ID:', countryId)
+      const response = await fetch(`/api/admin/provinces?countryId=${countryId}`)
+      console.log('技术表单-省份API响应状态:', response.status)
+      
       if (response.ok) {
         const result = await response.json()
-        setProvinces(result.data || [])
+        console.log('技术表单-省份API返回数据:', result)
+        // API返回格式是 { success: true, data: [...] }
+        const data = result.success ? result.data : []
+        console.log('技术表单-处理后的省份数据:', data)
+        setProvinces(Array.isArray(data) ? data : [])
+      } else {
+        console.log('技术表单-省份API请求失败')
+        setProvinces([])
       }
     } catch (error) {
-      console.error('加载省份数据失败:', error)
+      console.error('技术表单-加载省份数据失败:', error)
       setProvinces([])
     }
   }
@@ -156,13 +189,24 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     }
     
     try {
-      const response = await fetch(`/api/admin/development-zones?province_id=${provinceId}`)
+      // 使用与企业管理表单相同的参数名和响应处理逻辑
+      console.log('🔍 技术表单-开始加载经开区数据，省份ID:', provinceId)
+      const response = await fetch(`/api/admin/development-zones?provinceId=${provinceId}`)
+      console.log('技术表单-经开区API响应状态:', response.status)
+      
       if (response.ok) {
         const result = await response.json()
-        setDevelopmentZones(result.data || [])
+        console.log('技术表单-经开区API返回数据:', result)
+        // API返回格式是 { success: true, data: [...] }
+        const data = result.success ? result.data : []
+        console.log('技术表单-处理后的经开区数据:', data)
+        setDevelopmentZones(Array.isArray(data) ? data : [])
+      } else {
+        console.log('技术表单-经开区API请求失败')
+        setDevelopmentZones([])
       }
     } catch (error) {
-      console.error('加载开发区数据失败:', error)
+      console.error('技术表单-加载经开区数据失败:', error)
       setDevelopmentZones([])
     }
   }
@@ -236,12 +280,25 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         company_development_zone_id: selectedCompany.development_zone_id || ''
       }))
       
-      // 加载对应的省份和开发区
-      if (selectedCompany.country_id) {
-        loadProvinces(selectedCompany.country_id)
-      }
-      if (selectedCompany.province_id) {
-        loadDevelopmentZones(selectedCompany.province_id)
+      // 选择已有企业时清除logo预览，因为使用企业现有logo
+      setLogoPreview(null)
+      
+      // 检查企业是否在中国，只有中国企业才加载省份和开发区
+      const companyCountry = countries.find(c => c.id === selectedCompany.country_id)
+      const isChinaCompany = companyCountry?.code === 'china'
+      
+      if (isChinaCompany) {
+        // 加载对应的省份和开发区
+        if (selectedCompany.country_id) {
+          loadProvinces(selectedCompany.country_id)
+        }
+        if (selectedCompany.province_id) {
+          loadDevelopmentZones(selectedCompany.province_id)
+        }
+      } else {
+        // 非中国企业，清空省份和开发区数据
+        setProvinces([])
+        setDevelopmentZones([])
       }
     } else {
       // 如果是手动填写模式，清空企业关联数据
@@ -255,18 +312,30 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         company_province_id: '',
         company_development_zone_id: ''
       }))
+      setProvinces([])
+      setDevelopmentZones([])
+      setLogoPreview(null)
     }
   }
 
   // 处理国家变化
   const handleCountryChange = (countryId: string) => {
+    const selectedCountry = countries.find(c => c.id === countryId)
+    const isChinaSelected = selectedCountry?.code === 'china'
+    
     setFormData(prev => ({
       ...prev,
       company_country_id: countryId,
       company_province_id: '',
       company_development_zone_id: ''
     }))
-    loadProvinces(countryId)
+    
+    // 只有选择中国时才加载省份数据
+    if (isChinaSelected) {
+      loadProvinces(countryId)
+    } else {
+      setProvinces([])
+    }
     setDevelopmentZones([])
   }
 
@@ -338,6 +407,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
 
     try {
       setIsSubmitting(true)
+      // 注意：企业logo自动生成现在在后端处理，无需前端处理
 
       const submitData = {
         name_zh: formData.name_zh.trim(),
@@ -350,7 +420,16 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         subcategory_id: formData.subcategory_id || undefined,
         attachment_urls: formData.attachment_urls.length > 0 ? formData.attachment_urls : undefined,
         attachments: formData.attachments.length > 0 ? formData.attachments : undefined,
-        is_active: formData.is_active
+        is_active: formData.is_active,
+        
+        // 企业关联信息
+        company_id: formData.company_id || undefined,
+        company_name_zh: formData.company_name_zh.trim() || undefined,
+        company_name_en: formData.company_name_en.trim() || undefined,
+        company_logo_url: formData.company_logo_url || undefined,
+        company_country_id: formData.company_country_id || undefined,
+        company_province_id: formData.company_province_id || undefined,
+        company_development_zone_id: formData.company_development_zone_id || undefined
       }
 
       if (technology) {
@@ -380,6 +459,14 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.error || '创建失败')
+        }
+        
+        // 处理成功响应，检查是否创建了新企业
+        const responseData = await response.json()
+        console.log('技术创建响应:', responseData)
+        
+        if (responseData.company_created) {
+          alert(`✅ 技术创建成功！\n🏢 同时已创建新企业："${formData.company_name_zh}"，可在企业管理中查看。`)
         }
       }
 
@@ -581,7 +668,17 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                 <input
                   type="text"
                   value={formData.company_name_zh}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company_name_zh: e.target.value }))}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setFormData(prev => ({ ...prev, company_name_zh: value }))
+                    
+                    // 当企业中文名称改变且没有上传logo时，生成预览logo
+                    if (value && !formData.company_logo_url) {
+                      generateLogoPreview(value)
+                    } else {
+                      setLogoPreview(null)
+                    }
+                  }}
                   placeholder="请输入企业中文名称"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
@@ -606,10 +703,28 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                 </label>
                 <ImageUpload
                   value={formData.company_logo_url}
-                  onChange={(url) => setFormData(prev => ({ ...prev, company_logo_url: url }))}
+                  onChange={(url) => {
+                    setFormData(prev => ({ ...prev, company_logo_url: url }))
+                    // 当用户上传logo时，清除预览
+                    if (url) {
+                      setLogoPreview(null)
+                    }
+                  }}
                   placeholder="上传企业Logo"
                   maxSize={1}
                 />
+                
+                {/* 显示logo预览 */}
+                {!formData.company_logo_url && logoPreview && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-500 mb-1">自动生成预览</div>
+                    <img 
+                      src={logoPreview} 
+                      alt="Logo预览" 
+                      className="w-16 h-16 rounded border border-gray-200"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -640,10 +755,12 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                 <select
                   value={formData.company_province_id}
                   onChange={(e) => handleProvinceChange(e.target.value)}
-                  disabled={!formData.company_country_id}
+                  disabled={!formData.company_country_id || (Array.isArray(countries) && countries.find(c => c.id === formData.company_country_id)?.code !== 'china')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
                 >
-                  <option value="">请选择省份</option>
+                  <option value="">
+                    {Array.isArray(countries) && countries.find(c => c.id === formData.company_country_id)?.code === 'china' ? '请选择省份' : '仅限中国企业选择省份'}
+                  </option>
                   {provinces.map(province => (
                     <option key={province.id} value={province.id}>
                       {province.name_zh}
@@ -659,10 +776,12 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                 <select
                   value={formData.company_development_zone_id}
                   onChange={(e) => setFormData(prev => ({ ...prev, company_development_zone_id: e.target.value }))}
-                  disabled={!formData.company_province_id}
+                  disabled={!formData.company_province_id || (Array.isArray(countries) && countries.find(c => c.id === formData.company_country_id)?.code !== 'china')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
                 >
-                  <option value="">请选择开发区（可选）</option>
+                  <option value="">
+                    {Array.isArray(countries) && countries.find(c => c.id === formData.company_country_id)?.code === 'china' ? '请选择开发区（可选）' : '仅限中国企业选择经开区'}
+                  </option>
                   {developmentZones.map(zone => (
                     <option key={zone.id} value={zone.id}>
                       {zone.name_zh}

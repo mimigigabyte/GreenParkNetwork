@@ -57,8 +57,16 @@ export async function uploadFileToSupabase(
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `上传失败: HTTP ${response.status}`);
+      let errorMessage = `上传失败: HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (parseError) {
+        // 如果响应不是JSON格式，使用响应文本
+        const errorText = await response.text();
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();

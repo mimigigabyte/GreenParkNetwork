@@ -4,16 +4,16 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 // POST - 上传文件到 Supabase Storage
 export async function POST(request: NextRequest) {
-  // 检查管理员权限
-  if (!checkAdminAuth(request)) {
-    return NextResponse.json({ error: '需要管理员权限' }, { status: 401 })
-  }
-
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin client not available' }, { status: 500 })
-  }
-
   try {
+    // 检查管理员权限
+    if (!checkAdminAuth(request)) {
+      return NextResponse.json({ error: '需要管理员权限' }, { status: 401 })
+    }
+
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Supabase admin client not available' }, { status: 500 })
+    }
+
     const formData = await request.formData()
     const file = formData.get('file') as File
     const bucket = formData.get('bucket') as string || 'images'

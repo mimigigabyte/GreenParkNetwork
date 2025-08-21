@@ -18,18 +18,27 @@ import {
  * 获取所有国别
  */
 export async function getCountries(): Promise<AdminCountry[]> {
-  const { data, error } = await supabase
-    .from('admin_countries')
-    .select('*')
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
+  try {
+    const { data, error } = await supabase
+      .from('admin_countries')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
 
-  if (error) {
-    console.error('获取国别失败:', error)
-    throw new Error(`获取国别失败: ${error.message}`)
+    if (error) {
+      console.error('获取国别失败:', error)
+      throw new Error(`获取国别失败: ${error.message}`)
+    }
+
+    // 确保返回的是数组
+    const result = Array.isArray(data) ? data : []
+    console.log('✅ 获取国别数据成功:', result.length, '个国家')
+    return result
+  } catch (error) {
+    console.error('❌ 获取国别数据出错:', error)
+    // 返回空数组而不是抛出错误，防止整个应用崩溃
+    return []
   }
-
-  return data || []
 }
 
 /**

@@ -41,9 +41,14 @@ export function useFilterData() {
 
       setData(prev => ({
         ...prev,
-        categories: categoriesData,
-        countries: countriesData
+        categories: Array.isArray(categoriesData) ? categoriesData : [],
+        countries: Array.isArray(countriesData) ? countriesData : []
       }))
+      
+      console.log('✅ 加载筛选数据成功:', {
+        categories: categoriesData?.length || 0,
+        countries: countriesData?.length || 0
+      })
     } catch (err) {
       console.error('加载筛选数据失败:', err)
       setError('加载筛选数据失败')
@@ -55,14 +60,21 @@ export function useFilterData() {
   const loadProvinces = async (countryId: string) => {
     try {
       const provincesData = await getProvincesByCountryId(countryId)
+      const validProvinces = Array.isArray(provincesData) ? provincesData : []
       setData(prev => ({
         ...prev,
-        provinces: provincesData,
+        provinces: validProvinces,
         developmentZones: [] // 重置经开区
       }))
-      return provincesData
+      console.log('✅ 加载省份数据成功:', validProvinces.length, '个省份')
+      return validProvinces
     } catch (err) {
-      console.error('加载省份数据失败:', err)
+      console.error('❌ 加载省份数据失败:', err)
+      setData(prev => ({
+        ...prev,
+        provinces: [],
+        developmentZones: []
+      }))
       return []
     }
   }
@@ -70,13 +82,19 @@ export function useFilterData() {
   const loadDevelopmentZones = async (provinceId: string) => {
     try {
       const zonesData = await getDevelopmentZonesByProvinceId(provinceId)
+      const validZones = Array.isArray(zonesData) ? zonesData : []
       setData(prev => ({
         ...prev,
-        developmentZones: zonesData
+        developmentZones: validZones
       }))
-      return zonesData
+      console.log('✅ 加载经开区数据成功:', validZones.length, '个经开区')
+      return validZones
     } catch (err) {
-      console.error('加载经开区数据失败:', err)
+      console.error('❌ 加载经开区数据失败:', err)
+      setData(prev => ({
+        ...prev,
+        developmentZones: []
+      }))
       return []
     }
   }
@@ -97,7 +115,7 @@ export function useFilterData() {
 export function transformFilterDataForComponents(data: FilterData) {
   return {
     // 转换产业分类格式
-    mainCategories: data.categories.map(category => ({
+    mainCategories: (data.categories || []).map(category => ({
       id: category.slug,
       name: category.name_zh,
       subCategories: (category.subcategories || []).map(sub => ({
@@ -108,20 +126,20 @@ export function transformFilterDataForComponents(data: FilterData) {
     })),
 
     // 转换国家格式
-    countries: data.countries.map(country => ({
+    countries: (data.countries || []).map(country => ({
       value: country.code,
       label: country.name_zh,
       logo_url: country.logo_url
     })),
 
     // 转换省份格式
-    provinces: data.provinces.map(province => ({
+    provinces: (data.provinces || []).map(province => ({
       value: province.code,
       label: province.name_zh
     })),
 
     // 转换经开区格式
-    developmentZones: data.developmentZones.map(zone => ({
+    developmentZones: (data.developmentZones || []).map(zone => ({
       value: zone.code,
       label: zone.name_zh
     }))

@@ -7,6 +7,7 @@ import { AdminCompany, COMPANY_TYPE_OPTIONS, CompanyType } from '@/lib/types/adm
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { AdminCountry, AdminProvince, AdminDevelopmentZone } from '@/lib/types/admin'
+import { generateCompanyLogo } from '@/lib/logoGenerator'
 
 interface CompanyFormProps {
   company?: AdminCompany | null
@@ -38,6 +39,7 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
   const [developmentZones, setDevelopmentZones] = useState<AdminDevelopmentZone[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
 
   useEffect(() => {
     loadCountries()
@@ -73,18 +75,49 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
     }
   }, [company])
 
+  // 生成logo预览
+  const generateLogoPreview = async (companyName: string) => {
+    if (companyName.length < 2) {
+      setLogoPreview(null)
+      return
+    }
+    
+    try {
+      const logoDataUrl = await generateCompanyLogo({
+        companyName,
+        size: 128, // 预览时使用较小尺寸
+      })
+      setLogoPreview(logoDataUrl)
+      console.log('✅ 管理员企业表单-生成logo预览成功')
+    } catch (error) {
+      console.error('❌ 管理员企业表单-生成logo预览失败:', error)
+      setLogoPreview(null)
+    }
+  }
+
   const loadCountries = async () => {
     try {
       const response = await fetch('/api/admin/countries')
       if (response.ok) {
-        const data = await response.json()
-        // 确保数据是数组格式
-        setCountries(Array.isArray(data) ? data : [])
+        const result = await response.json()
+        console.log('📊 企业表单-国别API返回:', result)
+        
+        // 处理API返回格式 {success: true, data: [...]} 或直接数组
+        const data = result.data || result
+        
+        if (Array.isArray(data)) {
+          setCountries(data)
+          console.log('✅ 企业表单-加载国别成功:', data.length, '个国家')
+        } else {
+          console.error('❌ 企业表单-国别数据不是数组:', data)
+          setCountries([])
+        }
       } else {
+        console.error('❌ 企业表单-国别API请求失败:', response.status)
         setCountries([])
       }
     } catch (error) {
-      console.error('加载国家列表失败:', error)
+      console.error('❌ 企业表单-加载国家列表失败:', error)
       setCountries([])
     }
   }
@@ -207,10 +240,44 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
     try {
       setIsSubmitting(true)
 
+      let logoUrl = formData.logo_url
+      
+      // 如果用户没有上传logo，自动生成一个
+      if (!logoUrl && formData.name_zh) {
+        try {
+          const logoResponse = await fetch('/api/generate-logo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              companyName: formData.name_zh,
+              size: 256
+            }),
+          })
+          
+          if (logoResponse.ok) {
+            const logoData = await logoResponse.json()
+            if (logoData.success && logoData.logoUrl) {
+              logoUrl = logoData.logoUrl
+              console.log('✅ 管理员企业表单-自动生成logo成功:', logoUrl)
+            } else {
+              console.error('❌ 管理员企业表单-logo生成API返回失败:', logoData)
+            }
+          } else {
+            const errorData = await logoResponse.json().catch(() => ({}))
+            console.error('❌ 管理员企业表单-logo生成API请求失败:', logoResponse.status, errorData)
+          }
+        } catch (logoError) {
+          console.error('❌ 管理员企业表单-生成logo失败:', logoError)
+          // 如果生成logo失败，继续提交其他信息
+        }
+      }
+
       const submitData = {
         name_zh: formData.name_zh.trim(),
         name_en: formData.name_en.trim() || undefined,
-        logo_url: formData.logo_url || undefined,
+        logo_url: logoUrl || undefined, // 使用生成的logo URL
         address_zh: formData.address_zh.trim() || undefined,
         address_en: formData.address_en.trim() || undefined,
         company_type: formData.company_type,
@@ -294,10 +361,28 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
                 </label>
                 <ImageUpload
                   value={formData.logo_url}
-                  onChange={(url) => setFormData(prev => ({ ...prev, logo_url: url }))}
+                  onChange={(url) => {
+                    setFormData(prev => ({ ...prev, logo_url: url }))
+                    // 当用户上传了logo，清除预览
+                    if (url) {
+                      setLogoPreview(null)
+                    }
+                  }}
                   placeholder="上传企业Logo"
                   maxSize={2}
                 />
+                
+                {/* 显示logo预览 */}
+                {!formData.logo_url && logoPreview && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-500 mb-1">自动生成预览</div>
+                    <img 
+                      src={logoPreview} 
+                      alt="Logo预览" 
+                      className="w-16 h-16 rounded border border-gray-200"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* 企业名称 */}
@@ -307,10 +392,17 @@ export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) 
                     <LanguageField
                       label={language === 'zh' ? '企业中文名称' : '企业英文名称'}
                       value={language === 'zh' ? formData.name_zh : formData.name_en}
-                      onChange={(value) => setFormData(prev => ({ 
-                        ...prev, 
-                        [language === 'zh' ? 'name_zh' : 'name_en']: value 
-                      }))}
+                      onChange={(value) => {
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          [language === 'zh' ? 'name_zh' : 'name_en']: value 
+                        }))
+                        
+                        // 当企业中文名称改变且没有上传logo时，生成预览logo
+                        if (language === 'zh' && value && typeof value === 'string' && !formData.logo_url) {
+                          generateLogoPreview(value)
+                        }
+                      }}
                       placeholder={language === 'zh' ? '例如：绿色科技有限公司' : 'e.g. Green Technology Co., Ltd.'}
                       required={language === 'zh'}
                       error={language === 'zh' ? errors.name_zh : undefined}

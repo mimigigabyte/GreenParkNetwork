@@ -6,6 +6,62 @@ const supabaseUrl = 'https://qpeanozckghazlzzhrni.supabase.co'
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwZWFub3pja2doYXpsenpocm5pIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDI4NTg1MCwiZXhwIjoyMDY5ODYxODUwfQ.wE2j1kNbMKkQgZSkzLR7z6WFft6v90VfWkSd5SBi2P8'
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+// Logo生成函数
+function generateLogoServer(companyName: string, size: number = 256): Buffer {
+  // 获取企业名称的前四个字符
+  const firstFourChars = getFirstFourChars(companyName);
+  
+  // 计算字符位置 - 严格按照eo.jpg的布局
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const fontSize = Math.floor(size / 3.5); // 更大的字体，参考图片中文字占比很大
+  const spacing = fontSize * 1.3; // 适中的间距，给文字留出呼吸空间
+  
+  // 创建SVG - 严格参考eo.jpg的亮绿色背景和布局
+  const svg = `
+    <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#84c7a3" rx="8" ry="8"/>
+      <text x="${centerX - spacing/2}" y="${centerY - spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[0] || ''}</text>
+      <text x="${centerX + spacing/2}" y="${centerY - spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[1] || ''}</text>
+      <text x="${centerX - spacing/2}" y="${centerY + spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[2] || ''}</text>
+      <text x="${centerX + spacing/2}" y="${centerY + spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[3] || ''}</text>
+    </svg>
+  `;
+  
+  return Buffer.from(svg);
+}
+
+function getFirstFourChars(companyName: string): string[] {
+  // 移除常见的企业后缀
+  const cleanName = companyName
+    .replace(/(有限公司|股份有限公司|有限责任公司|集团|公司|科技|技术)$/g, '')
+    .replace(/\s+/g, ''); // 移除空格
+
+  // 如果清理后的名称长度>=4，取前4个字符
+  if (cleanName.length >= 4) {
+    return cleanName.slice(0, 4).split('');
+  }
+  
+  // 如果清理后的名称不足4个字符，补充原名称的字符
+  const remainingChars = companyName.replace(/\s+/g, '').slice(cleanName.length);
+  const result = cleanName.split('');
+  
+  for (let i = 0; i < remainingChars.length && result.length < 4; i++) {
+    const char = remainingChars[i];
+    // 避免重复添加已有的字符
+    if (!result.includes(char)) {
+      result.push(char);
+    }
+  }
+  
+  // 如果仍然不足4个字符，用第一个字符填充
+  while (result.length < 4 && result.length > 0) {
+    result.push(result[0]);
+  }
+  
+  return result.slice(0, 4);
+}
+
 // GET - 获取所有技术或按条件筛选
 export async function GET(request: NextRequest) {
   try {
@@ -145,6 +201,105 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // 处理企业创建逻辑
+    let finalCompanyId = technologyData.company_id
+    let finalCompanyLogoUrl = technologyData.company_logo_url // 用于技术记录的企业logo URL
+    
+    // 如果没有选择现有企业但提供了企业名称，则创建新企业
+    if (!finalCompanyId && technologyData.company_name_zh) {
+      try {
+        console.log('创建新企业:', technologyData.company_name_zh)
+        
+        // 检查企业名称是否已存在
+        const { data: existingCompany } = await supabase
+          .from('admin_companies')
+          .select('id, logo_url')
+          .eq('name_zh', technologyData.company_name_zh)
+          .single()
+        
+        if (existingCompany) {
+          console.log('企业已存在，使用现有企业ID:', existingCompany.id)
+          finalCompanyId = existingCompany.id
+          finalCompanyLogoUrl = existingCompany.logo_url || technologyData.company_logo_url
+        } else {
+          // 如果没有提供logo但有企业名称，在后端自动生成logo
+          let finalLogoUrl = technologyData.company_logo_url
+          if (!finalLogoUrl && technologyData.company_name_zh) {
+            try {
+              console.log('后端自动生成企业logo:', technologyData.company_name_zh)
+              
+              // 直接调用logo生成逻辑（避免HTTP调用的复杂性）
+              const logoBuffer = generateLogoServer(technologyData.company_name_zh, 256)
+              
+              // 生成文件名
+              const timestamp = Date.now()
+              const fileName = `company-logos/generated-${timestamp}.svg`
+              
+              // 上传到Supabase Storage
+              const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(fileName, logoBuffer, {
+                  contentType: 'image/svg+xml',
+                  upsert: false
+                })
+              
+              if (!uploadError && uploadData) {
+                // 获取公开URL
+                const { data: urlData } = supabase.storage
+                  .from('images')
+                  .getPublicUrl(fileName)
+                
+                finalLogoUrl = urlData.publicUrl
+                console.log('✅ 后端自动生成企业logo成功:', finalLogoUrl)
+              } else {
+                console.error('❌ 后端logo上传失败:', uploadError)
+              }
+            } catch (logoError) {
+              console.error('❌ 后端生成企业logo失败:', logoError)
+            }
+          }
+          
+          // 创建新企业记录
+          const companyInsertData = {
+            name_zh: technologyData.company_name_zh,
+            name_en: technologyData.company_name_en || null,
+            logo_url: finalLogoUrl || null,
+            country_id: technologyData.company_country_id || null,
+            province_id: technologyData.company_province_id || null,
+            development_zone_id: technologyData.company_development_zone_id || null,
+            company_type: 'private_company', // 默认为私营企业
+            is_active: true
+          }
+          
+          // 过滤掉空值
+          const filteredCompanyData = Object.fromEntries(
+            Object.entries(companyInsertData).filter(([, value]) => value !== null && value !== undefined && value !== '')
+          )
+          
+          console.log('准备创建企业数据:', filteredCompanyData)
+          
+          const { data: newCompany, error: companyError } = await supabase
+            .from('admin_companies')
+            .insert(filteredCompanyData)
+            .select()
+            .single()
+          
+          if (companyError) {
+            console.error('创建企业失败:', companyError)
+            throw new Error(`创建企业失败: ${companyError.message}`)
+          }
+          
+          finalCompanyId = newCompany.id
+          finalCompanyLogoUrl = finalLogoUrl // 使用生成的logo URL
+          console.log('新企业创建成功，ID:', finalCompanyId, 'Logo URL:', finalCompanyLogoUrl)
+        }
+      } catch (error) {
+        console.error('处理企业信息时出错:', error)
+        // 如果企业创建失败，不影响技术创建，但记录错误
+        console.warn('企业创建失败，技术将不关联企业')
+      }
+    }
+    
     // 准备要插入数据库的数据，只包含数据库表中存在的字段
     const insertData = {
       name_zh: technologyData.name_zh,
@@ -160,10 +315,10 @@ export async function POST(request: NextRequest) {
       is_active: technologyData.is_active,
       
       // 企业关联字段
-      company_id: technologyData.company_id,
+      company_id: finalCompanyId || technologyData.company_id, // 使用新创建的企业ID或原有ID
       company_name_zh: technologyData.company_name_zh,
       company_name_en: technologyData.company_name_en,
-      company_logo_url: technologyData.company_logo_url,
+      company_logo_url: finalCompanyLogoUrl, // 使用正确的企业logo URL
       company_country_id: technologyData.company_country_id,
       company_province_id: technologyData.company_province_id,
       company_development_zone_id: technologyData.company_development_zone_id,
@@ -191,7 +346,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data, { status: 201 })
+    // 构建响应数据，包含企业创建信息
+    const responseData = {
+      ...data,
+      // 添加企业创建信息
+      company_created: finalCompanyId && finalCompanyId !== technologyData.company_id,
+      company_id_used: finalCompanyId
+    }
+
+    console.log('技术创建成功:', responseData)
+    return NextResponse.json(responseData, { status: 201 })
   } catch (error) {
     console.error('API错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

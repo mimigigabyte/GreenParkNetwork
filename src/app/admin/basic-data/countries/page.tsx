@@ -29,11 +29,21 @@ export default function CountriesPage() {
         throw new Error('获取国家数据失败')
       }
       
-      const data = await response.json()
+      const result = await response.json()
+      console.log('📊 国别API返回的数据:', result)
+      
+      // 处理API返回格式 {success: true, data: [...]} 或直接数组
+      const data = result.data || result
+      
+      if (!Array.isArray(data)) {
+        console.error('❌ 国别数据不是数组格式:', data)
+        throw new Error('国别数据格式错误')
+      }
+      
       // 过滤掉中国，国别管理只管理其他国家
       const filteredData = data.filter((country: AdminCountry) => country.code !== 'china')
       setCountries(filteredData)
-      console.log('✅ 从数据库加载国家数据成功')
+      console.log('✅ 从数据库加载国家数据成功:', filteredData.length, '个国家')
       
     } catch (error) {
       console.error('加载国家数据失败:', error)

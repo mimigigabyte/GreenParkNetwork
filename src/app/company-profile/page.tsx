@@ -73,7 +73,12 @@ export default function CompanyProfilePage() {
     countries, 
     provinces, 
     developmentZones 
-  } = transformFilterDataForComponents(filterData);
+  } = transformFilterDataForComponents(filterData || {
+    categories: [],
+    countries: [],
+    provinces: [],
+    developmentZones: []
+  });
 
   // 处理企业选择的回调
   const handleCompanySelect = (company: CompanySearchResult) => {
@@ -117,9 +122,9 @@ export default function CompanyProfilePage() {
     }
 
     if (field === 'country') {
-      const selectedCountry = countries.find(c => c.value === value);
+      const selectedCountry = (countries || []).find(c => c.value === value);
       if (selectedCountry && selectedCountry.value === 'china') {
-        const chinaCountry = filterData.countries.find(c => c.code === 'china');
+        const chinaCountry = (filterData?.countries || []).find(c => c.code === 'china');
         if (chinaCountry) {
           loadProvinces(chinaCountry.id);
         }
@@ -130,7 +135,7 @@ export default function CompanyProfilePage() {
     }
 
     if (field === 'province') {
-      const selectedProvince = filterData.provinces.find(p => p.code === value);
+      const selectedProvince = (filterData?.provinces || []).find(p => p.code === value);
       if (selectedProvince) {
         loadDevelopmentZones(selectedProvince.id);
       } else {
