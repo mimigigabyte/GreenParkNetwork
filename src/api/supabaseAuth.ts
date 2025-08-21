@@ -730,6 +730,95 @@ export const supabaseAuthApi = {
   },
 
   /**
+   * 修改密码
+   */
+  async updatePassword(currentPassword: string, newPassword: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      // 输入验证
+      if (!currentPassword || !newPassword) {
+        return {
+          success: false,
+          error: '当前密码和新密码不能为空'
+        }
+      }
+
+      if (newPassword.length < 6) {
+        return {
+          success: false,
+          error: '新密码长度不能少于6位'
+        }
+      }
+
+      if (currentPassword === newPassword) {
+        return {
+          success: false,
+          error: '新密码不能与当前密码相同'
+        }
+      }
+
+      // 获取当前用户
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      if (userError || !user) {
+        return {
+          success: false,
+          error: '用户未登录或会话已过期'
+        }
+      }
+
+      // 验证当前密码
+      let verifyResult
+      if (user.email) {
+        // 通过邮箱验证当前密码
+        verifyResult = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword
+        })
+      } else if (user.phone) {
+        // 通过手机号验证当前密码
+        verifyResult = await supabase.auth.signInWithPassword({
+          phone: user.phone,
+          password: currentPassword
+        })
+      } else {
+        return {
+          success: false,
+          error: '无法验证当前密码：用户信息不完整'
+        }
+      }
+
+      if (verifyResult.error) {
+        return {
+          success: false,
+          error: '当前密码验证失败，请检查密码是否正确'
+        }
+      }
+
+      // 修改密码
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (updateError) {
+        return {
+          success: false,
+          error: updateError.message || '密码修改失败'
+        }
+      }
+
+      return {
+        success: true,
+        data: { message: '密码修改成功' }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '密码修改失败'
+      }
+    }
+  },
+
+  /**
    * 监听认证状态变化
    */
   onAuthStateChange(callback: (user: User | null, session: unknown) => void) {
