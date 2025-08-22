@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { RegisterForm } from './register-form';
 import { VerificationLoginForm } from './verification-login-form';
 import { ResetPasswordModal } from './reset-password-modal';
+import { TurnstileWidget } from './turnstile-widget';
 import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
 
@@ -32,6 +33,11 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
   });
   const [loginLoading, setLoginLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(initialAction === 'reset-password');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
+
+  // 获取Turnstile站点密钥
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   // 监听用户登录状态，登录成功后自动关闭模态框
   useEffect(() => {
@@ -54,6 +60,14 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
     if (!loginData.account || !loginData.password) {
       alert('请填写完整的登录信息');
       return;
+    }
+
+    // 检查人机验证（管理员账号除外）
+    if (!(loginData.account === 'admin' && loginData.password === 'Ecocenter2025')) {
+      if (!turnstileToken) {
+        alert('请完成人机验证');
+        return;
+      }
     }
 
     setLoginLoading(true);
@@ -90,7 +104,8 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
           const customResult = await customAuthApi.phoneLogin({
             phone: loginData.account,
             password: loginData.password,
-            countryCode: '+86' // 默认+86，后续可以改为用户选择
+            countryCode: '+86', // 默认+86，后续可以改为用户选择
+            turnstileToken // 添加人机验证token
           });
 
           if (customResult.success && customResult.data) {
@@ -112,7 +127,8 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
         const result = await authApi.passwordLogin({
           account: loginData.account,
           password: loginData.password,
-          type: accountType
+          type: accountType,
+          turnstileToken // 添加人机验证token
         });
 
         if (result.success && 'data' in result && result.data) {
@@ -236,12 +252,39 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                      </button>
                    </div>
 
+                  {/* Turnstile 人机验证 */}
+                  {turnstileSiteKey && (
+                    <div className="space-y-2">
+                      <TurnstileWidget
+                        siteKey={turnstileSiteKey}
+                        onSuccess={(token) => {
+                          setTurnstileToken(token);
+                          setTurnstileError(null);
+                        }}
+                        onError={(error) => {
+                          setTurnstileToken(null);
+                          setTurnstileError('人机验证失败，请重试');
+                        }}
+                        onExpired={() => {
+                          setTurnstileToken(null);
+                          setTurnstileError('验证已过期，请重新验证');
+                        }}
+                        theme="auto"
+                        size="normal"
+                        className="mb-4"
+                      />
+                      {turnstileError && (
+                        <p className="text-sm text-red-600">{turnstileError}</p>
+                      )}
+                    </div>
+                  )}
+
                                                         {/* 登录按钮 */}
                    <button
                      type="submit"
-                     disabled={!agreeToPrivacy || loginLoading}
+                     disabled={!agreeToPrivacy || loginLoading || (turnstileSiteKey && !turnstileToken)}
                      className={`w-full py-3 px-6 rounded-lg font-medium text-base transition-colors ${
-                       agreeToPrivacy && !loginLoading
+                       agreeToPrivacy && !loginLoading && (!turnstileSiteKey || turnstileToken)
                          ? 'bg-[#00b899] text-white hover:bg-[#009a7a] cursor-pointer'
                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                      }`}

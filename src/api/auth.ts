@@ -29,12 +29,14 @@ export interface PasswordLoginRequest {
   account: string // 手机号或邮箱
   password: string
   type: 'email' | 'phone' // 指定账号类型
+  turnstileToken?: string // Turnstile人机验证token
 }
 
 export interface PhoneCodeLoginRequest {
   phone: string
   code: string
   countryCode?: string
+  turnstileToken?: string // Turnstile人机验证token
 }
 
 // 注册相关接口

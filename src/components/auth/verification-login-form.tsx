@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
 import { useAuthContext } from './auth-provider';
+import { TurnstileWidget } from './turnstile-widget';
 
 interface VerificationLoginFormProps {
   onSwitchToLogin: () => void;
@@ -20,6 +21,11 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [agreeToPrivacy, setAgreeToPrivacy] = useState(true);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
+
+  // 获取Turnstile站点密钥
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const handleGetCode = async () => {
     if (!phoneNumber) {
@@ -74,6 +80,12 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
       return;
     }
     
+    // 检查人机验证
+    if (!turnstileToken) {
+      alert('请完成人机验证');
+      return;
+    }
+    
     try {
       console.log('📱 尝试验证码登录:', { phone: phoneNumber, countryCode });
       
@@ -81,7 +93,8 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
       const customResult = await customAuthApi.phoneCodeLogin({
         phone: phoneNumber,
         code: verificationCode,
-        countryCode
+        countryCode,
+        turnstileToken // 添加人机验证token
       });
 
       if (customResult.success && customResult.data) {
@@ -98,7 +111,8 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
       const result = await authApi.phoneCodeLogin({
         phone: phoneNumber,
         code: verificationCode,
-        countryCode
+        countryCode,
+        turnstileToken // 添加人机验证token
       });
 
       if (result.success && 'data' in result && result.data) {
@@ -203,12 +217,39 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
            </button>
          </div>
 
+         {/* Turnstile 人机验证 */}
+         {turnstileSiteKey && (
+           <div className="space-y-2">
+             <TurnstileWidget
+               siteKey={turnstileSiteKey}
+               onSuccess={(token) => {
+                 setTurnstileToken(token);
+                 setTurnstileError(null);
+               }}
+               onError={(error) => {
+                 setTurnstileToken(null);
+                 setTurnstileError('人机验证失败，请重试');
+               }}
+               onExpired={() => {
+                 setTurnstileToken(null);
+                 setTurnstileError('验证已过期，请重新验证');
+               }}
+               theme="auto"
+               size="normal"
+               className="mb-4"
+             />
+             {turnstileError && (
+               <p className="text-sm text-red-600">{turnstileError}</p>
+             )}
+           </div>
+         )}
+
                   {/* 登录按钮 */}
           <button
             type="submit"
-            disabled={!agreeToPrivacy}
+            disabled={!agreeToPrivacy || (turnstileSiteKey && !turnstileToken)}
             className={`w-full py-3 px-6 rounded-lg font-medium text-base transition-colors ${
-              agreeToPrivacy
+              agreeToPrivacy && (!turnstileSiteKey || turnstileToken)
                 ? 'bg-[#00b899] text-white hover:bg-[#009a7a] cursor-pointer'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}

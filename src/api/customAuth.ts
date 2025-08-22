@@ -27,6 +27,7 @@ export interface CustomPhoneLoginRequest {
   phone: string
   password: string
   countryCode?: string
+  turnstileToken?: string
 }
 
 // 验证码登录请求接口
@@ -34,6 +35,7 @@ export interface CustomPhoneCodeLoginRequest {
   phone: string
   code: string
   countryCode?: string
+  turnstileToken?: string
 }
 
 /**
@@ -98,7 +100,8 @@ export const customAuthApi = {
         body: JSON.stringify({
           mobile: data.phone,
           password: data.password,
-          countryCode: data.countryCode
+          countryCode: data.countryCode,
+          turnstileToken: data.turnstileToken
         })
       })
 
@@ -137,7 +140,8 @@ export const customAuthApi = {
         body: JSON.stringify({
           mobile: data.phone,
           code: data.code,
-          countryCode: data.countryCode
+          countryCode: data.countryCode,
+          turnstileToken: data.turnstileToken
         })
       })
 

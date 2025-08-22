@@ -7,6 +7,7 @@ import {
   type CustomUser,
   type CustomAuthResult 
 } from '@/lib/custom-auth'
+import { verifyTurnstileToken, extractIpAddress } from '@/lib/turnstile-verification'
 
 // 创建Supabase客户端用于数据库操作
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -17,14 +18,36 @@ interface CustomPhoneCodeLoginRequest {
   mobile: string
   code: string
   countryCode?: string
+  turnstileToken?: string
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: CustomPhoneCodeLoginRequest = await request.json()
-    const { mobile, code, countryCode = '+86' } = body
+    const { mobile, code, countryCode = '+86', turnstileToken } = body
 
     console.log('📱 自定义手机验证码登录请求:', { mobile, countryCode })
+
+    // Turnstile人机验证（如果配置了）
+    if (process.env.TURNSTILE_SECRET_KEY && turnstileToken) {
+      console.log('🛡️ 开始Turnstile验证...')
+      const clientIp = extractIpAddress(request)
+      const turnstileResult = await verifyTurnstileToken(turnstileToken, clientIp)
+      
+      if (!turnstileResult.success) {
+        console.log('❌ Turnstile验证失败:', turnstileResult.error)
+        return NextResponse.json({
+          success: false,
+          error: turnstileResult.error || '人机验证失败，请重试'
+        }, { status: 400 })
+      }
+      console.log('✅ Turnstile验证成功')
+    } else if (process.env.TURNSTILE_SECRET_KEY && !turnstileToken) {
+      return NextResponse.json({
+        success: false,
+        error: '缺少人机验证信息'
+      }, { status: 400 })
+    }
 
     // 参数验证
     if (!mobile || !code) {
