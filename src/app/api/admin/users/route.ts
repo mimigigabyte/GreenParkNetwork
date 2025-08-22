@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, supabaseAdmin } from '@/lib/supabase';
 
+// 强制动态渲染，避免缓存
+export const dynamic = 'force-dynamic';
+
 // 获取用户列表 (GET /api/admin/users)
 export async function GET(request: NextRequest) {
   try {
