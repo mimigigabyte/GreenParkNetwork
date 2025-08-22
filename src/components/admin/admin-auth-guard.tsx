@@ -72,8 +72,10 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
         localStorage.setItem('admin_auth_time', currentTime);
         
         // 设置cookie用于API请求验证
-        document.cookie = `admin_authenticated=true; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
-        document.cookie = `admin_auth_time=${currentTime}; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
+        const isSecure = window.location.protocol === 'https:';
+        const cookieOptions = `path=/; max-age=${8 * 60 * 60}; SameSite=strict${isSecure ? '; Secure' : ''}`;
+        document.cookie = `admin_authenticated=true; ${cookieOptions}`;
+        document.cookie = `admin_auth_time=${currentTime}; ${cookieOptions}`;
         
         setIsAuthenticated(true);
         setShowLoginForm(false);
@@ -94,8 +96,10 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
     localStorage.removeItem('admin_auth_time');
     
     // 清除cookie
-    document.cookie = 'admin_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'admin_auth_time=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    const isSecure = window.location.protocol === 'https:';
+    const clearCookieOptions = `path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=strict${isSecure ? '; Secure' : ''}`;
+    document.cookie = `admin_authenticated=; ${clearCookieOptions}`;
+    document.cookie = `admin_auth_time=; ${clearCookieOptions}`;
     
     router.push('/');
   };
