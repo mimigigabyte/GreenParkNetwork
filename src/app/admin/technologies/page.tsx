@@ -427,11 +427,13 @@ export default function TechnologiesPage() {
             <img 
               src={record.company_logo_url}
               alt={record.company_name_zh || '企业logo'}
-              className="w-8 h-8 object-cover rounded border border-gray-200"
+              className="w-12 h-12 object-cover rounded border border-gray-200"
             />
           ) : (
-            <div className="w-8 h-8 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
-              <div className="w-4 h-4 bg-gray-300 rounded"></div>
+            <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+              <span className="text-gray-600 text-sm font-medium">
+                {record.company_name_zh?.slice(0, 4) || '企业'}
+              </span>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -941,7 +943,7 @@ export default function TechnologiesPage() {
                           <img 
                             src={viewingTechnology.company_logo_url}
                             alt="企业logo"
-                            className="w-8 h-8 object-cover rounded"
+                            className="w-12 h-12 object-cover rounded"
                           />
                         )}
                         <div>

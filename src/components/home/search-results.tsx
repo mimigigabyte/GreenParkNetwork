@@ -285,7 +285,7 @@ export function SearchResults({
                     <img
                       src={product.companyLogoUrl}
                       alt={product.companyName}
-                      className="h-8 w-auto object-contain"
+                      className="h-12 w-auto object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         // 如果logo加载失败，使用默认占位符
@@ -293,9 +293,9 @@ export function SearchResults({
                       }}
                     />
                   ) : (
-                    <div className="h-8 w-8 bg-gray-200 rounded flex items-center justify-center">
-                      <span className="text-gray-500 text-xs">
-                        {product.companyName?.[0] || '企'}
+                    <div className="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">
+                        {product.companyName?.slice(0, 4) || '企业'}
                       </span>
                     </div>
                   )}
