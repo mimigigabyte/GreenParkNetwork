@@ -3,11 +3,18 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { authApi } from '@/api/auth';
+import { customAuthApi } from '@/api/customAuth';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@/types';
+import type { CustomUser } from '@/lib/custom-auth';
+
+// 统一用户接口
+interface UnifiedUser extends User {
+  authType?: 'supabase' | 'custom'
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UnifiedUser | null>(null);
   const [loading, setLoading] = useState(true);
   const isCheckingUser = useRef(false);
 
@@ -19,46 +26,90 @@ export function useAuth() {
     isCheckingUser.current = true;
 
     try {
-      // 首先检查 Supabase 会话
+      console.log('🔍 检查用户认证状态...')
+
+      // 1. 优先检查自定义认证
+      const customToken = localStorage.getItem('custom_auth_token');
+      if (customToken) {
+        console.log('🔍 发现自定义认证Token，验证中...')
+        try {
+          const customResponse = await customAuthApi.getCurrentUser();
+          if (customResponse.success && customResponse.data) {
+            console.log('✅ 自定义认证验证成功')
+            const customUser = customResponse.data;
+            const mappedUser: UnifiedUser = {
+              id: customUser.id,
+              email: customUser.email,
+              phone: customUser.phone,
+              name: customUser.name || '用户',
+              avatar_url: customUser.avatarUrl,
+              company_name: customUser.userMetadata?.company_name,
+              authType: 'custom'
+            };
+            setUser(mappedUser);
+            setLoading(false);
+            return;
+          } else {
+            console.log('❌ 自定义认证验证失败，清理Token')
+            customAuthApi.logout();
+          }
+        } catch (customError) {
+          console.error('❌ 自定义认证验证异常:', customError);
+          customAuthApi.logout();
+        }
+      }
+
+      // 2. 检查 Supabase 会话
+      console.log('🔍 检查Supabase认证...')
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (session?.user && !error) {
-        const mappedUser: User = {
+        console.log('✅ Supabase认证验证成功')
+        const mappedUser: UnifiedUser = {
           id: session.user.id,
           email: session.user.email,
           phone: session.user.phone,
           name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
           avatar_url: session.user.user_metadata?.avatar_url,
           company_name: session.user.user_metadata?.company_name,
+          authType: 'supabase'
         };
         setUser(mappedUser);
         setLoading(false);
         return;
       }
 
-      // 如果没有 Supabase 会话，检查传统的 token
+      // 3. 检查传统的 token（兼容性）
+      console.log('🔍 检查传统认证Token...')
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
           const response = await authApi.getCurrentUser();
           if (response.success && 'data' in response && response.data) {
-            setUser(response.data);
+            console.log('✅ 传统认证验证成功')
+            const mappedUser: UnifiedUser = {
+              ...response.data,
+              authType: 'supabase'
+            };
+            setUser(mappedUser);
+            setLoading(false);
+            return;
           } else {
+            console.log('❌ 传统认证验证失败，清理Token')
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            setUser(null);
           }
         } catch (error) {
-          console.error('Authentication error:', error);
+          console.error('❌ 传统认证验证异常:', error);
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          setUser(null);
         }
-      } else {
-        setUser(null);
       }
+
+      console.log('❌ 所有认证方式都失败，用户未登录')
+      setUser(null);
     } catch (error) {
-      console.error('检查 Supabase 会话失败:', error);
+      console.error('❌ 检查用户认证失败:', error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -75,56 +126,96 @@ export function useAuth() {
         switch (event) {
           case 'SIGNED_IN':
             if (session?.user) {
-              const mappedUser: User = {
-                id: session.user.id,
-                email: session.user.email,
-                phone: session.user.phone,
-                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                avatar_url: session.user.user_metadata?.avatar_url,
-                company_name: session.user.user_metadata?.company_name,
-              };
-              setUser(mappedUser);
-              setLoading(false);
+              // 只有在没有自定义认证时才使用Supabase认证
+              const customToken = localStorage.getItem('custom_auth_token');
+              if (!customToken) {
+                const mappedUser: UnifiedUser = {
+                  id: session.user.id,
+                  email: session.user.email,
+                  phone: session.user.phone,
+                  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                  avatar_url: session.user.user_metadata?.avatar_url,
+                  company_name: session.user.user_metadata?.company_name,
+                  authType: 'supabase'
+                };
+                setUser(mappedUser);
+                setLoading(false);
+              }
             }
             break;
 
           case 'SIGNED_OUT':
-            setUser(null);
-            setLoading(false);
+            // 只有在没有自定义认证时才清空用户
+            const customToken = localStorage.getItem('custom_auth_token');
+            if (!customToken) {
+              setUser(null);
+              setLoading(false);
+            }
             break;
 
           case 'TOKEN_REFRESHED':
             if (session?.user) {
-              const mappedUser: User = {
-                id: session.user.id,
-                email: session.user.email,
-                phone: session.user.phone,
-                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                avatar_url: session.user.user_metadata?.avatar_url,
-                company_name: session.user.user_metadata?.company_name,
-              };
-              setUser(mappedUser);
+              // 只有在没有自定义认证时才更新Supabase用户
+              const customToken = localStorage.getItem('custom_auth_token');
+              if (!customToken) {
+                const mappedUser: UnifiedUser = {
+                  id: session.user.id,
+                  email: session.user.email,
+                  phone: session.user.phone,
+                  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                  avatar_url: session.user.user_metadata?.avatar_url,
+                  company_name: session.user.user_metadata?.company_name,
+                  authType: 'supabase'
+                };
+                setUser(mappedUser);
+              }
             }
             break;
         }
       }
     );
 
+    // 监听自定义认证状态变化
+    const customAuthUnsubscribe = customAuthApi.onAuthStateChange((customUser) => {
+      if (customUser) {
+        const mappedUser: UnifiedUser = {
+          id: customUser.id,
+          email: customUser.email,
+          phone: customUser.phone,
+          name: customUser.name || '用户',
+          avatar_url: customUser.avatarUrl,
+          company_name: customUser.userMetadata?.company_name,
+          authType: 'custom'
+        };
+        setUser(mappedUser);
+      } else {
+        // 自定义认证登出，检查是否有Supabase认证
+        checkUser();
+      }
+    });
+
     return () => {
       subscription?.unsubscribe();
+      customAuthUnsubscribe();
     };
   }, [checkUser]);
 
   const logout = useCallback(async () => {
     try {
-      // 首先尝试 Supabase 登出
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Supabase logout failed:', error);
+      console.log('🚪 执行登出操作...')
+      
+      // 根据当前用户的认证类型执行相应的登出
+      if (user?.authType === 'custom') {
+        console.log('🚪 自定义认证登出')
+        customAuthApi.logout();
+      } else {
+        console.log('🚪 Supabase认证登出')
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('Supabase logout failed:', error);
+        }
       }
       
-      // 调用API端点注销（如果有的话）
-      // await authApi.logout(); 
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
@@ -132,10 +223,13 @@ export function useAuth() {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('company_name');
+      customAuthApi.logout(); // 确保自定义认证也被清理
+      
       // 清理用户状态
       setUser(null);
+      console.log('✅ 登出完成')
     }
-  }, []);
+  }, [user?.authType]);
 
   return { user, loading, logout, checkUser };
 }

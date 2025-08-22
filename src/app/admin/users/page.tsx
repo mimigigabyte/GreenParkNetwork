@@ -95,6 +95,31 @@ export default function UsersPage() {
       ),
     },
     {
+      key: 'name',
+      title: '用户名',
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (
+        <div className="flex items-center">
+          <Users className="w-4 h-4 mr-2 text-gray-400" />
+          {(record as any).name || '未知'}
+        </div>
+      ),
+    },
+    {
+      key: 'auth_type',
+      title: '认证类型',
+      render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (
+        <div>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            (record as any).auth_type === 'custom' 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-blue-100 text-blue-800'
+          }`}>
+            {(record as any).auth_type === 'custom' ? '自定义认证' : 'Supabase'}
+          </span>
+        </div>
+      ),
+    },
+    {
       key: 'company',
       title: '所属企业',
       render: (value: string | Pick<import('@/lib/types/admin').AdminCompany, 'id' | 'name_zh'> | undefined, record: AdminUser, index: number) => (

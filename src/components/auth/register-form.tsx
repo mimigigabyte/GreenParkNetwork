@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/api/auth';
+import { customAuthApi } from '@/api/customAuth';
 import { emailVerificationApi } from '@/api/emailVerification';
 import { useAuthContext } from './auth-provider';
-import { supabase } from '@/lib/supabase';
+import { CountryCodeSelector } from '@/components/ui/country-code-selector';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -25,6 +26,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     password: '',
     confirmPassword: ''
   });
+  const [countryCode, setCountryCode] = useState('+86');
   const [loading, setLoading] = useState(false);
   const [codeLoading, setCodeLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -52,7 +54,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         // 使用原有的手机验证码API
         result = await authApi.sendPhoneCode({
           phone: formData.phone,
-          purpose: 'register'
+          purpose: 'register',
+          countryCode
         });
       } else {
         // 使用新的邮件验证码API
@@ -74,7 +77,9 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         }, 1000);
         
         // 开发模式下显示验证码
-        if ('devOTP' in result.data && result.data.devOTP) {
+        if ('debugCode' in result.data && result.data.debugCode) {
+          alert(`验证码已发送！开发模式验证码：${result.data.debugCode}`);
+        } else if ('devOTP' in result.data && result.data.devOTP) {
           alert(`验证码已发送！开发模式验证码：${result.data.devOTP}`);
         } else {
           alert(result.data.message || '验证码已发送');
@@ -125,11 +130,14 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       let result;
       
       if (isPhoneRegister) {
-        // 使用原有的手机注册API
-        result = await authApi.phoneRegister({
+        // 使用自定义手机注册API
+        console.log('📱 使用自定义手机注册API')
+        result = await customAuthApi.phoneRegister({
           phone: formData.phone,
           phoneCode: formData.verificationCode,
-          password: formData.password
+          password: formData.password,
+          name: undefined,
+          countryCode
         });
       } else {
         // 使用新的邮件验证码注册API
@@ -141,43 +149,20 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       }
 
       if (result.success && 'data' in result && result.data) {
-        try {
-          // 用户创建成功，现在使用客户端登录以建立正确的会话
-          // 确保参数有效
-          if (!formData.email || !formData.password) {
-            alert('注册成功，但登录信息不完整，请手动登录');
-            return;
-          }
-          
-          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-            email: formData.email.trim(),
-            password: formData.password
-          });
-          
-          if (loginError) {
-            console.error('自动登录失败:', loginError);
-            alert('注册成功，但自动登录失败，请手动登录');
-            return;
-          }
+        console.log('✅ 注册成功!')
+        console.log('🔍 注册成功，token已保存:', !!result.data.token)
+        
+        // 更新认证状态
+        console.log('🔄 更新认证状态...')
+        await checkUser();
+        console.log('✅ 认证状态更新完成')
 
-          // 保存token（虽然Supabase会自动处理，但保持兼容性）
-          if (loginData.session) {
-            localStorage.setItem('access_token', loginData.session.access_token);
-            localStorage.setItem('refresh_token', loginData.session.refresh_token);
-          }
-
-          // 更新认证状态
-          await checkUser();
-
-          console.log('注册并登录成功，跳转到企业信息完善页面');
-          alert('注册成功！');
-          
-          // 跳转到企业信息完善页面
+        alert('注册成功！');
+        
+        // 稍等一下确保状态更新完成后再跳转
+        setTimeout(() => {
           router.push('/company-profile');
-        } catch (loginError) {
-          console.error('登录过程出错:', loginError);
-          alert('注册成功，但登录失败，请手动登录');
-        }
+        }, 100);
       } else {
         const errorMessage = 'error' in result ? result.error : '注册失败，请稍后重试';
         alert(errorMessage);
@@ -220,21 +205,40 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
                  {/* 邮箱地址/手机号码输入 */}
          <div className="space-y-2">
-           <div className="relative">
-             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isPhoneRegister ? "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" : "M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"} />
-               </svg>
+           {isPhoneRegister ? (
+             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+               {/* 国家代码选择 */}
+               <CountryCodeSelector
+                 value={countryCode}
+                 onChange={setCountryCode}
+               />
+               {/* 手机号码输入 */}
+               <input
+                 type="tel"
+                 placeholder="手机号码"
+                 value={formData.phone}
+                 onChange={(e) => handleInputChange('phone', e.target.value)}
+                 className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#00b899]"
+                 required
+               />
              </div>
-             <input
-               type={isPhoneRegister ? "tel" : "email"}
-               placeholder={isPhoneRegister ? "手机号码" : "邮箱地址"}
-               value={isPhoneRegister ? formData.phone : formData.email}
-               onChange={(e) => handleInputChange(isPhoneRegister ? 'phone' : 'email', e.target.value)}
-               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
-               required
-             />
-           </div>
+           ) : (
+             <div className="relative">
+               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                 </svg>
+               </div>
+               <input
+                 type="email"
+                 placeholder="邮箱地址"
+                 value={formData.email}
+                 onChange={(e) => handleInputChange('email', e.target.value)}
+                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
+                 required
+               />
+             </div>
+           )}
          </div>
 
                  {/* 验证码输入 */}

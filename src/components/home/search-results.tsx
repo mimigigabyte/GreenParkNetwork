@@ -151,7 +151,7 @@ export function SearchResults({
   // 处理联系我们按钮点击
   const handleContactUs = (product: TechProduct) => {
     if (!user) {
-      alert('请先登录后再联系我们');
+      alert('必须注册登录才能联系技术提供方');
       return;
     }
 
@@ -389,9 +389,8 @@ export function SearchResults({
                      <div className="flex justify-end">
                        <button 
                          onClick={() => handleContactUs(product)}
-                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                         disabled={!user}
-                         title={!user ? "请先登录后再联系我们" : "联系我们"}
+                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                         title={!user ? "必须注册登录才能联系技术提供方" : "联系我们"}
                        >
                          <Mail className="w-4 h-4 mr-2" />
                          联系我们

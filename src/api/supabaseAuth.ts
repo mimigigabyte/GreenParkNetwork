@@ -134,7 +134,7 @@ export const supabaseAuthApi = {
       let authData: any, error: any
       
       if (data.type === 'phone') {
-        // 手机号登录，确保包含国家代码
+        // 手机号登录，确保包含国家代码（与注册时格式保持一致）
         const phoneWithCountryCode = cleanAccount.startsWith('+') 
           ? cleanAccount 
           : `+86${cleanAccount}`

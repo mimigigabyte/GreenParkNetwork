@@ -17,10 +17,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const search = searchParams.get('search') || '';
 
-    // 使用 Supabase Auth Admin API 获取用户列表
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-    
+    // 1. 获取 Supabase Auth 用户列表
     const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
       page: page,
       perPage: pageSize,
@@ -34,19 +31,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let users = authUsers.users || [];
+    let supabaseUsers = authUsers.users || [];
 
-    // 如果有搜索条件，过滤用户
+    // 2. 获取自定义认证用户列表
+    const { data: customUsers, error: customError } = await supabase
+      .from('custom_users')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (customError) {
+      console.error('获取自定义用户列表失败:', customError);
+    }
+
+    const customUsersList = customUsers || [];
+
+    // 如果有搜索条件，过滤 Supabase 用户
     if (search) {
-      users = users.filter(user => 
+      supabaseUsers = supabaseUsers.filter(user => 
         user.email?.toLowerCase().includes(search.toLowerCase()) ||
         user.phone?.includes(search)
       );
     }
 
-    // 获取每个用户关联的企业信息
-    const usersWithCompany = await Promise.all(
-      users.map(async (user) => {
+    // 处理 Supabase 用户，获取关联的企业信息
+    const supabaseUsersWithCompany = await Promise.all(
+      supabaseUsers.map(async (user) => {
         // 查询用户关联的企业
         const { data: company } = await supabaseAdmin!
           .from('admin_companies')
@@ -59,6 +68,8 @@ export async function GET(request: NextRequest) {
           id: user.id,
           email: user.email,
           phone_number: user.phone,
+          name: user.user_metadata?.name || user.email?.split('@')[0] || 'Unknown',
+          auth_type: 'supabase',
           company_id: company?.id || null,
           company: company ? {
             id: company.id,
@@ -66,27 +77,62 @@ export async function GET(request: NextRequest) {
             name_en: company.name_en
           } : null,
           created_at: user.created_at,
+          last_login_at: user.last_sign_in_at,
           email_confirmed: !!user.email_confirmed_at,
+          phone_confirmed: !!user.phone_confirmed_at,
+          is_active: true,
           user_metadata: user.user_metadata
         };
       })
     );
 
-    // 如果有搜索条件，还要考虑企业名称搜索
-    const filteredUsers = search ? 
-      usersWithCompany.filter(user => 
+    // 处理自定义用户
+    let processedCustomUsers = customUsersList.map(user => ({
+      id: user.id,
+      email: user.email,
+      phone_number: `${user.country_code}${user.phone}`,
+      name: user.name || `用户${user.phone.slice(-4)}`,
+      auth_type: 'custom',
+      company_id: null, // 自定义用户暂时没有企业关联
+      company: null,
+      created_at: user.created_at,
+      last_login_at: user.last_login_at,
+      email_confirmed: false, // 自定义用户通过手机注册，邮箱未验证
+      phone_confirmed: true, // 自定义用户通过手机验证码注册，手机已验证
+      is_active: user.is_active,
+      user_metadata: user.user_metadata || {}
+    }));
+
+    // 如果有搜索条件，过滤自定义用户
+    if (search) {
+      processedCustomUsers = processedCustomUsers.filter(user => 
         user.email?.toLowerCase().includes(search.toLowerCase()) ||
         user.phone_number?.includes(search) ||
-        user.company?.name_zh?.includes(search)
-      ) : usersWithCompany;
+        user.name?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // 合并两种用户类型
+    const allUsers = [...supabaseUsersWithCompany, ...processedCustomUsers];
+
+    // 按创建时间排序（最新的在前）
+    allUsers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    // 应用分页
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize;
+    const paginatedUsers = allUsers.slice(from, to);
 
     return NextResponse.json({
       success: true,
-      data: filteredUsers,
+      data: paginatedUsers,
       pagination: {
         current: page,
         pageSize: pageSize,
-        total: filteredUsers.length // 注意：这里只是当前页面的总数，实际应该从 auth API 获取总数
+        total: allUsers.length,
+        totalPages: Math.ceil(allUsers.length / pageSize),
+        supabaseCount: supabaseUsersWithCompany.length,
+        customCount: processedCustomUsers.length
       }
     });
 

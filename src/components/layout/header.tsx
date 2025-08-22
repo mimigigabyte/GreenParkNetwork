@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Bell } from 'lucide-react';
 import { AuthModal } from '../auth/auth-modal';
 import { useAuthContext } from '../auth/auth-provider';
-import { UserNav } from '../user/user-nav';
+import { UserMenu } from '../user/user-menu';
 import { getUnreadInternalMessageCount } from '@/lib/supabase/contact-messages';
 
 export function Header() {
@@ -142,7 +142,7 @@ export function Header() {
             {loading ? (
               <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
             ) : user ? (
-              <UserNav user={user} />
+              <UserMenu />
             ) : (
               <button
                 onClick={() => setIsAuthModalOpen(true)}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { authApi } from '@/api/auth';
+import { customAuthApi } from '@/api/customAuth';
 import { useAuthContext } from './auth-provider';
 
 interface VerificationLoginFormProps {
@@ -50,7 +51,12 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
           });
         }, 1000);
         
-        alert(result.data.message || '验证码已发送，请注意查收');
+        // 开发模式下显示验证码
+        if ('debugCode' in result.data && result.data.debugCode) {
+          alert(`验证码已发送！开发模式验证码：${result.data.debugCode}`);
+        } else {
+          alert(result.data.message || '验证码已发送，请注意查收');
+        }
       } else {
         alert('error' in result ? result.error : '发送验证码失败');
       }
@@ -69,7 +75,26 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
     }
     
     try {
-      // 调用验证码登录API
+      console.log('📱 尝试验证码登录:', { phone: phoneNumber, countryCode });
+      
+      // 先尝试自定义认证系统的验证码登录
+      const customResult = await customAuthApi.phoneCodeLogin({
+        phone: phoneNumber,
+        code: verificationCode,
+        countryCode
+      });
+
+      if (customResult.success && customResult.data) {
+        console.log('✅ 自定义验证码登录成功:', customResult.data.user);
+        alert('登录成功！');
+        await checkUser();
+        onClose?.();
+        return;
+      }
+      
+      console.log('⚠️ 自定义认证失败，尝试传统认证:', customResult.error);
+      
+      // 如果自定义认证失败，尝试传统的Supabase认证
       const result = await authApi.phoneCodeLogin({
         phone: phoneNumber,
         code: verificationCode,
@@ -83,7 +108,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
           localStorage.setItem('refresh_token', result.data.refreshToken);
         }
 
-        console.log('验证码登录成功:', result.data.user);
+        console.log('✅ 传统验证码登录成功:', result.data.user);
         alert('登录成功！');
         await checkUser();
         onClose?.();

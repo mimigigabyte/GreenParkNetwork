@@ -22,9 +22,18 @@ export interface CompanyProfileData {
 // 提交企业信息（智能创建或更新）
 export const submitCompanyProfile = async (data: CompanyProfileData) => {
   try {
-    // 先检查是否已有企业信息
-    const existingInfo = await getUserCompanyInfo();
-    const hasExisting = existingInfo.success && existingInfo.data;
+    console.log('🏢 提交企业信息，先检查现有信息...');
+    
+    // 先检查是否已有企业信息（如果检查失败，假设没有现有信息）
+    let hasExisting = false;
+    try {
+      const existingInfo = await getUserCompanyInfo();
+      hasExisting = existingInfo.success && existingInfo.data;
+      console.log('🔍 现有企业信息检查结果:', { hasExisting });
+    } catch (error) {
+      console.log('⚠️ 检查现有企业信息失败，假设为新建:', error);
+      hasExisting = false;
+    }
 
     const requestData = {
       requirement: data.requirement || '',
@@ -48,7 +57,8 @@ export const submitCompanyProfile = async (data: CompanyProfileData) => {
     
     const response = await safeFetch('/api/company/profile', {
       method: hasExisting ? 'PUT' : 'POST',
-      body: JSON.stringify(requestData)
+      body: JSON.stringify(requestData),
+      useAuth: true
     });
 
     return await handleApiResponse(response);

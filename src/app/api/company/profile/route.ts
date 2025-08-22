@@ -1,32 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+import { verifyToken } from '@/lib/custom-auth';
+
+// 创建带有service role的Supabase客户端用于查询自定义用户
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+// 通用用户认证函数
+async function authenticateUser(request: NextRequest) {
+  console.log('🔍 开始用户认证检查...')
+  
+  const authHeader = request.headers.get('Authorization');
+  console.log('🔍 Authorization header:', authHeader ? 'Bearer ***' + authHeader.substring(authHeader.length - 10) : 'null')
+  
+  let token = null;
+  
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
+
+  // 1. 尝试自定义JWT认证
+  if (token) {
+    try {
+      console.log('🔍 尝试验证自定义JWT token...')
+      const decoded = verifyToken(token);
+      console.log('🔍 JWT解码结果:', decoded ? { userId: decoded.userId, type: decoded.type } : 'null')
+      
+      if (decoded && decoded.type === 'custom') {
+        // 从自定义用户表获取用户信息（使用service role绕过RLS）
+        const { data: customUser, error } = await supabaseAdmin
+          .from('custom_users')
+          .select('*')
+          .eq('id', decoded.userId)
+          .eq('is_active', true)
+          .single();
+
+        console.log('🔍 自定义用户查询结果:', { found: !!customUser, error })
+
+        if (!error && customUser) {
+          console.log('✅ 自定义认证成功:', customUser.id)
+          return {
+            id: customUser.id,
+            email: customUser.email,
+            phone: `${customUser.country_code}${customUser.phone}`,
+            authType: 'custom'
+          };
+        }
+      }
+    } catch (error) {
+      console.log('❌ 自定义token验证失败:', error);
+    }
+  }
+
+  // 2. 尝试Supabase认证
+  if (token) {
+    console.log('🔍 尝试Supabase token验证...')
+    const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token);
+    console.log('🔍 Supabase token验证结果:', { found: !!tokenUser, error: tokenError })
+    
+    if (!tokenError && tokenUser) {
+      console.log('✅ Supabase认证成功:', tokenUser.id)
+      return {
+        id: tokenUser.id,
+        email: tokenUser.email,
+        phone: tokenUser.phone,
+        authType: 'supabase'
+      };
+    }
+  }
+  
+  // 3. 尝试从session获取（仅限Supabase）
+  console.log('🔍 尝试Supabase session验证...')
+  const { data: { user: sessionUser }, error: sessionError } = await supabase.auth.getUser();
+  console.log('🔍 Supabase session验证结果:', { found: !!sessionUser, error: sessionError })
+  
+  if (!sessionError && sessionUser) {
+    console.log('✅ Supabase session认证成功:', sessionUser.id)
+    return {
+      id: sessionUser.id,
+      email: sessionUser.email,
+      phone: sessionUser.phone,
+      authType: 'supabase'
+    };
+  }
+
+  console.log('❌ 所有认证方式都失败')
+  return null;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // 获取认证token
-    const authHeader = request.headers.get('Authorization');
-    let token = null;
-    
-    if (authHeader?.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    }
-
-    // 如果有token，使用token验证用户身份
-    let user = null;
-    if (token) {
-      const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token);
-      if (!tokenError && tokenUser) {
-        user = tokenUser;
-      }
-    }
-    
-    // 如果token验证失败，尝试从session获取
-    if (!user) {
-      const { data: { user: sessionUser }, error: sessionError } = await supabase.auth.getUser();
-      if (!sessionError && sessionUser) {
-        user = sessionUser;
-      }
-    }
+    // 使用通用认证函数
+    const user = await authenticateUser(request);
     
     if (!user) {
       return NextResponse.json(
@@ -97,7 +164,7 @@ export async function POST(request: NextRequest) {
       developmentZoneId = zoneData?.id;
     }
 
-    // 保存企业信息到数据库
+    // 保存企业信息到数据库（所有用户都使用admin_companies表）
     const insertData = {
       user_id: user.id,
       name_zh: companyName,
@@ -156,30 +223,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // 获取认证token
-    const authHeader = request.headers.get('Authorization');
-    let token = null;
-    
-    if (authHeader?.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    }
-
-    // 如果有token，使用token验证用户身份
-    let user = null;
-    if (token) {
-      const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token);
-      if (!tokenError && tokenUser) {
-        user = tokenUser;
-      }
-    }
-    
-    // 如果token验证失败，尝试从session获取
-    if (!user) {
-      const { data: { user: sessionUser }, error: sessionError } = await supabase.auth.getUser();
-      if (!sessionError && sessionUser) {
-        user = sessionUser;
-      }
-    }
+    // 使用通用认证函数
+    const user = await authenticateUser(request);
     
     if (!user) {
       return NextResponse.json(
@@ -325,30 +370,8 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // 获取认证token
-    const authHeader = request.headers.get('Authorization');
-    let token = null;
-    
-    if (authHeader?.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    }
-
-    // 如果有token，使用token验证用户身份
-    let user = null;
-    if (token) {
-      const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token);
-      if (!tokenError && tokenUser) {
-        user = tokenUser;
-      }
-    }
-    
-    // 如果token验证失败，尝试从session获取
-    if (!user) {
-      const { data: { user: sessionUser }, error: sessionError } = await supabase.auth.getUser();
-      if (!sessionError && sessionUser) {
-        user = sessionUser;
-      }
-    }
+    // 使用通用认证函数
+    const user = await authenticateUser(request);
     
     if (!user) {
       return NextResponse.json(
@@ -357,7 +380,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取用户的企业信息
+    // 获取用户的企业信息（所有用户都使用admin_companies表）
     const { data: companyData, error: selectError } = await supabase
       .from('admin_companies')
       .select(`

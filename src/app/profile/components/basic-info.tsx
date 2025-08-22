@@ -9,8 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
+import { useAuthContext } from '@/components/auth/auth-provider'
 
 export default function BasicInfo() {
+  const { user: authUser, loading: authLoading } = useAuthContext()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false)
@@ -26,20 +28,31 @@ export default function BasicInfo() {
   const [phoneCountdown, setPhoneCountdown] = useState(0)
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setIsLoading(true)
-      const { data, error } = await supabaseAuthApi.getCurrentUser()
-      if (error) {
-        console.error('获取用户信息失败:', error)
-        // 这里可以添加一些错误提示，比如 toast
+    if (!authLoading) {
+      console.log('🔍 个人中心加载用户信息:', authUser)
+      
+      if (authUser) {
+        // 转换AuthContext用户信息为BasicInfo需要的格式
+        const basicInfoUser: User = {
+          id: authUser.id,
+          email: authUser.email || undefined,
+          phone: authUser.phone || undefined,
+          name: authUser.name || '用户',
+          avatar: authUser.avatar_url || undefined,
+          role: 'user', // AuthContext没有role信息，默认为user
+          createdAt: new Date().toISOString(), // AuthContext没有createdAt，使用当前时间
+          emailVerified: !!authUser.email, // 简单判断
+          phoneVerified: !!authUser.phone  // 简单判断
+        }
+        setUser(basicInfoUser)
+        console.log('✅ 用户信息已设置:', basicInfoUser)
       } else {
-        setUser(data || null)
+        setUser(null)
+        console.log('❌ 未找到用户信息')
       }
       setIsLoading(false)
     }
-
-    fetchUser()
-  }, [])
+  }, [authUser, authLoading])
 
   // 发送邮箱验证码
   const handleSendEmailCode = async () => {

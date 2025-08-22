@@ -2,9 +2,13 @@ import { apiClient, USE_MOCK, USE_SUPABASE } from './index'
 import { AuthMockManager } from './authMockManager'
 import { supabaseAuthApi } from './supabaseAuth'
 import { resendAuthApi } from './resendAuth'
+import { tencentSmsAuthApi } from './tencentSmsAuth'
+
+// 短信服务配置
+const USE_TENCENT_SMS = process.env.NEXT_PUBLIC_USE_TENCENT_SMS === 'true'
 
 // 重新导出常量供其他组件使用
-export { USE_MOCK, USE_SUPABASE }
+export { USE_MOCK, USE_SUPABASE, USE_TENCENT_SMS }
 
 // ========================= 类型定义 =========================
 
@@ -116,6 +120,8 @@ export const authApi = {
   phoneCodeLogin: (data: PhoneCodeLoginRequest) => 
     USE_MOCK 
       ? AuthMockManager.phoneCodeLogin(data)
+      : USE_TENCENT_SMS
+      ? tencentSmsAuthApi.phoneCodeLogin(data)
       : USE_SUPABASE
       ? supabaseAuthApi.phoneCodeLogin(data)
       : apiClient.post<AuthResponse>('/auth/login/phone-code', data),
@@ -138,6 +144,8 @@ export const authApi = {
   phoneRegister: (data: PhoneRegisterRequest) => 
     USE_MOCK 
       ? AuthMockManager.phoneRegister(data)
+      : USE_TENCENT_SMS
+      ? tencentSmsAuthApi.phoneRegister(data)
       : USE_SUPABASE
       ? supabaseAuthApi.phoneRegister(data)
       : apiClient.post<AuthResponse>('/auth/register/phone', data),
@@ -158,20 +166,24 @@ export const authApi = {
   sendPhoneCode: (data: SendPhoneCodeRequest) => 
     USE_MOCK 
       ? AuthMockManager.sendPhoneCode(data)
+      : USE_TENCENT_SMS
+      ? tencentSmsAuthApi.sendPhoneCode(data)
       : USE_SUPABASE
       ? supabaseAuthApi.sendPhoneCode(data)
       : apiClient.post<CodeResponse>('/auth/code/phone', data),
 
   /**
-   * 验证验证码（邮箱使用Resend，手机使用原来的逻辑）
+   * 验证验证码（邮箱使用Resend，手机使用腾讯云或Supabase）
    */
   verifyCode: (data: VerifyCodeRequest) => 
     USE_MOCK 
       ? AuthMockManager.verifyCode(data)
       : data.email 
       ? resendAuthApi.verifyCode(data) // 邮箱验证码使用Resend
+      : USE_TENCENT_SMS
+      ? tencentSmsAuthApi.verifyCode(data) // 手机验证码优先使用腾讯云
       : USE_SUPABASE
-      ? supabaseAuthApi.verifyCode(data) // 手机验证码仍使用Supabase
+      ? supabaseAuthApi.verifyCode(data) // 手机验证码备用Supabase
       : apiClient.post<{ valid: boolean; message: string }>('/auth/code/verify', data),
 
   // =============== 密码找回 ===============
@@ -190,6 +202,8 @@ export const authApi = {
   resetPasswordByPhone: (data: ResetPasswordByPhoneRequest) => 
     USE_MOCK 
       ? AuthMockManager.resetPasswordByPhone(data)
+      : USE_TENCENT_SMS
+      ? tencentSmsAuthApi.resetPasswordByPhone(data)
       : apiClient.post<{ success: boolean; message: string }>('/auth/password/reset/phone', data),
 
   // =============== 用户管理 ===============
@@ -245,7 +259,7 @@ export const sendVerificationCode = async (phoneNumber: string, countryCode: str
   });
   
   if (!result.success) {
-    throw new Error('error' in result ? result.error : result.message || '发送验证码失败');
+    throw new Error('error' in result ? result.error : '发送验证码失败');
   }
   
   return 'data' in result ? result.data : result;
@@ -263,7 +277,7 @@ export const loginWithVerificationCode = async (phoneNumber: string, verificatio
   });
   
   if (!result.success) {
-    throw new Error('error' in result ? result.error : result.message || '验证码登录失败');
+    throw new Error('error' in result ? result.error : '验证码登录失败');
   }
   
   return 'data' in result ? result.data : result;

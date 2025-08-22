@@ -8,6 +8,7 @@ import { RegisterForm } from './register-form';
 import { VerificationLoginForm } from './verification-login-form';
 import { ResetPasswordModal } from './reset-password-modal';
 import { authApi } from '@/api/auth';
+import { customAuthApi } from '@/api/customAuth';
 
 import { useAuthContext } from './auth-provider';
 
@@ -78,24 +79,56 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
 
       // 普通用户登录
       const accountType = detectAccountType(loginData.account);
-      const result = await authApi.passwordLogin({
-        account: loginData.account,
-        password: loginData.password,
-        type: accountType
-      });
+      console.log('🔐 密码登录尝试:', { account: loginData.account, type: accountType });
+      
+      let loginSuccess = false;
+      
+      // 如果是手机号，先尝试自定义认证
+      if (accountType === 'phone') {
+        try {
+          console.log('📱 尝试自定义手机号密码登录');
+          const customResult = await customAuthApi.phoneLogin({
+            phone: loginData.account,
+            password: loginData.password,
+            countryCode: '+86' // 默认+86，后续可以改为用户选择
+          });
 
-      if (result.success && 'data' in result && result.data) {
-        // 保存token
-        localStorage.setItem('access_token', result.data.token);
-        if (result.data.refreshToken) {
-          localStorage.setItem('refresh_token', result.data.refreshToken);
+          if (customResult.success && customResult.data) {
+            console.log('✅ 自定义手机号密码登录成功:', customResult.data.user);
+            alert('登录成功！');
+            await checkUser(); // 更新认证状态
+            onClose(); // 关闭登录弹窗
+            loginSuccess = true;
+          } else {
+            console.log('⚠️ 自定义认证失败，尝试传统认证:', customResult.error);
+          }
+        } catch (customError) {
+          console.log('⚠️ 自定义认证异常，尝试传统认证:', customError);
         }
+      }
+      
+      // 如果自定义认证失败或者是邮箱登录，使用传统认证
+      if (!loginSuccess) {
+        const result = await authApi.passwordLogin({
+          account: loginData.account,
+          password: loginData.password,
+          type: accountType
+        });
 
-        alert('登录成功！');
-        await checkUser(); // 更新认证状态
-        onClose(); // 关闭登录弹窗
-      } else {
-        alert('error' in result ? result.error : '登录失败，请检查账号和密码');
+        if (result.success && 'data' in result && result.data) {
+          // 保存token
+          localStorage.setItem('access_token', result.data.token);
+          if (result.data.refreshToken) {
+            localStorage.setItem('refresh_token', result.data.refreshToken);
+          }
+
+          console.log('✅ 传统密码登录成功:', result.data.user);
+          alert('登录成功！');
+          await checkUser(); // 更新认证状态
+          onClose(); // 关闭登录弹窗
+        } else {
+          alert('error' in result ? result.error : '登录失败，请检查账号和密码');
+        }
       }
     } catch (error) {
       console.error('登录错误:', error);

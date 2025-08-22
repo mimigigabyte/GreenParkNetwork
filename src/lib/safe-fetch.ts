@@ -19,19 +19,39 @@ async function getAuthToken(): Promise<string | null> {
   try {
     if (typeof window !== 'undefined') {
       // 客户端环境
-      // 首先尝试从Supabase session获取
+      console.log('🔍 开始获取认证token...')
+      
+      // 1. 优先检查自定义认证token
+      const customToken = localStorage.getItem('custom_auth_token');
+      console.log('🔍 自定义token检查:', customToken ? '存在' : '不存在')
+      if (customToken) {
+        console.log('🔑 使用自定义认证token');
+        return customToken;
+      }
+      
+      // 2. 尝试从Supabase session获取
       try {
+        console.log('🔍 尝试获取Supabase session...')
         const { supabase } = await import('@/lib/supabase');
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('🔍 Supabase session检查:', session?.access_token ? '存在' : '不存在')
         if (session?.access_token) {
+          console.log('🔑 使用Supabase session token');
           return session.access_token;
         }
       } catch (error) {
         console.warn('获取Supabase session失败:', error);
       }
       
-      // 回退到localStorage
-      return localStorage.getItem('access_token');
+      // 3. 回退到传统localStorage token
+      const legacyToken = localStorage.getItem('access_token');
+      console.log('🔍 传统token检查:', legacyToken ? '存在' : '不存在')
+      if (legacyToken) {
+        console.log('🔑 使用传统localStorage token');
+        return legacyToken;
+      }
+      
+      console.log('❌ 所有token都不存在')
     }
     return null;
   } catch (error) {
