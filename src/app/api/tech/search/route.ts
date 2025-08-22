@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-// 强制动态渲染
+// 强制动态渲染，禁用所有缓存
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // GET - 搜索技术产品
 export async function GET(request: NextRequest) {
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
     const sortBy = searchParams.get('sortBy') || 'updateTime';
 
+    console.log('🔍 技术搜索API调用时间:', new Date().toISOString());
     console.log('搜索参数:', { keyword, category, subCategory, country, province, developmentZone, page, pageSize, sortBy });
 
     const from = (page - 1) * pageSize;
@@ -152,6 +154,14 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(`找到 ${count} 个技术，返回 ${technologies?.length} 个`);
+    
+    // 详细日志：显示前几个技术的关键信息
+    if (technologies && technologies.length > 0) {
+      console.log('🔍 返回的技术列表（前3个）:');
+      technologies.slice(0, 3).forEach((tech, index) => {
+        console.log(`  ${index + 1}. ${tech.name_zh} (ID: ${tech.id}, 状态: ${tech.review_status}, 更新时间: ${tech.updated_at})`);
+      });
+    }
 
     // 获取所有需要的关联数据ID
     const categoryIds = [...new Set(technologies?.map(tech => tech.category_id).filter(Boolean))];
@@ -247,10 +257,18 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: result
     });
+    
+    // 添加强制禁用缓存的头部
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Surrogate-Control', 'no-store');
+    
+    return response;
 
   } catch (error) {
     console.error('技术搜索API错误:', error);
