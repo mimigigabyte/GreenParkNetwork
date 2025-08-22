@@ -94,7 +94,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         phone: phoneNumber,
         code: verificationCode,
         countryCode,
-        turnstileToken // 添加人机验证token
+        turnstileToken: turnstileToken || undefined // 添加人机验证token
       });
 
       if (customResult.success && customResult.data) {
@@ -112,7 +112,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         phone: phoneNumber,
         code: verificationCode,
         countryCode,
-        turnstileToken // 添加人机验证token
+        turnstileToken: turnstileToken || undefined // 添加人机验证token
       });
 
       if (result.success && 'data' in result && result.data) {
@@ -247,9 +247,9 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                   {/* 登录按钮 */}
           <button
             type="submit"
-            disabled={!agreeToPrivacy || (turnstileSiteKey && !turnstileToken)}
+            disabled={!agreeToPrivacy || (!!turnstileSiteKey && !turnstileToken)}
             className={`w-full py-3 px-6 rounded-lg font-medium text-base transition-colors ${
-              agreeToPrivacy && (!turnstileSiteKey || turnstileToken)
+              agreeToPrivacy && (!turnstileSiteKey || !!turnstileToken)
                 ? 'bg-[#00b899] text-white hover:bg-[#009a7a] cursor-pointer'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}

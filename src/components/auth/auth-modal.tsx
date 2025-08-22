@@ -105,7 +105,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
             phone: loginData.account,
             password: loginData.password,
             countryCode: '+86', // 默认+86，后续可以改为用户选择
-            turnstileToken // 添加人机验证token
+            turnstileToken: turnstileToken || undefined // 添加人机验证token
           });
 
           if (customResult.success && customResult.data) {
@@ -128,7 +128,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
           account: loginData.account,
           password: loginData.password,
           type: accountType,
-          turnstileToken // 添加人机验证token
+          turnstileToken: turnstileToken || undefined // 添加人机验证token
         });
 
         if (result.success && 'data' in result && result.data) {
@@ -282,9 +282,9 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                                                         {/* 登录按钮 */}
                    <button
                      type="submit"
-                     disabled={!agreeToPrivacy || loginLoading || (turnstileSiteKey && !turnstileToken)}
+                     disabled={!agreeToPrivacy || loginLoading || (!!turnstileSiteKey && !turnstileToken)}
                      className={`w-full py-3 px-6 rounded-lg font-medium text-base transition-colors ${
-                       agreeToPrivacy && !loginLoading && (!turnstileSiteKey || turnstileToken)
+                       agreeToPrivacy && !loginLoading && (!turnstileSiteKey || !!turnstileToken)
                          ? 'bg-[#00b899] text-white hover:bg-[#009a7a] cursor-pointer'
                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                      }`}
