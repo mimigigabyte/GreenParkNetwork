@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
           authData.user.id,
           {
             phone: mobile,
-            phone_confirmed_at: new Date().toISOString(), // 标记手机号已验证
+            phone_confirm: true, // 标记手机号已验证
             user_metadata: {
               ...authData.user.user_metadata,
               name: name || `用户${mobile.slice(-4)}`,

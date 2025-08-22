@@ -39,11 +39,11 @@ export function useAuth() {
             const customUser = customResponse.data;
             const mappedUser: UnifiedUser = {
               id: customUser.id,
-              email: customUser.email,
-              phone: customUser.phone,
+              email: customUser.email || undefined,
+              phone: customUser.phone || undefined,
               name: customUser.name || '用户',
-              avatar_url: customUser.avatarUrl,
-              company_name: customUser.userMetadata?.company_name,
+              avatar_url: customUser.avatarUrl || undefined,
+              company_name: customUser.userMetadata?.company_name || undefined,
               authType: 'custom'
             };
             setUser(mappedUser);
@@ -180,11 +180,11 @@ export function useAuth() {
       if (customUser) {
         const mappedUser: UnifiedUser = {
           id: customUser.id,
-          email: customUser.email,
-          phone: customUser.phone,
+          email: customUser.email || undefined,
+          phone: customUser.phone || undefined,
           name: customUser.name || '用户',
-          avatar_url: customUser.avatarUrl,
-          company_name: customUser.userMetadata?.company_name,
+          avatar_url: customUser.avatarUrl || undefined,
+          company_name: customUser.userMetadata?.company_name || undefined,
           authType: 'custom'
         };
         setUser(mappedUser);
