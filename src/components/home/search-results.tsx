@@ -26,14 +26,20 @@ export function SearchResults({
   onPageChange,
   totalResults,
   currentCategory,
-  companyCount = 39, // 默认值，实际应该从API获取
-  technologyCount = 400, // 默认值，实际应该从API获取
+  companyCount, // 可选参数，如果未提供则基于搜索结果计算
+  technologyCount, // 可选参数，如果未提供则使用totalResults
   onSortChange
 }: SearchResultsProps) {
   const { user } = useAuthContext();
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
   const [currentSort, setCurrentSort] = useState<SortType>('updateTime');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // 计算实际的企业数量（基于搜索结果去重）
+  const actualCompanyCount = companyCount ?? new Set(products.map(product => product.companyName)).size;
+  
+  // 计算实际的技术数量
+  const actualTechnologyCount = technologyCount ?? totalResults;
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [selectedTechnology, setSelectedTechnology] = useState<{
     id: string;
@@ -176,9 +182,9 @@ export function SearchResults({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="text-sm text-gray-600">
             相关结果：为您搜索到来自
-            <span className="font-black text-blue-600 mx-1">{companyCount}</span>
+            <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
             家企业的
-            <span className="font-black text-blue-600 mx-1">{technologyCount}</span>
+            <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
             项绿色低碳技术
           </div>
           <div className="flex items-center space-x-2">

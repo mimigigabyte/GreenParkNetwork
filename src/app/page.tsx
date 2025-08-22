@@ -284,10 +284,8 @@ function HomePageContent() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          totalResults={getCurrentCategoryCount()}
+          totalResults={products.length}
           currentCategory={selectedCategory}
-          companyCount={companyCount}
-          technologyCount={technologyCount}
           onSortChange={handleSortChange}
         />
       </main>
