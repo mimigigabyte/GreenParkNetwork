@@ -30,25 +30,33 @@ export async function POST(request: NextRequest) {
 
     console.log('📱 自定义手机密码登录请求:', { mobile, countryCode })
 
-    // Turnstile人机验证（如果配置了）
-    if (process.env.TURNSTILE_SECRET_KEY && turnstileToken) {
-      console.log('🛡️ 开始Turnstile验证...')
-      const clientIp = extractIpAddress(request)
-      const turnstileResult = await verifyTurnstileToken(turnstileToken, clientIp)
-      
-      if (!turnstileResult.success) {
-        console.log('❌ Turnstile验证失败:', turnstileResult.error)
-        return NextResponse.json({
-          success: false,
-          error: turnstileResult.error || '人机验证失败，请重试'
-        }, { status: 400 })
+    // Turnstile人机验证（如果配置了且非本地环境）
+    if (process.env.TURNSTILE_SECRET_KEY) {
+      if (turnstileToken) {
+        console.log('🛡️ 开始Turnstile验证...')
+        const clientIp = extractIpAddress(request)
+        const turnstileResult = await verifyTurnstileToken(turnstileToken, clientIp)
+        
+        if (!turnstileResult.success) {
+          console.log('❌ Turnstile验证失败:', turnstileResult.error)
+          return NextResponse.json({
+            success: false,
+            error: turnstileResult.error || '人机验证失败，请重试'
+          }, { status: 400 })
+        }
+        console.log('✅ Turnstile验证成功')
+      } else {
+        // 检查是否应该跳过验证（本地环境会在verifyTurnstileToken内部处理）
+        const clientIp = extractIpAddress(request)
+        const turnstileResult = await verifyTurnstileToken('localhost-bypass-token', clientIp)
+        
+        if (!turnstileResult.success) {
+          return NextResponse.json({
+            success: false,
+            error: '缺少人机验证信息'
+          }, { status: 400 })
+        }
       }
-      console.log('✅ Turnstile验证成功')
-    } else if (process.env.TURNSTILE_SECRET_KEY && !turnstileToken) {
-      return NextResponse.json({
-        success: false,
-        error: '缺少人机验证信息'
-      }, { status: 400 })
     }
 
     // 参数验证
@@ -88,7 +96,7 @@ export async function POST(request: NextRequest) {
       // 为了安全，不告诉用户具体是用户不存在还是密码错误
       return NextResponse.json({
         success: false,
-        error: '手机号或密码错误'
+        error: '您输入的账号/密码有误，请重试'
       }, { status: 401 })
     }
 
@@ -135,7 +143,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: lockCheck.shouldLock 
           ? lockCheck.message 
-          : `手机号或密码错误${lockCheck.remainingAttempts ? `，还可尝试${lockCheck.remainingAttempts}次` : ''}`
+          : `您输入的账号/密码有误，请重试${lockCheck.remainingAttempts ? `，还可尝试${lockCheck.remainingAttempts}次` : ''}`
       }, { status: 401 })
     }
 

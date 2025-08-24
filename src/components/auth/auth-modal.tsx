@@ -113,6 +113,8 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
             alert('登录成功！');
             await checkUser(); // 更新认证状态
             onClose(); // 关闭登录弹窗
+            // 跳转到用户控制台
+            window.location.href = '/user';
             loginSuccess = true;
           } else {
             console.log('⚠️ 自定义认证失败，尝试传统认证:', customResult.error);
@@ -142,6 +144,8 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
           alert('登录成功！');
           await checkUser(); // 更新认证状态
           onClose(); // 关闭登录弹窗
+          // 跳转到用户控制台
+          window.location.href = '/user';
         } else {
           alert('error' in result ? result.error : '登录失败，请检查账号和密码');
         }

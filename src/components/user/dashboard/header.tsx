@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Globe, Home } from 'lucide-react'
+import { Bell, Home } from 'lucide-react'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { cn } from '@/lib/utils'
 import { getUnreadInternalMessageCount } from '@/lib/supabase/contact-messages'
 import { UserMenu } from '@/components/user/user-menu'
+import { LanguageSwitcher } from '@/components/common/language-switcher'
 
 interface UserHeaderProps {
   className?: string
@@ -13,16 +14,11 @@ interface UserHeaderProps {
 
 export function UserHeader({ className }: UserHeaderProps) {
   const { user, loading } = useAuthContext()
-  const [currentLanguage, setCurrentLanguage] = useState<'zh' | 'en'>('zh')
   const [unreadCount, setUnreadCount] = useState(0)
 
   // 获取用户名（邮箱或手机号）
   const getUserName = () => {
     return user?.email || user?.phone || user?.name || 'User'
-  }
-
-  const toggleLanguage = () => {
-    setCurrentLanguage(prev => prev === 'zh' ? 'en' : 'zh')
   }
 
 
@@ -67,14 +63,7 @@ export function UserHeader({ className }: UserHeaderProps) {
         {/* 右侧 - 工具栏 */}
         <div className="flex items-center space-x-4">
           {/* 语言切换 */}
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            title="切换语言"
-          >
-            <Globe className="w-4 h-4 mr-1" />
-            {currentLanguage === 'zh' ? '中文' : 'EN'}
-          </button>
+          <LanguageSwitcher />
 
           {/* 通知 */}
           <button

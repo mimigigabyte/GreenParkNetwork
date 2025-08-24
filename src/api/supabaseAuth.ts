@@ -279,9 +279,21 @@ export const supabaseAuthApi = {
       }
       
       if (error) {
+        // 翻译常见的Supabase错误消息
+        let errorMessage = error.message;
+        if (error.message === 'Invalid login credentials') {
+          errorMessage = '您输入的账号/密码有误，请重试';
+        } else if (error.message.includes('User not found')) {
+          errorMessage = '用户不存在，请先注册';
+        } else if (error.message.includes('Wrong password')) {
+          errorMessage = '您输入的账号/密码有误，请重试';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = '邮箱尚未验证，请先验证邮箱';
+        }
+        
         return {
           success: false,
-          error: error.message
+          error: errorMessage
         }
       }
       

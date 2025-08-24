@@ -7,10 +7,10 @@ import { Bell } from 'lucide-react';
 import { AuthModal } from '../auth/auth-modal';
 import { useAuthContext } from '../auth/auth-provider';
 import { UserMenu } from '../user/user-menu';
+import { LanguageSwitcher } from '../common/language-switcher';
 import { getUnreadInternalMessageCount } from '@/lib/supabase/contact-messages';
 
 export function Header() {
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user, loading } = useAuthContext();
@@ -37,8 +37,7 @@ export function Header() {
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="flex justify-between items-center h-16 px-6">
           {/* Logo和标题 */}
           <div className="flex items-center space-x-3">
             {/* Logo */}
@@ -74,49 +73,16 @@ export function Header() {
           </div>
 
           {/* 导航菜单 */}
-          <nav className="flex items-center space-x-6">
+          <nav className="flex items-center space-x-4">
             {/* 语言选择 */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" strokeWidth={2} />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12h20" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-                <span>简体中文</span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {isLanguageDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  <div className="py-1">
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      简体中文
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      English
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
+            <LanguageSwitcher />
 
             {/* 用户功能链接 - 只在用户登录后显示 */}
             {user && (
               <>
                 <Link 
                   href="/user/companies"
-                  className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -126,9 +92,10 @@ export function Header() {
                 
                 <Link 
                   href="/user/messages"
-                  className="relative flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                  className="relative flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
+                  title="消息中心"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -146,16 +113,16 @@ export function Header() {
             ) : (
               <button
                 onClick={() => setIsAuthModalOpen(true)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
+                title="登录或注册"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <span>登录/注册</span>
               </button>
             )}
           </nav>
-        </div>
       </div>
       
       {/* 登录注册弹窗 */}

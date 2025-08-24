@@ -160,6 +160,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 如果是登录验证码，检查用户是否存在
+    if (purpose === 'login') {
+      const { data: userData, error: userError } = await supabase
+        .from('custom_users')
+        .select('id')
+        .eq('phone', phoneData.phone)
+        .eq('country_code', countryCode)
+        .single()
+      
+      if (userError || !userData) {
+        console.log('❌ 登录验证码请求：用户不存在:', phoneData.phone)
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: '您输入的手机号码未注册，请注册后重试' 
+          },
+          { status: 404 }
+        )
+      }
+    }
+
     // 生成验证码
     const verificationCode = generateVerificationCode()
     console.log(`🔐 生成验证码: ${phoneData.phone} -> ${verificationCode}`)

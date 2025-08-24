@@ -102,6 +102,8 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         alert('登录成功！');
         await checkUser();
         onClose?.();
+        // 跳转到用户控制台
+        window.location.href = '/user';
         return;
       }
       
@@ -126,6 +128,8 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         alert('登录成功！');
         await checkUser();
         onClose?.();
+        // 跳转到用户控制台
+        window.location.href = '/user';
       } else {
         alert('error' in result ? result.error : '登录失败，请检查验证码是否正确');
       }
@@ -183,6 +187,12 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                onChange={(e) => setVerificationCode(e.target.value)}
                placeholder="收到的验证码"
                className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400"
+               onKeyDown={(e) => {
+                 if (e.key === 'Enter') {
+                   e.preventDefault();
+                   handleSubmit(e as any);
+                 }
+               }}
              />
              {/* 获取验证码按钮 */}
              <button
@@ -210,7 +220,11 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
            />
            <span className="ml-2">我已阅读并同意</span>
            <button 
-             onClick={() => window.open('/privacy-policy', '_blank')}
+             type="button"
+             onClick={(e) => {
+               e.preventDefault();
+               window.open('/privacy-policy', '_blank');
+             }}
              className="text-[#00b899] hover:text-[#009a7a] transition-colors underline"
            >
              《隐私条款》

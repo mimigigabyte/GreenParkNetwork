@@ -1,7 +1,10 @@
 /**
  * Cloudflare Turnstile 验证工具类
  * 用于后端验证Turnstile token的有效性
+ * 支持本地环境自动跳过验证
  */
+
+import { shouldSkipTurnstile, getEnvironmentInfo } from './environment';
 
 export interface TurnstileVerifyRequest {
   secret: string;
@@ -51,6 +54,17 @@ export async function verifyTurnstileToken(
   remoteIp?: string
 ): Promise<TurnstileVerificationResult> {
   try {
+    // 环境检测 - 本地环境直接跳过验证
+    if (shouldSkipTurnstile()) {
+      const envInfo = getEnvironmentInfo();
+      console.log('🏠 本地环境检测到，跳过Turnstile验证:', envInfo);
+      return {
+        success: true,
+        challengeTimestamp: new Date().toISOString(),
+        hostname: envInfo.hostname
+      };
+    }
+
     // 检查必需的环境变量
     const secret = process.env.TURNSTILE_SECRET_KEY;
     if (!secret) {
