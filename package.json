@@ -37,6 +37,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.294.0",
     "next": "^14.0.0",
+    "next-intl": "^4.3.5",
     "node-fetch": "^3.3.2",
     "nuqs": "^1.15.0",
     "postcss": "^8.4.0",

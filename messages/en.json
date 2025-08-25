@@ -1,0 +1,256 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "select": "Select",
+    "all": "All"
+  },
+  "header": {
+    "platformName": "National Economic Development Zone Green Low-Carbon Technology Promotion Platform",
+    "platformNameEn": "National Economic Development Zone Green Low-Carbon Technology Promotion Platform",
+    "language": "Language",
+    "chinese": "中文",
+    "english": "English",
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "loginRegister": "Login/Register"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "sendVerificationCode": "Send Code",
+    "verificationCode": "Verification Code",
+    "agreePrivacy": "I agree to the Privacy Policy",
+    "keepLoggedIn": "Keep me logged in",
+    "loginSuccess": "Login successful",
+    "registerSuccess": "Registration successful",
+    "loginWithVerification": "Login with Code",
+    "loginWithPassword": "Login with Password",
+    "switchToRegister": "Don't have an account? Sign up",
+    "switchToLogin": "Already have an account? Sign in"
+  },
+  "home": {
+    "loading": "Loading...",
+    "technology": "Technology"
+  },
+  "userCompanies": {
+    "title": "Company Information",
+    "subtitle": "Edit and improve your company information",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveSuccess": "Company information saved successfully!",
+    "saveFailed": "Save failed",
+    "pleaseRetry": "Please try again later",
+    "optional": "optional",
+    "basicInfo": {
+      "title": "Basic Information",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "Enter company name",
+      "logo": "Upload Company Logo",
+      "selectFile": "Select File"
+    },
+    "addressInfo": {
+      "title": "Address Information",
+      "country": "Country",
+      "selectCountry": "Select country",
+      "province": "Province",
+      "selectProvince": "Select province",
+      "economicZone": "National Economic Development Zone",
+      "selectZone": "Select development zone",
+      "notInZone": "Not located in national development zone",
+      "detailAddress": "Detailed Address",
+      "addressPlaceholder": "Enter detailed address"
+    },
+    "companyDetails": {
+      "title": "Company Details",
+      "companyType": "Company Type",
+      "selectCompanyType": "Select company type",
+      "industryCode": "Industry Code",
+      "industryCodePlaceholder": "Enter industry code",
+      "annualOutput": "Annual Output Value (100M CNY)",
+      "outputPlaceholder": "Enter output value"
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "contactPerson": "Contact Person",
+      "contactPersonPlaceholder": "Enter contact person name",
+      "contactPhone": "Contact Phone",
+      "contactPhonePlaceholder": "Enter contact phone",
+      "contactEmail": "Contact Email",
+      "contactEmailPlaceholder": "Enter contact email"
+    },
+    "validation": {
+      "companyNameRequired": "Please enter company name",
+      "countryRequired": "Please select country",
+      "provinceRequired": "Please select province",
+      "companyTypeRequired": "Please select company type",
+      "contactPersonRequired": "Please enter contact person",
+      "contactPhoneRequired": "Please enter contact phone",
+      "contactEmailRequired": "Please enter contact email"
+    }
+  },
+  "home": {
+    "loading": "Loading...",
+    "technology": "Technology",
+    "heroTitle": "National Economic Development Zone Green Low-Carbon Technology Promotion Platform",
+    "heroSubtitle": "Driving sustainable development, building a green future together",
+    "searchPlaceholder": "Search green technology solutions...",
+    "categories": "Green Low-Carbon Technology Product Categories",
+    "allCategories": "All Categories",
+    "searchResults": "Search Results",
+    "noResults": "No relevant technologies found",
+    "loadMore": "Load More",
+    "companyCount": "Companies",
+    "technologyCount": "Technologies",
+    "loginRequired": "You must register and login to submit green technology applications",
+    "companyRegistration": "Company Registration",
+    "searchTitle": "Green Technology, One-Click Search",
+    "joinUs": "Join Us",
+    "popularSearches": "Popular Searches",
+    "relatedTechnology": "Related Technologies",
+    "categoryLabel": "Industry Category",
+    "subCategoryLabel": "Subcategory",
+    "countryLabel": "Country",
+    "provinceLabel": "Province",
+    "developmentZoneLabel": "Development Zone",
+    "allSubCategories": "All Subcategories",
+    "allCountries": "All Countries",
+    "allProvinces": "All Provinces",
+    "allDevelopmentZones": "All Development Zones"
+  },
+  "userCompanies": {
+    "title": "Company Information",
+    "subtitle": "Edit and improve your company information",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveSuccess": "Company information saved successfully!",
+    "saveFailed": "Save failed",
+    "pleaseRetry": "Please try again later",
+    "optional": "optional",
+    "basicInfo": {
+      "title": "Basic Information",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "Enter company name",
+      "logo": "Upload Company Logo",
+      "selectFile": "Select File"
+    },
+    "addressInfo": {
+      "title": "Address Information",
+      "country": "Country",
+      "selectCountry": "Select country",
+      "province": "Province",
+      "selectProvince": "Select province",
+      "economicZone": "National Economic Development Zone",
+      "selectZone": "Select development zone",
+      "notInZone": "Not located in national development zone",
+      "detailAddress": "Detailed Address",
+      "addressPlaceholder": "Enter detailed address"
+    },
+    "companyDetails": {
+      "title": "Company Details",
+      "companyType": "Company Type",
+      "selectCompanyType": "Select company type",
+      "industryCode": "Industry Code",
+      "industryCodePlaceholder": "Enter industry code",
+      "annualOutput": "Annual Output Value (100M CNY)",
+      "outputPlaceholder": "Enter output value"
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "contactPerson": "Contact Person",
+      "contactPersonPlaceholder": "Enter contact person name",
+      "contactPhone": "Contact Phone",
+      "contactPhonePlaceholder": "Enter contact phone",
+      "contactEmail": "Contact Email",
+      "contactEmailPlaceholder": "Enter contact email"
+    },
+    "validation": {
+      "companyNameRequired": "Please enter company name",
+      "countryRequired": "Please select country",
+      "provinceRequired": "Please select province",
+      "companyTypeRequired": "Please select company type",
+      "contactPersonRequired": "Please enter contact person",
+      "contactPhoneRequired": "Please enter contact phone",
+      "contactEmailRequired": "Please enter contact email"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "basicInfo": "Basic Information",
+    "accountSecurity": "Account Security",
+    "favorites": "Favorites",
+    "personalSettings": "Personal Settings"
+  },
+  "companyProfile": {
+    "title": "Company Profile Setup",
+    "step1": "Basic Information",
+    "step2": "Detailed Information",
+    "companyName": "Company Name",
+    "country": "Country",
+    "province": "Province/State",
+    "economicZone": "Economic Development Zone",
+    "companyType": "Company Type",
+    "address": "Address",
+    "contactPerson": "Contact Person",
+    "contactPhone": "Contact Phone",
+    "contactEmail": "Contact Email"
+  },
+  "user": {
+    "companies": {
+      "title": "Company Management",
+      "addCompany": "Add Company",
+      "editCompany": "Edit Company",
+      "companyList": "Company List"
+    },
+    "technologies": {
+      "title": "Technology Management",
+      "addTechnology": "Publish Technology",
+      "editTechnology": "Edit Technology",
+      "technologyList": "Technology List",
+      "status": "Status",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "messages": {
+      "title": "Message Center",
+      "unread": "Unread Messages",
+      "read": "Read Messages",
+      "markAsRead": "Mark as Read",
+      "noMessages": "No messages"
+    }
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactAddress": "Contact Address",
+    "email": "Email",
+    "hotline": "Platform Hotline",
+    "friendlyLinks": "Friendly Links",
+    "guidanceUnits": "Guidance Units",
+    "hostingUnits": "Hosting Units"
+  }
+}

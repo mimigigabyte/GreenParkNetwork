@@ -215,23 +215,31 @@ export async function GET(request: NextRequest) {
       return {
         id: tech.id,
         companyName: tech.company_name_zh || '未知企业',
-        companyNameEn: tech.company_name_en || 'Unknown Company',
+        companyNameEn: tech.company_name_en || tech.company_name_zh || 'Unknown Company',
         companyLogo: tech.company_logo_url || '',
         companyLogoUrl: tech.company_logo_url || '',
         solutionTitle: tech.name_zh || tech.name_en || '未知技术',
+        solutionTitleEn: tech.name_en || tech.name_zh || 'Unknown Technology',
         solutionImage: tech.image_url || '',
         solutionThumbnail: tech.image_url || '',
         solutionDescription: tech.description_zh || tech.description_en || '',
+        solutionDescriptionEn: tech.description_en || tech.description_zh || '',
         shortDescription: (tech.description_zh || tech.description_en || '').slice(0, 100) + '...',
+        shortDescriptionEn: (tech.description_en || tech.description_zh || '').slice(0, 100) + '...',
         fullDescription: tech.description_zh || tech.description_en || '',
+        fullDescriptionEn: tech.description_en || tech.description_zh || '',
         attachmentUrls, // 附件URL数组
         attachmentNames, // 附件原始文件名数组
         // 新增标签字段 - 从映射中获取
         categoryName: categoriesMap.get(tech.category_id)?.name_zh || '',
+        categoryNameEn: categoriesMap.get(tech.category_id)?.name_en || '',
         subCategoryName: subcategoriesMap.get(tech.subcategory_id)?.name_zh || '',
+        subCategoryNameEn: subcategoriesMap.get(tech.subcategory_id)?.name_en || '',
         countryName: countriesMap.get(tech.company_country_id)?.name_zh || '',
+        countryNameEn: countriesMap.get(tech.company_country_id)?.name_en || '',
         countryFlagUrl: countriesMap.get(tech.company_country_id)?.logo_url || '',
         developmentZoneName: developmentZonesMap.get(tech.company_development_zone_id)?.name_zh || '',
+        developmentZoneNameEn: developmentZonesMap.get(tech.company_development_zone_id)?.name_en || '',
         // 原有字段保持兼容性
         category: category || '',
         subCategory: '',

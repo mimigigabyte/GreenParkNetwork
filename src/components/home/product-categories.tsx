@@ -1,28 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { ProductCategory } from '@/api/tech';
 
 interface ProductCategoriesProps {
   categories: ProductCategory[];
   selectedCategory: string;
   onCategorySelect: (categoryId: string) => void;
+  locale?: string;
 }
 
 export function ProductCategories({ 
   categories, 
   selectedCategory, 
-  onCategorySelect 
+  onCategorySelect,
+  locale 
 }: ProductCategoriesProps) {
   const [loadedImages, setLoadedImages] = useState<{[key: number]: string}>({});
+  const t = useTranslations('home');
 
   // 尝试加载不同格式的图片
   const tryLoadImage = async (index: number) => {
-    const formats = ['jpg', 'jpeg', 'png', 'webp'];
-    const baseUrl = `/images/categories/category-${index + 1}`;
+    const formats = ['png', 'jpg', 'jpeg', 'webp'];
     
     for (const format of formats) {
-      const url = `${baseUrl}.${format}`;
+      // 直接尝试加载图片，避免fetch被中间件拦截
+      const url = `/images/categories/category-${index + 1}.${format}`;
       try {
         const img = new Image();
         await new Promise((resolve, reject) => {
@@ -69,7 +73,7 @@ export function ProductCategories({
           
           {/* 标题文字 */}
           <h2 className="text-2xl md:text-3xl font-bold text-green-600 text-center">
-            绿色低碳技术产品分类
+            {t('categories')}
           </h2>
           
           {/* 右侧装饰图案 */}
@@ -130,10 +134,10 @@ export function ProductCategories({
                    {/* 顶部标题区域 - 向下调整位置 */}
                    <div className="mt-8 mb-6">
                      <h3 className="text-xl lg:text-2xl font-bold mb-1">
-                       {category.name}
+                       {locale === 'en' ? category.nameEn : category.name}
                      </h3>
                      <p className="text-sm text-white/80 uppercase tracking-wider font-medium">
-                       {category.nameEn}
+                       {locale === 'en' ? category.name : category.nameEn}
                      </p>
                    </div>
 
@@ -144,7 +148,7 @@ export function ProductCategories({
                        <span className="text-2xl font-normal">+</span>
                      </div>
                      <div className="text-sm text-white/80 font-medium">
-                       相关技术
+                       {t('relatedTechnology')}
                      </div>
                    </div>
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { X, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import { RegisterForm } from './register-form';
@@ -21,8 +22,13 @@ interface AuthModalProps {
 
 export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const t = useTranslations('auth');
   const { user, checkUser } = useAuthContext();
   const [isLogin, setIsLogin] = useState(initialAction !== 'register');
+  
+  // 检测当前语言
+  const locale = pathname.startsWith('/en') ? 'en' : 'zh';
   const [isVerificationLogin, setIsVerificationLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
@@ -178,14 +184,14 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
               <div className="max-w-md mx-auto w-full">
                                                 {/* 标题 */}
                  <div className="mb-8 mt-0">
-                   <h2 className="text-3xl font-bold text-gray-800 mb-2">账号登录</h2>
+                   <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('login')}</h2>
                   <div className="flex items-center text-sm text-gray-600">
-                    <span>没有账号?</span>
+                    <span>{t('switchToRegister')}</span>
                     <button 
                       onClick={() => setIsLogin(false)}
                       className="ml-1 text-[#00b899] hover:text-[#009a7a] transition-colors"
                     >
-                      免费注册
+                      {t('register')}
                     </button>
                   </div>
                 </div>
@@ -196,7 +202,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                   <div className="space-y-2">
                     <input
                       type="text"
-                      placeholder="手机号/邮箱"
+                      placeholder={locale === 'en' ? 'Phone/Email' : '手机号/邮箱'}
                       value={loginData.account}
                       onChange={(e) => setLoginData(prev => ({ ...prev, account: e.target.value }))}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all text-gray-700 placeholder-gray-400"
@@ -209,7 +215,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="密码"
+                        placeholder={locale === 'en' ? 'Password' : '密码'}
                         value={loginData.password}
                         onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
                         className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all text-gray-700 placeholder-gray-400"
@@ -229,32 +235,34 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                     </div>
                   </div>
 
-                                     {/* 忘记密码链接和隐私条款 */}
-                   <div className="flex justify-between items-center">
-                     <div className="flex items-center text-sm text-gray-600">
-                       <input
-                         type="checkbox"
-                         checked={agreeToPrivacy}
-                         onChange={(e) => setAgreeToPrivacy(e.target.checked)}
-                         className="w-4 h-4 text-[#00b899] bg-gray-100 border-gray-300 rounded focus:ring-[#00b899] focus:ring-2"
-                       />
-                       <span className="ml-2">我已阅读并同意</span>
-                       <button 
-                         type="button"
-                         onClick={() => window.open('/privacy-policy', '_blank')}
-                         className="text-[#00b899] hover:text-[#009a7a] transition-colors underline"
-                       >
-                         《隐私条款》
-                       </button>
-                     </div>
-                     <button 
-                       type="button"
-                       onClick={() => setShowResetPassword(true)}
-                       className="text-sm text-[#00b899] hover:text-[#009a7a] transition-colors"
-                     >
-                       忘记密码?
-                     </button>
-                   </div>
+                  {/* 隐私政策协议和忘记密码 - 同一行 */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <input
+                        type="checkbox"
+                        checked={agreeToPrivacy}
+                        onChange={(e) => setAgreeToPrivacy(e.target.checked)}
+                        className="w-4 h-4 text-[#00b899] bg-gray-100 border-gray-300 rounded focus:ring-[#00b899] focus:ring-2 flex-shrink-0"
+                      />
+                      <span className="ml-2 whitespace-nowrap">
+                        {locale === 'en' ? 'I agree to the' : '我已阅读并同意'}
+                      </span>
+                      <button 
+                        type="button"
+                        onClick={() => window.open('/privacy-policy', '_blank')}
+                        className="text-[#00b899] hover:text-[#009a7a] transition-colors underline ml-1 whitespace-nowrap"
+                      >
+                        {locale === 'en' ? 'Privacy Policy' : '《隐私条款》'}
+                      </button>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setShowResetPassword(true)}
+                      className="text-sm text-[#00b899] hover:text-[#009a7a] transition-colors whitespace-nowrap"
+                    >
+                      {locale === 'en' ? 'Forgot Password?' : '忘记密码?'}
+                    </button>
+                  </div>
 
                   {/* Turnstile 人机验证 */}
                   {turnstileSiteKey && (
@@ -267,11 +275,11 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                         }}
                         onError={(error) => {
                           setTurnstileToken(null);
-                          setTurnstileError('人机验证失败，请重试');
+                          setTurnstileError(locale === 'en' ? 'Verification failed, please try again' : '人机验证失败，请重试');
                         }}
                         onExpired={() => {
                           setTurnstileToken(null);
-                          setTurnstileError('验证已过期，请重新验证');
+                          setTurnstileError(locale === 'en' ? 'Verification expired, please verify again' : '验证已过期，请重新验证');
                         }}
                         theme="auto"
                         size="normal"
@@ -293,7 +301,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                      }`}
                                        >
-                      {loginLoading ? '登录中...' : '登录'}
+                      {loginLoading ? (locale === 'en' ? 'Logging in...' : '登录中...') : (locale === 'en' ? 'Login' : '登录')}
                     </button>
                   </form>
                   
@@ -304,7 +312,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                       onClick={() => setIsVerificationLogin(true)}
                       className="text-sm text-[#00b899] hover:text-[#009a7a] transition-colors"
                     >
-                      手机验证码登录
+{locale === 'en' ? 'Login with SMS Code' : '手机验证码登录'}
                     </button>
                   </div>
 
@@ -314,7 +322,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                      <div className="w-full border-t border-gray-300"></div>
                    </div>
                    <div className="relative flex justify-center text-sm">
-                     <span className="bg-white px-4 text-gray-500">或</span>
+                     <span className="bg-white px-4 text-gray-500">{locale === 'en' ? 'or' : '或'}</span>
                    </div>
                  </div>
 
@@ -341,12 +349,19 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                       </div>
                     </div>
                     <span className="text-sm text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-                      微信扫码登录
+                      {locale === 'en' ? 'WeChat Login' : '微信扫码登录'}
                     </span>
                   </div>
              </div>
                          ) : isVerificationLogin ? (
-               <VerificationLoginForm onSwitchToLogin={() => setIsVerificationLogin(false)} onClose={onClose} />
+               <VerificationLoginForm 
+                onSwitchToLogin={() => setIsVerificationLogin(false)}
+                onSwitchToRegister={() => {
+                  setIsVerificationLogin(false);
+                  setIsLogin(false);
+                }}
+                onClose={onClose} 
+              />
             ) : (
               <RegisterForm onSwitchToLogin={() => setIsLogin(true)} />
             )}
@@ -388,12 +403,16 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                 <div className="flex flex-col">
                   {/* 主标题 */}
                   <h1 className="text-lg font-bold text-gray-900 mb-0">
-                    国家级经开区绿色低碳技术推广平台
+                    {locale === 'en' 
+                      ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform' 
+                      : '国家级经开区绿色低碳技术推广平台'}
                   </h1>
                   
-                  {/* 英文副标题 */}
+                  {/* 副标题 */}
                   <p className="text-[10px] text-gray-500 -mt-1">
-                    National Economic Development Zone Green Low-Carbon Technology Promotion Platform
+                    {locale === 'en' 
+                      ? 'Promoting sustainable development for a better future'
+                      : '推动可持续发展，共建绿色未来'}
                   </p>
                 </div>
               </div>

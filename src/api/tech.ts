@@ -7,8 +7,10 @@ export interface TechProduct {
   companyNameEn: string;
   companyLogo: string;
   solutionTitle: string;
+  solutionTitleEn?: string; // 技术英文名称
   solutionImage: string;
   solutionDescription: string;
+  solutionDescriptionEn?: string; // 技术英文描述
   category: string;
   subCategory: string;
   country: string;
@@ -20,15 +22,21 @@ export interface TechProduct {
   companyLogoUrl?: string; // 公司logo图片URL
   solutionThumbnail?: string; // 技术简介缩略图
   shortDescription?: string; // 简短描述（3行文字）
+  shortDescriptionEn?: string; // 简短英文描述
   fullDescription?: string; // 完整描述
+  fullDescriptionEn?: string; // 完整英文描述
   attachmentUrls?: string[]; // 附件文件URL数组
   attachmentNames?: string[]; // 附件原始文件名数组（与URL对应）
   // 新增标签字段
   categoryName?: string; // 产业分类名称
+  categoryNameEn?: string; // 产业分类英文名称
   subCategoryName?: string; // 子分类名称
+  subCategoryNameEn?: string; // 子分类英文名称
   countryName?: string; // 国别名称
+  countryNameEn?: string; // 国别英文名称
   countryFlagUrl?: string; // 国旗logo URL
   developmentZoneName?: string; // 国家级经开区名称
+  developmentZoneNameEn?: string; // 国家级经开区英文名称
 }
 
 // 子分类类型

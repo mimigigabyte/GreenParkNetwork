@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { TechProduct, SortType } from '@/api/tech';
 import { Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown, ChevronDown as ChevronDownIcon, FileText, Download, Mail } from 'lucide-react';
 import { ContactUsModal } from '@/components/contact/contact-us-modal';
@@ -17,6 +18,7 @@ interface SearchResultsProps {
   companyCount?: number;
   technologyCount?: number;
   onSortChange?: (sortType: SortType) => void;
+  locale?: string;
 }
 
 export function SearchResults({ 
@@ -28,9 +30,11 @@ export function SearchResults({
   currentCategory,
   companyCount, // 可选参数，如果未提供则基于搜索结果计算
   technologyCount, // 可选参数，如果未提供则使用totalResults
-  onSortChange
+  onSortChange,
+  locale
 }: SearchResultsProps) {
   const { user } = useAuthContext();
+  const t = useTranslations('home');
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
   const [currentSort, setCurrentSort] = useState<SortType>('updateTime');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -76,13 +80,23 @@ export function SearchResults({
   };
 
   const getCategoryName = (categoryId: string) => {
-    const categoryMap: { [key: string]: string } = {
+    const categoryMapZh: { [key: string]: string } = {
       'energy-saving': '节能环保技术',
       'clean-energy': '清洁能源技术',
       'clean-production': '清洁生产技术',
       'new-energy-vehicle': '新能源汽车技术'
     };
-    return categoryMap[categoryId] || '技术';
+    
+    const categoryMapEn: { [key: string]: string } = {
+      'energy-saving': 'Energy Saving',
+      'clean-energy': 'Clean Energy',
+      'clean-production': 'Clean Production',
+      'new-energy-vehicle': 'New Energy Vehicle'
+    };
+    
+    const categoryMap = locale === 'en' ? categoryMapEn : categoryMapZh;
+    const fallback = locale === 'en' ? 'Technology' : '技术';
+    return categoryMap[categoryId] || fallback;
   };
 
   const handleSortChange = (sortType: SortType) => {
@@ -94,19 +108,19 @@ export function SearchResults({
   const sortOptions = [
     {
       value: 'updateTime' as SortType,
-      label: '更新时间',
+      label: locale === 'en' ? 'Update Time' : '更新时间',
       icon: Clock,
       className: 'text-gray-600'
     },
     {
       value: 'nameDesc' as SortType,
-      label: '中文名称降序',
+      label: locale === 'en' ? 'Name Descending' : '中文名称降序',
       icon: ArrowDownAZ,
       className: 'text-red-600'
     },
     {
       value: 'nameAsc' as SortType,
-      label: '中文名称升序',
+      label: locale === 'en' ? 'Name Ascending' : '中文名称升序',
       icon: ArrowUpAZ,
       className: 'text-green-600'
     }
@@ -126,10 +140,10 @@ export function SearchResults({
     if (parts.length > 1) {
       const ext = parts.pop(); // 获取文件扩展名
       // 如果文件名看起来像是时间戳+随机字符，则生成更友好的名称
-      return `技术资料.${ext}`;
+      return locale === 'en' ? `Technical_Document.${ext}` : `技术资料.${ext}`;
     }
     
-    return '技术资料';
+    return locale === 'en' ? 'Technical_Document' : '技术资料';
   };
 
   const handleDownloadAttachment = async (attachmentUrl: string, originalFilename?: string) => {
@@ -150,21 +164,21 @@ export function SearchResults({
       document.body.removeChild(a)
     } catch (error) {
       console.error('下载附件失败:', error)
-      alert('下载附件失败，请重试')
+      alert(locale === 'en' ? 'Download failed, please try again' : '下载附件失败，请重试')
     }
   }
 
   // 处理联系我们按钮点击
   const handleContactUs = (product: TechProduct) => {
     if (!user) {
-      alert('必须注册登录才能联系技术提供方');
+      alert(locale === 'en' ? 'You must register and login to contact technology providers' : '必须注册登录才能联系技术提供方');
       return;
     }
 
     setSelectedTechnology({
       id: product.id,
-      name: product.solutionTitle,
-      companyName: product.companyName
+      name: locale === 'en' ? (product.solutionTitleEn || product.solutionTitle) : product.solutionTitle,
+      companyName: locale === 'en' ? (product.companyNameEn || product.companyName) : product.companyName
     });
     setContactModalOpen(true);
   };
@@ -181,21 +195,33 @@ export function SearchResults({
         {/* 结果信息和排序 */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="text-sm text-gray-600">
-            相关结果：为您搜索到来自
-            <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
-            家企业的
-            <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
-            项绿色低碳技术
+            {locale === 'en' ? (
+              <>
+                Search Results: Found{' '}
+                <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
+                green low-carbon technologies from{' '}
+                <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
+                companies
+              </>
+            ) : (
+              <>
+                相关结果：为您搜索到来自
+                <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
+                家企业的
+                <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
+                项绿色低碳技术
+              </>
+            )}
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">排序方式:</span>
+            <span className="text-sm text-gray-600">{locale === 'en' ? 'Sort by:' : '排序方式:'}</span>
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 px-3 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 <CurrentIcon className={`w-4 h-4 ${currentSortOption?.className || 'text-gray-600'}`} />
-                <span>{currentSortOption?.label || '更新时间'}</span>
+                <span>{currentSortOption?.label || (locale === 'en' ? 'Update Time' : '更新时间')}</span>
                 <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
@@ -235,31 +261,31 @@ export function SearchResults({
                 {/* 左侧：公司名称和标签 */}
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {product.companyName}
+                    {locale === 'en' ? (product.companyNameEn || product.companyName) : product.companyName}
                   </h3>
                   {/* 四个标签：产业分类、子分类、国别（带国旗）、经开区 */}
                   <div className="flex flex-wrap gap-2">
                     {/* 产业分类标签 */}
-                    {product.categoryName && (
+                    {(product.categoryName || product.categoryNameEn) && (
                       <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                        {product.categoryName}
+                        {locale === 'en' ? (product.categoryNameEn || product.categoryName) : product.categoryName}
                       </span>
                     )}
                     
                     {/* 子分类标签 */}
-                    {product.subCategoryName && (
+                    {(product.subCategoryName || product.subCategoryNameEn) && (
                       <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                        {product.subCategoryName}
+                        {locale === 'en' ? (product.subCategoryNameEn || product.subCategoryName) : product.subCategoryName}
                       </span>
                     )}
                     
                     {/* 国别标签（带国旗） */}
-                    {product.countryName && (
+                    {(product.countryName || product.countryNameEn) && (
                       <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
                         {product.countryFlagUrl && (
                           <img 
                             src={product.countryFlagUrl} 
-                            alt={`${product.countryName}国旗`}
+                            alt={`${locale === 'en' ? (product.countryNameEn || product.countryName) : product.countryName} flag`}
                             className="w-4 h-3 mr-1 object-cover"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -267,14 +293,14 @@ export function SearchResults({
                             }}
                           />
                         )}
-                        {product.countryName}
+                        {locale === 'en' ? (product.countryNameEn || product.countryName) : product.countryName}
                       </span>
                     )}
                     
                     {/* 国家级经开区标签 */}
-                    {product.developmentZoneName && (
+                    {(product.developmentZoneName || product.developmentZoneNameEn) && (
                       <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
-                        {product.developmentZoneName}
+                        {locale === 'en' ? (product.developmentZoneNameEn || product.developmentZoneName) : product.developmentZoneName}
                       </span>
                     )}
                   </div>
@@ -284,7 +310,7 @@ export function SearchResults({
                   {product.companyLogoUrl ? (
                     <img
                       src={product.companyLogoUrl}
-                      alt={product.companyName}
+                      alt={locale === 'en' ? (product.companyNameEn || product.companyName) : product.companyName}
                       className="h-12 w-auto object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -295,7 +321,9 @@ export function SearchResults({
                   ) : (
                     <div className="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
                       <span className="text-gray-500 text-sm">
-                        {product.companyName?.slice(0, 4) || '企业'}
+                        {locale === 'en' ? 
+                          (product.companyNameEn || product.companyName)?.slice(0, 4) || 'Corp' : 
+                          product.companyName?.slice(0, 4) || '企业'}
                       </span>
                     </div>
                   )}
@@ -309,7 +337,7 @@ export function SearchResults({
                    <div className="lg:w-1/4">
                      <img
                        src={product.solutionThumbnail || product.solutionImage}
-                       alt={product.solutionTitle}
+                       alt={locale === 'en' ? (product.solutionTitleEn || product.solutionTitle) : product.solutionTitle}
                        className="w-full h-64 object-cover rounded-lg"
                        onError={(e) => {
                          const target = e.target as HTMLImageElement;
@@ -322,7 +350,7 @@ export function SearchResults({
                    <div className="lg:w-3/4 flex flex-col justify-between">
                     <div>
                       <h4 className="text-xl font-bold text-gray-900 mb-4">
-                        {product.solutionTitle}
+                        {locale === 'en' ? (product.solutionTitleEn || product.solutionTitle) : product.solutionTitle}
                       </h4>
                       
                       {/* 简介文字 - 最多6行 */}
@@ -342,7 +370,9 @@ export function SearchResults({
                                 lineHeight: '1.5'
                               }
                         }>
-                          {product.fullDescription || product.solutionDescription}
+                          {locale === 'en' ? 
+                            (product.fullDescriptionEn || product.solutionDescriptionEn || product.fullDescription || product.solutionDescription) : 
+                            (product.fullDescription || product.solutionDescription)}
                         </p>
                         
                         {/* 展开更多按钮 */}
@@ -351,7 +381,9 @@ export function SearchResults({
                             onClick={() => toggleDescription(product.id)}
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-flex items-center"
                           >
-                            {expandedDescriptions.has(product.id) ? '收起' : '展开更多'}
+                            {expandedDescriptions.has(product.id) 
+                              ? (locale === 'en' ? 'Show Less' : '收起') 
+                              : (locale === 'en' ? 'Show More' : '展开更多')}
                             <ChevronDownIcon
                               className={`w-4 h-4 ml-1 transition-transform ${
                                 expandedDescriptions.has(product.id) ? 'rotate-180' : ''
@@ -366,7 +398,7 @@ export function SearchResults({
                         <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
                           <div className="flex items-center mb-3">
                             <FileText className="w-5 h-5 text-gray-600 mr-2" />
-                            <h5 className="text-sm font-medium text-gray-900">技术资料附件</h5>
+                            <h5 className="text-sm font-medium text-gray-900">{locale === 'en' ? 'Technical Documents' : '技术资料附件'}</h5>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                             {product.attachmentUrls.map((attachment, index) => {
@@ -396,10 +428,12 @@ export function SearchResults({
                        <button 
                          onClick={() => handleContactUs(product)}
                          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                         title={!user ? "必须注册登录才能联系技术提供方" : "联系我们"}
+                         title={!user 
+                           ? (locale === 'en' ? "You must register and login to contact technology providers" : "必须注册登录才能联系技术提供方")
+                           : (locale === 'en' ? "Contact Us" : "联系我们")}
                        >
                          <Mail className="w-4 h-4 mr-2" />
-                         联系我们
+{locale === 'en' ? 'Contact Us' : '联系我们'}
                        </button>
                      </div>
                   </div>
@@ -412,7 +446,9 @@ export function SearchResults({
         {/* 分页 */}
         <div className="mt-8 flex flex-col items-center space-y-4">
           <div className="text-sm text-gray-600">
-            每页10条 共{products.length * totalPages}条记录
+{locale === 'en' 
+              ? `10 items per page, total ${products.length * totalPages} records`
+              : `每页10条 共${products.length * totalPages}条记录`}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -472,6 +508,7 @@ export function SearchResults({
         technologyId={selectedTechnology?.id}
         technologyName={selectedTechnology?.name}
         companyName={selectedTechnology?.companyName}
+        locale={locale}
       />
     </section>
   );

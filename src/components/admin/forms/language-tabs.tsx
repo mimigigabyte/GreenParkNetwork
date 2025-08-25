@@ -29,6 +29,7 @@ export function LanguageTabs({
         {languages.map((language) => (
           <button
             key={language.key}
+            type="button"
             onClick={() => setActiveLanguage(language.key)}
             className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeLanguage === language.key

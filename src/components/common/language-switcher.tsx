@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { Globe, ChevronDown } from 'lucide-react';
+import { locales, type Locale } from '@/i18n/request';
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -9,28 +12,35 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'zh' | 'en'>('zh');
+  const pathname = usePathname();
+  const router = useRouter();
+  const currentLocale = useLocale() as Locale;
+  const t = useTranslations('header');
 
   const languages = [
     {
-      code: 'zh',
-      name: '中文',
+      code: 'zh' as const,
+      name: t('chinese'),
       flag: '🇨🇳'
     },
     {
-      code: 'en', 
-      name: 'English',
+      code: 'en' as const, 
+      name: t('english'),
       flag: '🇬🇧'
     }
   ];
 
-  const currentLangData = languages.find(lang => lang.code === currentLanguage);
+  const currentLangData = languages.find(lang => lang.code === currentLocale);
 
-  const handleLanguageChange = (langCode: 'zh' | 'en') => {
-    setCurrentLanguage(langCode);
+  const handleLanguageChange = (langCode: Locale) => {
     setIsDropdownOpen(false);
-    // TODO: 这里可以添加实际的语言切换逻辑
-    console.log('切换语言到:', langCode);
+    
+    // 构建新的路径：替换当前语言为新语言
+    const segments = pathname.split('/');
+    segments[1] = langCode; // 第一个segment是空字符串，第二个是语言代码
+    const newPath = segments.join('/');
+    
+    router.push(newPath);
   };
 
   return (
@@ -38,7 +48,7 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
-        title="语言切换"
+        title={t('language')}
       >
         <Globe className="w-4 h-4" />
         <span className="flex items-center space-x-1">
@@ -64,16 +74,16 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
               {languages.map((language) => (
                 <button
                   key={language.code}
-                  onClick={() => handleLanguageChange(language.code as 'zh' | 'en')}
+                  onClick={() => handleLanguageChange(language.code)}
                   className={`w-full flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
-                    currentLanguage === language.code 
+                    currentLocale === language.code 
                       ? 'text-blue-600 bg-blue-50' 
                       : 'text-gray-700'
                   }`}
                 >
                   <span className="text-base">{language.flag}</span>
                   <span>{language.name}</span>
-                  {currentLanguage === language.code && (
+                  {currentLocale === language.code && (
                     <span className="ml-auto text-blue-600">✓</span>
                   )}
                 </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Select,
   SelectContent,
@@ -19,6 +20,7 @@ interface SearchFilterProps {
   onOpenAuth?: () => void;
   totalResults: number;
   currentCategory: string;
+  locale?: string;
 }
 
 export function SearchFilter({ 
@@ -26,10 +28,13 @@ export function SearchFilter({
   onFilterChange, 
   onOpenAuth,
   totalResults, 
-  currentCategory 
+  currentCategory,
+  locale 
 }: SearchFilterProps) {
   const { user, loading } = useAuthContext();
   const router = useRouter();
+  const t = useTranslations('home');
+  const common = useTranslations('common');
   const [keyword, setKeyword] = useState('');
   const [filters, setFilters] = useState({
     category: 'all',
@@ -49,10 +54,10 @@ export function SearchFilter({
 
   useEffect(() => {
     if (filterData.categories.length > 0) {
-      const transformedData = transformFilterDataForComponents(filterData);
+      const transformedData = transformFilterDataForComponents(filterData, locale);
       setMainCategories(transformedData.mainCategories);
     }
-  }, [filterData]);
+  }, [filterData, locale]);
 
   const handleSearch = () => {
     onSearch(keyword);
@@ -83,7 +88,7 @@ export function SearchFilter({
         loadProvinces(chinaCountry.id).then(provincesData => {
           const transformedProvinces = provincesData.map(p => ({
             value: p.code,
-            label: p.name_zh
+            label: locale === 'en' ? (p.name_en || p.name_zh) : p.name_zh
           }));
           setProvinces(transformedProvinces);
         });
@@ -99,7 +104,18 @@ export function SearchFilter({
         loadDevelopmentZones(province.id).then(zonesData => {
           const transformedZones = zonesData.map(z => ({
             value: z.code,
-            label: z.name_zh
+            label: locale === 'en' 
+              ? (z.name_en && !/[\u4e00-\u9fff]/.test(z.name_en) ? z.name_en : z.name_zh
+                  .replace(/经济技术开发区/g, 'Economic and Technological Development Zone')
+                  .replace(/经济开发区/g, 'Economic Development Zone')
+                  .replace(/高新技术开发区/g, 'High-Tech Development Zone')
+                  .replace(/工业园区/g, 'Industrial Park')
+                  .replace(/科技园/g, 'Science Park')
+                  .replace(/新区/g, 'New Area')
+                  .replace(/开发区/g, 'Development Zone')
+                  .replace(/自贸区/g, 'Free Trade Zone')
+                  .replace(/保税区/g, 'Bonded Zone'))
+              : z.name_zh
           }));
           setDevelopmentZones(transformedZones);
         });
@@ -183,7 +199,7 @@ export function SearchFilter({
             
             {/* 标题文字 */}
             <h2 className="text-2xl md:text-3xl font-bold text-green-600 text-center">
-              绿色技术，一键搜索
+              {t('searchTitle')}
             </h2>
             
             {/* 右侧装饰图案 */}
@@ -209,7 +225,7 @@ export function SearchFilter({
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="搜索绿色低碳技术..."
+                placeholder={t('searchPlaceholder')}
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -226,7 +242,7 @@ export function SearchFilter({
               className="w-32 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4" />
-              搜索
+{common('search')}
             </button>
             
             {/* 我要加入按钮 */}
@@ -238,7 +254,7 @@ export function SearchFilter({
                 
                 if (!user) {
                   // 用户未登录，显示提示并打开登录弹窗
-                  alert('必须注册登录才能进行绿色低碳技术的入库申报');
+                  alert(t('loginRequired'));
                   if (onOpenAuth) {
                     onOpenAuth();
                   }
@@ -251,7 +267,7 @@ export function SearchFilter({
               className="w-32 px-8 py-3 bg-white text-green-600 border border-green-600 rounded-lg hover:bg-green-50 hover:border-green-700 hover:text-green-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4" style={{ color: '#059669' }} />
-              我要加入
+{t('joinUs')}
             </button>
           </div>
           
@@ -262,11 +278,15 @@ export function SearchFilter({
                 <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
                 </svg>
-                热门搜索:
+{t('popularSearches')}:
               </span>
-              {[
-                '零碳园区', '太阳能光伏', '绿色建筑', '虚拟电厂', '氢能'
-              ].map((tag, index) => (
+              {(() => {
+                const popularSearchTags = {
+                  zh: ['零碳园区', '太阳能光伏', '绿色建筑', '虚拟电厂', '氢能'],
+                  en: ['Zero-Carbon Park', 'Solar Photovoltaic', 'Green Building', 'Virtual Power Plant', 'Hydrogen Energy']
+                };
+                return (locale === 'en' ? popularSearchTags.en : popularSearchTags.zh);
+              })().map((tag, index) => (
                 <button
                   key={index}
                   onClick={() => {
@@ -290,13 +310,13 @@ export function SearchFilter({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* 产业分类 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">产业分类</label>
+              <label className="block text-sm font-medium text-gray-700">{t('categoryLabel')}</label>
               <select
                 value={selectedMainCategory}
                 onChange={(e) => handleMainCategoryChange(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="all">全部分类</option>
+                <option value="all">{t('allCategories')}</option>
                 {mainCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -307,14 +327,14 @@ export function SearchFilter({
 
             {/* 子分类 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">子分类</label>
+              <label className="block text-sm font-medium text-gray-700">{t('subCategoryLabel')}</label>
               <select
                 value={filters.subCategory}
                 onChange={(e) => handleFilterChange('subCategory', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 disabled={selectedMainCategory === 'all'}
               >
-                <option value="all">全部子分类</option>
+                <option value="all">{t('allSubCategories')}</option>
                 {getCurrentSubCategories().map((subCategory) => (
                   <option key={subCategory.id} value={subCategory.id}>
                     {subCategory.name}
@@ -325,16 +345,16 @@ export function SearchFilter({
 
             {/* 国别 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">国别</label>
+              <label className="block text-sm font-medium text-gray-700">{t('countryLabel')}</label>
               <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="全部国家" />
+                  <SelectValue placeholder={t('allCountries')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    <div className="flex items-center gap-2">全部国家</div>
+                    <div className="flex items-center gap-2">{t('allCountries')}</div>
                   </SelectItem>
-                  {transformFilterDataForComponents(filterData).countries.map((country) => (
+                  {transformFilterDataForComponents(filterData, locale).countries.map((country) => (
                     <SelectItem key={country.value} value={country.value}>
                       <div className="flex items-center gap-2">
                         {country.logo_url && (
@@ -356,7 +376,7 @@ export function SearchFilter({
 
             {/* 省份 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">省份</label>
+              <label className="block text-sm font-medium text-gray-700">{t('provinceLabel')}</label>
               <select
                 value={filters.province}
                 onChange={(e) => handleFilterChange('province', e.target.value)}
@@ -365,7 +385,7 @@ export function SearchFilter({
                   filters.country !== 'china' ? 'bg-gray-100 text-gray-400' : ''
                 }`}
               >
-                <option value="all">全部省份</option>
+                <option value="all">{t('allProvinces')}</option>
                 {provinces.map((province) => (
                   <option key={province.value} value={province.value}>
                     {province.label}
@@ -376,7 +396,7 @@ export function SearchFilter({
 
             {/* 国家级经开区 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">国家级经开区</label>
+              <label className="block text-sm font-medium text-gray-700">{t('developmentZoneLabel')}</label>
               <select
                 value={filters.developmentZone}
                 onChange={(e) => handleFilterChange('developmentZone', e.target.value)}
@@ -385,7 +405,7 @@ export function SearchFilter({
                   filters.country !== 'china' || filters.province === 'all' ? 'bg-gray-100 text-gray-400' : ''
                 }`}
               >
-                <option value="all">全部国家级经开区</option>
+                <option value="all">{t('allDevelopmentZones')}</option>
                 {getCurrentDevelopmentZones().map((zone) => (
                   <option key={zone.value} value={zone.value}>
                     {zone.label}

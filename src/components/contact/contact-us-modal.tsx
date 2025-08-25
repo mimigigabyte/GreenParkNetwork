@@ -24,6 +24,7 @@ interface ContactUsModalProps {
   technologyId?: string;
   technologyName?: string;
   companyName?: string;
+  locale?: string;
 }
 
 interface ContactFormData {
@@ -38,11 +39,80 @@ export function ContactUsModal({
   onClose, 
   technologyId, 
   technologyName, 
-  companyName 
+  companyName,
+  locale = 'zh'
 }: ContactUsModalProps) {
   const { user } = useAuthContext();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+
+  // Translation constants
+  const translations = {
+    zh: {
+      contactUs: '联系我们',
+      aboutTechnology: '关于技术：',
+      contactName: '联系人姓名',
+      contactPhone: '联系电话',
+      contactEmail: '联系邮箱',
+      message: '留言内容',
+      required: '*',
+      cancel: '取消',
+      submit: '提交留言',
+      submitting: '提交中...',
+      placeholders: {
+        name: '请输入您的姓名',
+        phone: '请输入您的联系电话',
+        email: '请输入您的邮箱地址',
+        message: '请详细描述您的需求或问题...'
+      },
+      validation: {
+        title: '验证失败',
+        nameRequired: '请填写联系人姓名',
+        phoneRequired: '请填写联系电话',
+        emailRequired: '请填写联系邮箱',
+        emailFormat: '请填写正确的邮箱格式',
+        messageRequired: '请填写留言内容'
+      },
+      submitError: '提交失败',
+      loginRequired: '请先登录后再联系我们',
+      submitSuccess: '提交成功',
+      successMessage: '您的留言已成功提交，我们会尽快与您联系！',
+      errorMessage: '提交失败，请稍后重试'
+    },
+    en: {
+      contactUs: 'Contact Us',
+      aboutTechnology: 'About Technology: ',
+      contactName: 'Contact Name',
+      contactPhone: 'Phone Number',
+      contactEmail: 'Email Address',
+      message: 'Message',
+      required: '*',
+      cancel: 'Cancel',
+      submit: 'Submit Message',
+      submitting: 'Submitting...',
+      placeholders: {
+        name: 'Please enter your name',
+        phone: 'Please enter your phone number',
+        email: 'Please enter your email address',
+        message: 'Please describe your needs or questions in detail...'
+      },
+      validation: {
+        title: 'Validation Failed',
+        nameRequired: 'Please fill in contact name',
+        phoneRequired: 'Please fill in phone number',
+        emailRequired: 'Please fill in email address',
+        emailFormat: 'Please enter a valid email format',
+        messageRequired: 'Please fill in message content'
+      },
+      submitError: 'Submission Failed',
+      loginRequired: 'Please login first to contact us',
+      submitSuccess: 'Submitted Successfully',
+      successMessage: 'Your message has been submitted successfully, we will contact you soon!',
+      errorMessage: 'Submission failed, please try again later'
+    }
+  };
+
+  const t = translations[locale as keyof typeof translations] || translations.zh;
   const [formData, setFormData] = useState<ContactFormData>({
     contactName: '',
     contactPhone: '',
@@ -74,8 +144,8 @@ export function ContactUsModal({
   const validateForm = (): boolean => {
     if (!formData.contactName.trim()) {
       toast({
-        title: "验证失败",
-        description: "请填写联系人姓名",
+        title: t.validation.title,
+        description: t.validation.nameRequired,
         variant: "destructive"
       });
       return false;
@@ -83,8 +153,8 @@ export function ContactUsModal({
 
     if (!formData.contactPhone.trim()) {
       toast({
-        title: "验证失败", 
-        description: "请填写联系电话",
+        title: t.validation.title, 
+        description: t.validation.phoneRequired,
         variant: "destructive"
       });
       return false;
@@ -92,8 +162,8 @@ export function ContactUsModal({
 
     if (!formData.contactEmail.trim()) {
       toast({
-        title: "验证失败",
-        description: "请填写联系邮箱", 
+        title: t.validation.title,
+        description: t.validation.emailRequired, 
         variant: "destructive"
       });
       return false;
@@ -103,8 +173,8 @@ export function ContactUsModal({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.contactEmail)) {
       toast({
-        title: "验证失败",
-        description: "请填写正确的邮箱格式",
+        title: t.validation.title,
+        description: t.validation.emailFormat,
         variant: "destructive"
       });
       return false;
@@ -112,8 +182,8 @@ export function ContactUsModal({
 
     if (!formData.message.trim()) {
       toast({
-        title: "验证失败",
-        description: "请填写留言内容",
+        title: t.validation.title,
+        description: t.validation.messageRequired,
         variant: "destructive"
       });
       return false;
@@ -128,8 +198,8 @@ export function ContactUsModal({
     
     if (!user) {
       toast({
-        title: "提交失败",
-        description: "请先登录后再联系我们",
+        title: t.submitError,
+        description: t.loginRequired,
         variant: "destructive"
       });
       return;
@@ -154,8 +224,8 @@ export function ContactUsModal({
       });
 
       toast({
-        title: "提交成功",
-        description: "您的留言已成功提交，我们会尽快与您联系！",
+        title: t.submitSuccess,
+        description: t.successMessage,
         variant: "default"
       });
 
@@ -170,9 +240,9 @@ export function ContactUsModal({
       onClose();
     } catch (error) {
       console.error('提交联系消息失败:', error);
-      const errorMessage = error instanceof Error ? error.message : '提交失败，请稍后重试';
+      const errorMessage = error instanceof Error ? error.message : t.errorMessage;
       toast({
-        title: "提交失败",
+        title: t.submitError,
         description: errorMessage,
         variant: "destructive"
       });
@@ -201,11 +271,11 @@ export function ContactUsModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
             <MessageSquare className="w-5 h-5 text-green-600" />
-            联系我们
+            {t.contactUs}
           </DialogTitle>
           {technologyName && (
             <p className="text-sm text-gray-600 mt-2">
-              关于技术：<span className="font-medium">{technologyName}</span>
+              {t.aboutTechnology}<span className="font-medium">{technologyName}</span>
               {companyName && (
                 <span className="text-gray-500"> - {companyName}</span>
               )}
@@ -218,12 +288,12 @@ export function ContactUsModal({
           <div className="space-y-2">
             <Label htmlFor="contactName" className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              联系人姓名 <span className="text-red-500">*</span>
+              {t.contactName} <span className="text-red-500">{t.required}</span>
             </Label>
             <Input
               id="contactName"
               type="text"
-              placeholder="请输入您的姓名"
+              placeholder={t.placeholders.name}
               value={formData.contactName}
               onChange={(e) => handleInputChange('contactName', e.target.value)}
               required
@@ -234,12 +304,12 @@ export function ContactUsModal({
           <div className="space-y-2">
             <Label htmlFor="contactPhone" className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
-              联系电话 <span className="text-red-500">*</span>
+              {t.contactPhone} <span className="text-red-500">{t.required}</span>
             </Label>
             <Input
               id="contactPhone"
               type="tel"
-              placeholder="请输入您的联系电话"
+              placeholder={t.placeholders.phone}
               value={formData.contactPhone}
               onChange={(e) => handleInputChange('contactPhone', e.target.value)}
               required
@@ -250,12 +320,12 @@ export function ContactUsModal({
           <div className="space-y-2">
             <Label htmlFor="contactEmail" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              联系邮箱 <span className="text-red-500">*</span>
+              {t.contactEmail} <span className="text-red-500">{t.required}</span>
             </Label>
             <Input
               id="contactEmail"
               type="email"
-              placeholder="请输入您的邮箱地址"
+              placeholder={t.placeholders.email}
               value={formData.contactEmail}
               onChange={(e) => handleInputChange('contactEmail', e.target.value)}
               required
@@ -266,11 +336,11 @@ export function ContactUsModal({
           <div className="space-y-2">
             <Label htmlFor="message" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              留言内容 <span className="text-red-500">*</span>
+              {t.message} <span className="text-red-500">{t.required}</span>
             </Label>
             <Textarea
               id="message"
-              placeholder="请详细描述您的需求或问题..."
+              placeholder={t.placeholders.message}
               value={formData.message}
               onChange={(e) => handleInputChange('message', e.target.value)}
               rows={4}
@@ -288,7 +358,7 @@ export function ContactUsModal({
               className="flex items-center gap-2"
             >
               <X className="w-4 h-4" />
-              取消
+              {t.cancel}
             </Button>
             <Button
               type="submit"
@@ -296,7 +366,7 @@ export function ContactUsModal({
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <Send className="w-4 h-4" />
-              {loading ? '提交中...' : '提交留言'}
+              {loading ? t.submitting : t.submit}
             </Button>
           </DialogFooter>
         </form>

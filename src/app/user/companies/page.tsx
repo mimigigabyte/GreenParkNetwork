@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { ChevronDown, Save, X } from 'lucide-react';
 import { CompactImageUpload } from '@/components/ui/compact-image-upload';

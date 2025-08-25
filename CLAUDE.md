@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 技术栈
 - 前端使用Next.js技术+Tailwind CSS框架 
 - 移动端APP开发使用React Native 
-- 尽量使用shadcn/ui现成的组件
+- 尽量使用shadcn/ui现成的组件,加上Radix UI 和 Framer Motion
 - 使用 GitHub 作为代码托管平台
 - 使用Upstash Redis作为边缘缓存服务
-- 后端使用Java语言+SpringBoot框架
+- 后端使用FastAPI
+- 数据ORM使用Drizzle
 - 邮件服务使用Resend
 - 使用Cloudflare作为CDN网络服务
 - 使用Vercel进行一键部署

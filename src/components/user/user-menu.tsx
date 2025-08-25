@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { User, LogOut, Settings } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { useAuthContext } from '@/components/auth/auth-provider'
 
 interface UserMenuProps {
@@ -12,6 +13,10 @@ export function UserMenu({ className }: UserMenuProps) {
   const { user, loading, logout } = useAuthContext()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
+  
+  // 检测当前语言
+  const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
   // 获取用户名（邮箱或手机号）
   const getUserName = () => {
@@ -73,18 +78,18 @@ export function UserMenu({ className }: UserMenuProps) {
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-[9999]">
           <div className="px-4 py-2 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-900">{getUserName()}</p>
-            <p className="text-xs text-gray-500">{user.email || user.phone || '用户'}</p>
+            <p className="text-xs text-gray-500">{user.email || user.phone || (locale === 'en' ? 'User' : '用户')}</p>
           </div>
           
           <button
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
             onClick={() => {
               setShowUserMenu(false)
-              window.location.href = '/profile'
+              window.location.href = `/${locale}/profile`
             }}
           >
             <Settings className="w-4 h-4 mr-2" />
-            个人中心
+            {locale === 'en' ? 'Profile' : '个人中心'}
           </button>
           
           <button
@@ -92,7 +97,7 @@ export function UserMenu({ className }: UserMenuProps) {
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4 mr-2" />
-            退出登录
+            {locale === 'en' ? 'Sign Out' : '退出登录'}
           </button>
         </div>
       )}

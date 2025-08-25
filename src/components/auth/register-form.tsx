@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
 import { emailVerificationApi } from '@/api/emailVerification';
@@ -15,7 +16,12 @@ interface RegisterFormProps {
 
 export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const t = useTranslations('auth');
   const { checkUser } = useAuthContext();
+  
+  // 检测当前语言
+  const locale = pathname.startsWith('/en') ? 'en' : 'zh';
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPhoneRegister, setIsPhoneRegister] = useState(false);
@@ -41,7 +47,9 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const handleGetCode = async () => {
     const target = isPhoneRegister ? formData.phone : formData.email;
     if (!target) {
-      alert(`请输入${isPhoneRegister ? '手机号' : '邮箱地址'}`);
+      alert(locale === 'en' 
+        ? `Please enter ${isPhoneRegister ? 'phone number' : 'email address'}`
+        : `请输入${isPhoneRegister ? '手机号' : '邮箱地址'}`);
       return;
     }
 
@@ -78,18 +86,22 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         
         // 开发模式下显示验证码
         if ('debugCode' in result.data && result.data.debugCode) {
-          alert(`验证码已发送！开发模式验证码：${result.data.debugCode}`);
+          alert(locale === 'en' 
+            ? `Verification code sent! Dev mode code: ${result.data.debugCode}`
+            : `验证码已发送！开发模式验证码：${result.data.debugCode}`);
         } else if ('devOTP' in result.data && result.data.devOTP) {
-          alert(`验证码已发送！开发模式验证码：${result.data.devOTP}`);
+          alert(locale === 'en' 
+            ? `Verification code sent! Dev mode code: ${result.data.devOTP}`
+            : `验证码已发送！开发模式验证码：${result.data.devOTP}`);
         } else {
-          alert(result.data.message || '验证码已发送');
+          alert(result.data.message || (locale === 'en' ? 'Verification code sent' : '验证码已发送'));
         }
       } else {
-        alert('error' in result ? result.error : '发送验证码失败');
+        alert('error' in result ? result.error : (locale === 'en' ? 'Failed to send verification code' : '发送验证码失败'));
       }
     } catch (error) {
       console.error('发送验证码失败:', error);
-      alert('发送验证码失败，请稍后重试');
+      alert(locale === 'en' ? 'Failed to send verification code, please try again later' : '发送验证码失败，请稍后重试');
     } finally {
       setCodeLoading(false);
     }
@@ -100,27 +112,27 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     
     // 表单验证
     if (!formData.verificationCode || !formData.password || !formData.confirmPassword) {
-      alert('请填写完整信息');
+      alert(locale === 'en' ? 'Please fill in all information' : '请填写完整信息');
       return;
     }
 
     if (!isPhoneRegister && !formData.email) {
-      alert('请输入邮箱地址');
+      alert(locale === 'en' ? 'Please enter email address' : '请输入邮箱地址');
       return;
     }
 
     if (isPhoneRegister && !formData.phone) {
-      alert('请输入手机号');
+      alert(locale === 'en' ? 'Please enter phone number' : '请输入手机号');
       return;
     }
     
     if (formData.password !== formData.confirmPassword) {
-      alert('两次输入的密码不一致');
+      alert(locale === 'en' ? 'Passwords do not match' : '两次输入的密码不一致');
       return;
     }
     
     if (formData.password.length < 6) {
-      alert('密码长度至少6位');
+      alert(locale === 'en' ? 'Password must be at least 6 characters' : '密码长度至少6位');
       return;
     }
 
@@ -157,20 +169,20 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         await checkUser();
         console.log('✅ 认证状态更新完成')
 
-        alert('注册成功！');
+        alert(locale === 'en' ? 'Registration successful!' : '注册成功！');
         
         // 稍等一下确保状态更新完成后再跳转
         setTimeout(() => {
           router.push('/company-profile');
         }, 100);
       } else {
-        const errorMessage = 'error' in result ? result.error : '注册失败，请稍后重试';
+        const errorMessage = 'error' in result ? result.error : (locale === 'en' ? 'Registration failed, please try again later' : '注册失败，请稍后重试');
         alert(errorMessage);
       }
       
     } catch (error) {
       console.error('注册失败:', error);
-      alert('注册失败，请稍后重试');
+      alert(locale === 'en' ? 'Registration failed, please try again later' : '注册失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -180,23 +192,26 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     <div className="max-w-md mx-auto w-full pb-8">
       {/* 标题 */}
       <div className="mb-8 mt-0">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">新用户注册</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">{locale === 'en' ? 'Sign Up' : '新用户注册'}</h2>
                  <div className="flex items-center justify-between text-sm text-gray-600">
            <div className="flex items-center">
-             <span>已有账号？</span>
+             <span>{locale === 'en' ? 'Already have an account?' : '已有账号？'}</span>
              <button 
                onClick={onSwitchToLogin}
-               className="ml-1 text-[#00b899] hover:text-[#009a7a] transition-colors"
+               className="ml-1 text-[#00b899] hover:text-[#009a7a] transition-colors whitespace-nowrap"
              >
-               立即登录
+ {locale === 'en' ? 'Sign In' : '立即登录'}
              </button>
            </div>
                        <button 
               type="button"
               onClick={() => setIsPhoneRegister(!isPhoneRegister)}
-              className="text-[#00b899] hover:text-[#009a7a] transition-colors"
+              className="text-[#00b899] hover:text-[#009a7a] transition-colors whitespace-nowrap"
             >
-              {isPhoneRegister ? '切换至邮箱注册' : '切换至手机号注册'}
+              {isPhoneRegister 
+                ? (locale === 'en' ? 'Email Sign Up' : '切换至邮箱注册') 
+                : (locale === 'en' ? 'SMS Sign Up' : '切换至手机号注册')
+              }
             </button>
          </div>
       </div>
@@ -215,7 +230,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                {/* 手机号码输入 */}
                <input
                  type="tel"
-                 placeholder="手机号码"
+                 placeholder={locale === 'en' ? 'Phone number' : '手机号码'}
                  value={formData.phone}
                  onChange={(e) => handleInputChange('phone', e.target.value)}
                  className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#00b899]"
@@ -231,7 +246,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                </div>
                <input
                  type="email"
-                 placeholder="邮箱地址"
+                 placeholder={locale === 'en' ? 'Email address' : '邮箱地址'}
                  value={formData.email}
                  onChange={(e) => handleInputChange('email', e.target.value)}
                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
@@ -247,7 +262,10 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
              {/* 验证码输入 */}
              <input
                type="text"
-               placeholder={isPhoneRegister ? "手机验证码" : "邮箱验证码"}
+               placeholder={isPhoneRegister 
+                 ? (locale === 'en' ? 'Phone verification code' : '手机验证码') 
+                 : (locale === 'en' ? 'Email verification code' : '邮箱验证码')
+               }
                value={formData.verificationCode}
                onChange={(e) => handleInputChange('verificationCode', e.target.value)}
                className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400"
@@ -264,7 +282,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer'
                 }`}
               >
-                {countdown > 0 ? `${countdown}s` : codeLoading ? '发送中...' : '获取验证码'}
+                {countdown > 0 
+                  ? `${countdown}s` 
+                  : codeLoading 
+                    ? (locale === 'en' ? 'Sending...' : '发送中...') 
+                    : (locale === 'en' ? 'Send Code' : '获取验证码')
+                }
               </button>
            </div>
          </div>
@@ -279,7 +302,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             </div>
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="密码"
+              placeholder={locale === 'en' ? 'Password' : '密码'}
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
               className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
@@ -309,7 +332,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             </div>
             <input
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="确认密码"
+              placeholder={locale === 'en' ? 'Confirm password' : '确认密码'}
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
               className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
@@ -331,21 +354,21 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
                  {/* 服务条款和隐私声明提示 */}
          <div className="text-center text-sm text-gray-600">
-           <span>点击注册表明你已阅读并同意</span>
+           <span className="whitespace-nowrap">{locale === 'en' ? 'By registering, you agree to our' : '点击注册表明你已阅读并同意'}</span>
            <button 
              type="button"
              onClick={() => window.open('/terms-of-service', '_blank')}
-             className="text-[#00b899] hover:text-[#009a7a] transition-colors underline mx-1"
+             className="text-[#00b899] hover:text-[#009a7a] transition-colors underline mx-1 whitespace-nowrap"
            >
-             《服务条款》
+             {locale === 'en' ? 'Terms of Service' : '《服务条款》'}
            </button>
-           <span>和</span>
+           <span className="whitespace-nowrap">{locale === 'en' ? ' and ' : '和'}</span>
            <button 
              type="button"
              onClick={() => window.open('/privacy-policy', '_blank')}
-             className="text-[#00b899] hover:text-[#009a7a] transition-colors underline mx-1"
+             className="text-[#00b899] hover:text-[#009a7a] transition-colors underline mx-1 whitespace-nowrap"
            >
-             《隐私声明》
+             {locale === 'en' ? 'Privacy Policy' : '《隐私声明》'}
            </button>
          </div>
 
@@ -360,7 +383,10 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                  : 'bg-[#00b899] hover:bg-[#009a7a]'
              } text-white`}
            >
-             {loading ? '注册中...' : '注册'}
+             {loading 
+               ? (locale === 'en' ? 'Registering...' : '注册中...') 
+               : (locale === 'en' ? 'Register' : '注册')
+             }
            </button>
          </div>
 

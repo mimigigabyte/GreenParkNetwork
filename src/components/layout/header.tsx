@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Bell } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { AuthModal } from '../auth/auth-modal';
 import { useAuthContext } from '../auth/auth-provider';
 import { UserMenu } from '../user/user-menu';
@@ -14,6 +16,12 @@ export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user, loading } = useAuthContext();
+  const pathname = usePathname();
+  const t = useTranslations('header');
+  
+  // 检测是否在国际化路由下
+  const isI18nRoute = pathname.startsWith('/zh') || pathname.startsWith('/en');
+  const locale = isI18nRoute ? pathname.split('/')[1] : 'zh';
 
   // 加载未读消息数量
   useEffect(() => {
@@ -63,8 +71,8 @@ export function Header() {
             </div>
             
             <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                国家级经开区绿色低碳技术推广平台
+              <h1 className={`font-bold text-gray-900 ${locale === 'en' ? 'text-lg' : 'text-xl'}`}>
+                {locale === 'en' ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform' : '国家级经开区绿色低碳技术推广平台'}
               </h1>
               <p className="text-xs text-gray-500">
                 National Economic Development Zone Green Low-Carbon Technology Promotion Platform
@@ -73,7 +81,7 @@ export function Header() {
           </div>
 
           {/* 导航菜单 */}
-          <nav className="flex items-center space-x-4">
+          <nav className="flex items-center space-x-2">
             {/* 语言选择 */}
             <LanguageSwitcher />
 
@@ -81,19 +89,19 @@ export function Header() {
             {user && (
               <>
                 <Link 
-                  href="/user/companies"
+                  href={`/${locale}/user/technologies`}
                   className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                   </svg>
-                  <span>控制台</span>
+                  <span>{t('dashboard')}</span>
                 </Link>
                 
                 <Link 
-                  href="/user/messages"
+                  href={`/${locale}/user/messages`}
                   className="relative flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
-                  title="消息中心"
+                  title={t('messages')}
                 >
                   <Bell className="w-4 h-4" />
                   {unreadCount > 0 && (
@@ -114,12 +122,12 @@ export function Header() {
               <button
                 onClick={() => setIsAuthModalOpen(true)}
                 className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
-                title="登录或注册"
+                title={t('loginRegister')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>登录/注册</span>
+                <span>{t('loginRegister')}</span>
               </button>
             )}
           </nav>

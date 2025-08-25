@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
@@ -10,11 +12,17 @@ import { TurnstileWidget } from './turnstile-widget';
 
 interface VerificationLoginFormProps {
   onSwitchToLogin: () => void;
+  onSwitchToRegister: () => void;
   onClose?: () => void;
 }
 
-export function VerificationLoginForm({ onSwitchToLogin, onClose }: VerificationLoginFormProps) {
+export function VerificationLoginForm({ onSwitchToLogin, onSwitchToRegister, onClose }: VerificationLoginFormProps) {
+  const pathname = usePathname();
+  const t = useTranslations('auth');
   const { checkUser } = useAuthContext();
+  
+  // 检测当前语言
+  const locale = pathname.startsWith('/en') ? 'en' : 'zh';
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [countryCode, setCountryCode] = useState('+86');
@@ -29,7 +37,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
 
   const handleGetCode = async () => {
     if (!phoneNumber) {
-      alert('请输入手机号码');
+      alert(locale === 'en' ? 'Please enter phone number' : '请输入手机号码');
       return;
     }
     
@@ -59,16 +67,18 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         
         // 开发模式下显示验证码
         if ('debugCode' in result.data && result.data.debugCode) {
-          alert(`验证码已发送！开发模式验证码：${result.data.debugCode}`);
+          alert(locale === 'en' 
+            ? `Verification code sent! Dev mode code: ${result.data.debugCode}`
+            : `验证码已发送！开发模式验证码：${result.data.debugCode}`);
         } else {
-          alert(result.data.message || '验证码已发送，请注意查收');
+          alert(result.data.message || (locale === 'en' ? 'Verification code sent, please check' : '验证码已发送，请注意查收'));
         }
       } else {
-        alert('error' in result ? result.error : '发送验证码失败');
+        alert('error' in result ? result.error : (locale === 'en' ? 'Failed to send verification code' : '发送验证码失败'));
       }
     } catch (error) {
       console.error('发送验证码失败:', error);
-      alert('发送验证码失败，请稍后重试');
+      alert(locale === 'en' ? 'Failed to send verification code, please try again later' : '发送验证码失败，请稍后重试');
     }
   };
 
@@ -76,13 +86,13 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
     e.preventDefault();
     
     if (!phoneNumber || !verificationCode) {
-      alert('请输入手机号码和验证码');
+      alert(locale === 'en' ? 'Please enter phone number and verification code' : '请输入手机号码和验证码');
       return;
     }
     
     // 检查人机验证
     if (!turnstileToken) {
-      alert('请完成人机验证');
+      alert(locale === 'en' ? 'Please complete human verification' : '请完成人机验证');
       return;
     }
     
@@ -99,7 +109,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
 
       if (customResult.success && customResult.data) {
         console.log('✅ 自定义验证码登录成功:', customResult.data.user);
-        alert('登录成功！');
+        alert(locale === 'en' ? 'Login successful!' : '登录成功！');
         await checkUser();
         onClose?.();
         // 跳转到用户控制台
@@ -125,17 +135,17 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
         }
 
         console.log('✅ 传统验证码登录成功:', result.data.user);
-        alert('登录成功！');
+        alert(locale === 'en' ? 'Login successful!' : '登录成功！');
         await checkUser();
         onClose?.();
         // 跳转到用户控制台
         window.location.href = '/user';
       } else {
-        alert('error' in result ? result.error : '登录失败，请检查验证码是否正确');
+        alert('error' in result ? result.error : (locale === 'en' ? 'Login failed, please check if the verification code is correct' : '登录失败，请检查验证码是否正确'));
       }
     } catch (error) {
       console.error('验证码登录失败:', error);
-      alert('登录失败，请检查验证码是否正确');
+      alert(locale === 'en' ? 'Login failed, please check if the verification code is correct' : '登录失败，请检查验证码是否正确');
     }
   };
 
@@ -143,14 +153,14 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
     <div className="max-w-md mx-auto w-full">
       {/* 标题 */}
       <div className="mb-8 mt-0">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">手机验证码登录</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">{locale === 'en' ? 'SMS Code Login' : '手机验证码登录'}</h2>
         <div className="flex items-center text-sm text-gray-600">
-          <span>没有账号?</span>
+          <span>{locale === 'en' ? "Don't have an account?" : '没有账号?'}</span>
           <button 
-            onClick={onSwitchToLogin}
+            onClick={onSwitchToRegister}
             className="ml-1 text-[#00b899] hover:text-[#009a7a] transition-colors"
           >
-            免费注册
+{locale === 'en' ? 'Sign Up' : '免费注册'}
           </button>
         </div>
       </div>
@@ -171,7 +181,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="你的手机号"
+              placeholder={locale === 'en' ? 'Your phone number' : '你的手机号'}
               className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400"
             />
           </div>
@@ -185,7 +195,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                type="text"
                value={verificationCode}
                onChange={(e) => setVerificationCode(e.target.value)}
-               placeholder="收到的验证码"
+               placeholder={locale === 'en' ? 'Verification code received' : '收到的验证码'}
                className="flex-1 px-4 py-3 border-none outline-none text-gray-700 placeholder-gray-400"
                onKeyDown={(e) => {
                  if (e.key === 'Enter') {
@@ -205,7 +215,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 cursor-pointer'
                }`}
              >
-               {isCountingDown ? `${countdown}s` : '获取验证码'}
+               {isCountingDown ? `${countdown}s` : (locale === 'en' ? 'Get Code' : '获取验证码')}
              </button>
            </div>
          </div>
@@ -218,7 +228,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
              onChange={(e) => setAgreeToPrivacy(e.target.checked)}
              className="w-4 h-4 text-[#00b899] bg-gray-100 border-gray-300 rounded focus:ring-[#00b899] focus:ring-2"
            />
-           <span className="ml-2">我已阅读并同意</span>
+           <span className="ml-2">{locale === 'en' ? 'I agree to the' : '我已阅读并同意'}</span>
            <button 
              type="button"
              onClick={(e) => {
@@ -227,7 +237,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
              }}
              className="text-[#00b899] hover:text-[#009a7a] transition-colors underline"
            >
-             《隐私条款》
+             {locale === 'en' ? 'Privacy Policy' : '《隐私条款》'}
            </button>
          </div>
 
@@ -242,11 +252,11 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                }}
                onError={(error) => {
                  setTurnstileToken(null);
-                 setTurnstileError('人机验证失败，请重试');
+                 setTurnstileError(locale === 'en' ? 'Human verification failed, please try again' : '人机验证失败，请重试');
                }}
                onExpired={() => {
                  setTurnstileToken(null);
-                 setTurnstileError('验证已过期，请重新验证');
+                 setTurnstileError(locale === 'en' ? 'Verification expired, please verify again' : '验证已过期，请重新验证');
                }}
                theme="auto"
                size="normal"
@@ -268,7 +278,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            登录
+{locale === 'en' ? 'Login' : '登录'}
           </button>
         </form>
 
@@ -279,7 +289,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
             onClick={onSwitchToLogin}
             className="text-sm text-[#00b899] hover:text-[#009a7a] transition-colors"
           >
-            密码登录
+{locale === 'en' ? 'Password Login' : '密码登录'}
           </button>
         </div>
 
@@ -289,7 +299,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-4 text-gray-500">或</span>
+            <span className="bg-white px-4 text-gray-500">{locale === 'en' ? 'or' : '或'}</span>
           </div>
         </div>
 
@@ -316,7 +326,7 @@ export function VerificationLoginForm({ onSwitchToLogin, onClose }: Verification
             </div>
           </div>
           <span className="text-sm text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-            微信扫码登录
+{locale === 'en' ? 'WeChat Login' : '微信扫码登录'}
           </span>
         </div>
     </div>
