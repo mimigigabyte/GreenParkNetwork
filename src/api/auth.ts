@@ -4,11 +4,23 @@ import { supabaseAuthApi } from './supabaseAuth'
 import { resendAuthApi } from './resendAuth'
 import { tencentSmsAuthApi } from './tencentSmsAuth'
 
-// 短信服务配置
-const USE_TENCENT_SMS = process.env.NEXT_PUBLIC_USE_TENCENT_SMS === 'true'
+// 短信服务配置 - 在生产环境优先使用腾讯云SMS避免Supabase/Twilio配置问题
+const USE_TENCENT_SMS = process.env.NEXT_PUBLIC_USE_TENCENT_SMS === 'true' || 
+  (process.env.NODE_ENV === 'production' && process.env.TENCENT_SMS_SDK_APP_ID)
 
 // 重新导出常量供其他组件使用
 export { USE_MOCK, USE_SUPABASE, USE_TENCENT_SMS }
+
+// 调试日志 - 显示当前使用的短信服务
+console.log('📱 短信服务配置:', {
+  USE_MOCK,
+  USE_SUPABASE, 
+  USE_TENCENT_SMS,
+  NODE_ENV: process.env.NODE_ENV,
+  HAS_TENCENT_CONFIG: !!process.env.TENCENT_SMS_SDK_APP_ID,
+  NEXT_PUBLIC_USE_TENCENT_SMS: process.env.NEXT_PUBLIC_USE_TENCENT_SMS,
+  selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend'
+})
 
 // ========================= 类型定义 =========================
 
