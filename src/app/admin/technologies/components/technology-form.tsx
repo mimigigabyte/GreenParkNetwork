@@ -227,7 +227,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         description_en: technology.description_en || '',
         image_url: technology.image_url || '',
         tech_source: technology.tech_source || 'self_developed',
-        acquisition_method: technology.acquisition_method || '',
+        acquisition_method: (technology.acquisition_method || '') as TechAcquisitionMethod,
         category_id: technology.category_id || '',
         subcategory_id: technology.subcategory_id || '',
         attachment_urls: technology.attachment_urls || [],
