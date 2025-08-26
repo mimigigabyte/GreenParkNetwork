@@ -5,8 +5,10 @@ import { resendAuthApi } from './resendAuth'
 import { tencentSmsAuthApi } from './tencentSmsAuth'
 
 // 短信服务配置 - 在生产环境优先使用腾讯云SMS避免Supabase/Twilio配置问题
+// 注意：客户端只能访问NEXT_PUBLIC_开头的环境变量，所以使用显式配置
+// 临时解决方案：在生产环境中强制启用腾讯云SMS
 const USE_TENCENT_SMS = process.env.NEXT_PUBLIC_USE_TENCENT_SMS === 'true' || 
-  (process.env.NODE_ENV === 'production' && process.env.TENCENT_SMS_SDK_APP_ID)
+  process.env.NODE_ENV === 'production'
 
 // 在生产环境中，如果启用了腾讯云SMS，则完全禁用Supabase SMS避免回退
 const USE_SUPABASE_SMS = USE_SUPABASE && !(process.env.NODE_ENV === 'production' && USE_TENCENT_SMS)
@@ -21,15 +23,12 @@ console.log('📱 短信服务配置 [BUILD TIME]:', {
   USE_SUPABASE_SMS,
   USE_TENCENT_SMS,
   NODE_ENV: process.env.NODE_ENV,
-  HAS_TENCENT_CONFIG: !!process.env.TENCENT_SMS_SDK_APP_ID,
   NEXT_PUBLIC_USE_TENCENT_SMS: process.env.NEXT_PUBLIC_USE_TENCENT_SMS,
   selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE_SMS ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend',
-  // 环境变量检查
-  TENCENT_SECRET_ID: !!process.env.TENCENT_SECRET_ID,
-  TENCENT_SECRET_KEY: !!process.env.TENCENT_SECRET_KEY,
-  TENCENT_SMS_REGION: !!process.env.TENCENT_SMS_REGION,
-  TENCENT_SMS_SIGN_NAME: !!process.env.TENCENT_SMS_SIGN_NAME,
-  TENCENT_SMS_TEMPLATE_ID: !!process.env.TENCENT_SMS_TEMPLATE_ID,
+  // 客户端配置状态
+  tencentSmsEnabled: USE_TENCENT_SMS,
+  supabaseSmsEnabled: USE_SUPABASE_SMS,
+  forcedProductionTencent: process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_USE_TENCENT_SMS,
   timestamp: new Date().toISOString(),
   configDecision: `TENCENT=${USE_TENCENT_SMS}, SUPABASE_SMS=${USE_SUPABASE_SMS}, SUPABASE=${USE_SUPABASE}, MOCK=${USE_MOCK}`,
   productionSmsBlocking: process.env.NODE_ENV === 'production' && USE_TENCENT_SMS ? 'Supabase SMS DISABLED' : 'Supabase SMS enabled'
