@@ -155,7 +155,6 @@ export async function POST(request: NextRequest) {
         console.error('❌ Supabase 注册失败:', authError)
         console.error('❌ 详细错误信息:', {
           message: authError.message,
-          status: authError.status,
           code: authError.code,
           details: authError
         })
