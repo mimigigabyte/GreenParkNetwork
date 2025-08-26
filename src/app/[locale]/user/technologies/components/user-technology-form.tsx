@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, Upload, FileText, Trash2 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { AdminTechnology, AdminCategory, AdminSubcategory, TECH_SOURCE_OPTIONS, TechSource, TechReviewStatus } from '@/lib/types/admin'
+import { AdminTechnology, AdminCategory, AdminSubcategory, TECH_SOURCE_OPTIONS, TECH_ACQUISITION_METHOD_OPTIONS, TechSource, TechAcquisitionMethod, TechReviewStatus } from '@/lib/types/admin'
 import { getPublicCategoriesApi, getPublicSubcategoriesApi } from '@/lib/api/public-categories'
 import { createUserTechnologyApi, updateUserTechnologyApi } from '@/lib/api/user-technologies'
 import { CompactImageUpload } from '@/components/ui/compact-image-upload'
@@ -35,6 +35,7 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     description_zh: technology?.description_zh || '',
     description_en: technology?.description_en || '',
     tech_source: (technology?.tech_source || '') as TechSource,
+    acquisition_method: (technology?.acquisition_method || 'enterprise_report') as TechAcquisitionMethod,
     category_id: technology?.category_id || '',
     subcategory_id: technology?.subcategory_id || '',
     image_url: technology?.image_url || '',
@@ -441,6 +442,8 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
                     ))}
                   </select>
                 </div>
+
+                {/* 技术获取方式字段已隐藏，用户创建的技术自动设置为"企业上报" */}
               </div>
             </div>
 

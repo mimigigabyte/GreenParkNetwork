@@ -38,6 +38,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       description_en: technologyData.description_en,
       image_url: technologyData.image_url,
       tech_source: technologyData.tech_source,
+      acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
       // 处理附件数据：支持新旧格式

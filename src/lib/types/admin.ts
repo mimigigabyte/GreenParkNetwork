@@ -136,6 +136,8 @@ export interface TechnologyAttachment {
  * 技术来源枚举
  */
 export type TechSource = 'self_developed' | 'cooperative' | 'transfer' | 'import_digest' | 'other'
+// 技术获取方式
+export type TechAcquisitionMethod = 'enterprise_report' | 'partner' | 'wipo' | 'japan_china_cooperation' | 'other'
 
 /**
  * 技术审核状态枚举
@@ -152,6 +154,7 @@ export interface AdminTechnology extends BaseEntity {
   description_en?: string
   image_url?: string
   tech_source: TechSource // 保持与数据库一致
+  acquisition_method?: TechAcquisitionMethod // 技术获取方式
   brief_zh?: string
   brief_en?: string
   category_id?: string
@@ -273,6 +276,14 @@ export const TECH_SOURCE_OPTIONS = [
   { value: 'transfer', label_zh: '转让', label_en: 'Transfer' },
   { value: 'import_digest', label_zh: '引进消化', label_en: 'Import and Digest' },
   { value: 'other', label_zh: '其它', label_en: 'Other' }
+] as const
+// 技术获取方式选项
+export const TECH_ACQUISITION_METHOD_OPTIONS = [
+  { value: 'enterprise_report', label_zh: '企业上报', label_en: 'Enterprise Report' },
+  { value: 'partner', label_zh: '合作伙伴', label_en: 'Partner' },
+  { value: 'wipo', label_zh: 'WIPO', label_en: 'WIPO' },
+  { value: 'japan_china_cooperation', label_zh: '日中经协', label_en: 'Japan-China Economic Association' },
+  { value: 'other', label_zh: '其他', label_en: 'Other' }
 ] as const
 
 /**

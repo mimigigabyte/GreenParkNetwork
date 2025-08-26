@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { AdminTechnology, TECH_SOURCE_OPTIONS, AdminCategory, AdminSubcategory, AdminCompany, AdminCountry, AdminProvince, AdminDevelopmentZone, TechSource, TechnologyAttachment } from '@/lib/types/admin'
+import { AdminTechnology, TECH_SOURCE_OPTIONS, TECH_ACQUISITION_METHOD_OPTIONS, AdminCategory, AdminSubcategory, AdminCompany, AdminCountry, AdminProvince, AdminDevelopmentZone, TechSource, TechAcquisitionMethod, TechnologyAttachment } from '@/lib/types/admin'
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
@@ -24,6 +24,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     description_en: '',
     image_url: '',
     tech_source: 'self_developed' as TechSource,
+    acquisition_method: '' as TechAcquisitionMethod,
     category_id: '',
     subcategory_id: '',
     attachment_urls: [] as string[], // 技术资料（为了向后兼容）
@@ -226,6 +227,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         description_en: technology.description_en || '',
         image_url: technology.image_url || '',
         tech_source: technology.tech_source || 'self_developed',
+        acquisition_method: technology.acquisition_method || '',
         category_id: technology.category_id || '',
         subcategory_id: technology.subcategory_id || '',
         attachment_urls: technology.attachment_urls || [],
@@ -416,6 +418,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         description_en: formData.description_en.trim() || undefined,
         image_url: formData.image_url || undefined,
         tech_source: formData.tech_source,
+        acquisition_method: formData.acquisition_method || undefined,
         category_id: formData.category_id || undefined,
         subcategory_id: formData.subcategory_id || undefined,
         attachment_urls: formData.attachment_urls.length > 0 ? formData.attachment_urls : undefined,
@@ -562,7 +565,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4">技术来源与分类</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   技术来源
@@ -573,6 +576,25 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   {TECH_SOURCE_OPTIONS.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label_zh}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  技术获取方式 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.acquisition_method}
+                  onChange={(e) => setFormData(prev => ({ ...prev, acquisition_method: e.target.value as TechAcquisitionMethod }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">请选择技术获取方式</option>
+                  {TECH_ACQUISITION_METHOD_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label_zh}
                     </option>

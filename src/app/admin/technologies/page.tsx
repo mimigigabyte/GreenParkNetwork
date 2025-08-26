@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, Lightbulb, Tag, FileText, Image as ImageIcon, Download, Check, X, MessageSquare, Eye } from 'lucide-react'
-import { AdminTechnology, AdminCategory, AdminSubcategory, AdminCountry, AdminProvince, AdminDevelopmentZone, AdminCompany, TechnologyAttachment, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus } from '@/lib/types/admin'
+import { AdminTechnology, AdminCategory, AdminSubcategory, AdminCountry, AdminProvince, AdminDevelopmentZone, AdminCompany, TechnologyAttachment, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus, TECH_ACQUISITION_METHOD_OPTIONS } from '@/lib/types/admin'
 import { DataTable } from '@/components/admin/data-table/data-table'
 import { TechnologyForm } from './components/technology-form'
 import { getTechnologiesApi, deleteTechnologyApi, reviewTechnologyApi } from '@/lib/api/admin-technologies'
@@ -289,6 +289,11 @@ export default function TechnologiesPage() {
     return option?.label_zh || '未知'
   }
 
+  const getTechAcquisitionMethodLabel = (method?: string) => {
+    const option = TECH_ACQUISITION_METHOD_OPTIONS.find(opt => opt.value === method)
+    return option?.label_zh || '未知'
+  }
+
   const handlePreviewImage = (imageUrl: string) => {
     window.open(imageUrl, '_blank')
   }
@@ -474,6 +479,21 @@ export default function TechnologiesPage() {
               <div className="text-xs text-gray-500 truncate">{record.company_development_zone.name_zh}</div>
             )}
           </div>
+        )
+      }
+    },
+    {
+      key: 'acquisition_method',
+      title: '技术获取方式',
+      width: '120px',
+      render: (_: unknown, record: AdminTechnology) => {
+        if (!record.acquisition_method) {
+          return <span className="text-gray-400 text-sm">-</span>
+        }
+        return (
+          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+            {getTechAcquisitionMethodLabel(record.acquisition_method)}
+          </span>
         )
       }
     },
@@ -870,6 +890,13 @@ export default function TechnologiesPage() {
                           {viewingTechnology.subcategory && (
                             <span className="text-gray-500"> / {viewingTechnology.subcategory.name_zh}</span>
                           )}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">技术获取方式</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
+                          {getTechAcquisitionMethodLabel(viewingTechnology.acquisition_method)}
                         </p>
                       </div>
 
