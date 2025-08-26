@@ -19,7 +19,13 @@ console.log('📱 短信服务配置:', {
   NODE_ENV: process.env.NODE_ENV,
   HAS_TENCENT_CONFIG: !!process.env.TENCENT_SMS_SDK_APP_ID,
   NEXT_PUBLIC_USE_TENCENT_SMS: process.env.NEXT_PUBLIC_USE_TENCENT_SMS,
-  selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend'
+  selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend',
+  // 环境变量检查
+  TENCENT_SECRET_ID: !!process.env.TENCENT_SECRET_ID,
+  TENCENT_SECRET_KEY: !!process.env.TENCENT_SECRET_KEY,
+  TENCENT_SMS_REGION: !!process.env.TENCENT_SMS_REGION,
+  TENCENT_SMS_SIGN_NAME: !!process.env.TENCENT_SMS_SIGN_NAME,
+  TENCENT_SMS_TEMPLATE_ID: !!process.env.TENCENT_SMS_TEMPLATE_ID
 })
 
 // ========================= 类型定义 =========================

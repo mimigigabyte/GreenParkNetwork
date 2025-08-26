@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { hashPassword } from '@/lib/custom-auth'
 
 // 创建Supabase客户端用于存储验证码
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -112,18 +113,41 @@ export async function POST(request: NextRequest) {
         password: password ? '已提供' : '未提供'
       })
       
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        phone: phoneWithCountryCode,
-        password: password,
-        options: {
-          data: {
-            name: name || `用户${mobile.slice(-4)}`,
+      // 避免调用 Supabase Auth API 以防止 SMS 触发
+      // 直接创建用户记录到数据库
+      const userId = crypto.randomUUID()
+      const { data: authData, error: authError } = await supabase
+        .from('custom_users')
+        .insert({
+          id: userId,
+          phone: mobile,
+          country_code: countryCode,
+          password_hash: await hashPassword(password),
+          name: name || `用户${mobile.slice(-4)}`,
+          role: 'user',
+          is_active: true,
+          user_metadata: {
+            phone_verified: true,
+            registration_method: 'phone_sms',
+            phone_with_country_code: phoneWithCountryCode
+          }
+        })
+        .select()
+        .single()
+
+      // 兼容性：模拟原来的 authData 结构
+      const simulatedAuthData = authData ? {
+        user: {
+          id: authData.id,
+          phone: phoneWithCountryCode,
+          user_metadata: {
+            name: authData.name,
             country_code: countryCode,
-            phone_verified: true, // 手机号已通过验证码验证
-            is_phone_registration: true // 标记为手机号注册
+            phone_verified: true,
+            is_phone_registration: true
           }
         }
-      })
+      } : null
       
       console.log('🔧 Supabase注册响应:', { authData: !!authData, authError: !!authError })
 
@@ -141,16 +165,14 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      console.log('🔍 详细检查Supabase响应:', {
-        hasUser: !!authData.user,
-        hasSession: !!authData.session,
-        userId: authData.user?.id,
-        userEmail: authData.user?.email,
-        userMetadata: authData.user?.user_metadata,
-        sessionToken: authData.session?.access_token ? '存在' : '不存在'
+      console.log('🔍 详细检查用户创建响应:', {
+        hasUser: !!simulatedAuthData?.user,
+        userId: simulatedAuthData?.user?.id,
+        userPhone: simulatedAuthData?.user?.phone,
+        userMetadata: simulatedAuthData?.user?.user_metadata
       })
 
-      if (!authData.user) {
+      if (!simulatedAuthData?.user) {
         console.error('❌ 用户数据为空')
         return NextResponse.json({
           success: false,

@@ -117,28 +117,16 @@ export async function POST(request: NextRequest) {
       .eq('id', verificationData.id)
 
     try {
-      // 检查手机号是否已注册（检查自定义用户表和Auth表）
-      const [customUserCheck, authUserCheck] = await Promise.all([
-        supabase
-          .from('custom_users')
-          .select('id')
-          .eq('phone', phoneData.phone)
-          .eq('country_code', countryCode)
-          .single(),
-        supabase.auth.admin.listUsers()
-      ]);
+      // 检查手机号是否已注册（只检查自定义用户表）
+      const { data: existingUser, error: checkError } = await supabase
+        .from('custom_users')
+        .select('id')
+        .eq('phone', phoneData.phone)
+        .eq('country_code', countryCode)
+        .single()
 
       // 检查自定义用户表
-      if (customUserCheck.data && !customUserCheck.error) {
-        return NextResponse.json({
-          success: false,
-          error: '该手机号已注册'
-        }, { status: 409 });
-      }
-
-      // 检查Auth表中的手机号
-      const phoneExists = authUserCheck.data?.users?.some(u => u.phone === phoneData.phoneWithCountryCode);
-      if (phoneExists) {
+      if (existingUser && !checkError) {
         return NextResponse.json({
           success: false,
           error: '该手机号已注册'
@@ -155,33 +143,10 @@ export async function POST(request: NextRequest) {
         countryCode
       })
 
-      // 1. 首先在Supabase Auth中创建用户（用于外键约束，只使用手机号）
-      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-        phone: phoneData.phoneWithCountryCode,
-        password: password,
-        phone_confirm: true,
-        user_metadata: {
-          name: name || `用户${phoneData.phone.slice(-4)}`,
-          registration_method: 'custom_phone_sms',
-          custom_auth: true
-        }
-      });
-
-      if (authError) {
-        console.error('❌ 创建Supabase Auth用户失败:', authError);
-        return NextResponse.json({
-          success: false,
-          error: `认证系统注册失败: ${authError.message}`
-        }, { status: 400 });
-      }
-
-      console.log('✅ Supabase Auth用户创建成功:', authUser.user.id);
-
-      // 2. 创建自定义用户记录（使用Supabase Auth的user ID保持一致）
+      // 直接创建自定义用户记录（不使用Supabase Auth以避免SMS触发）
       const { data: userData, error: userError } = await supabase
         .from('custom_users')
         .insert({
-          id: authUser.user.id, // 使用Supabase Auth的user ID
           phone: phoneData.phone,
           country_code: countryCode,
           email: null, // 手机号注册不设置邮箱
@@ -192,8 +157,7 @@ export async function POST(request: NextRequest) {
           user_metadata: {
             phone_verified: true,
             registration_method: 'phone_sms',
-            phone_with_country_code: phoneData.phoneWithCountryCode,
-            supabase_auth_id: authUser.user.id
+            phone_with_country_code: phoneData.phoneWithCountryCode
           }
         })
         .select()
