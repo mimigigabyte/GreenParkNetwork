@@ -8,24 +8,31 @@ import { tencentSmsAuthApi } from './tencentSmsAuth'
 const USE_TENCENT_SMS = process.env.NEXT_PUBLIC_USE_TENCENT_SMS === 'true' || 
   (process.env.NODE_ENV === 'production' && process.env.TENCENT_SMS_SDK_APP_ID)
 
+// 在生产环境中，如果启用了腾讯云SMS，则完全禁用Supabase SMS避免回退
+const USE_SUPABASE_SMS = USE_SUPABASE && !(process.env.NODE_ENV === 'production' && USE_TENCENT_SMS)
+
 // 重新导出常量供其他组件使用
-export { USE_MOCK, USE_SUPABASE, USE_TENCENT_SMS }
+export { USE_MOCK, USE_SUPABASE, USE_TENCENT_SMS, USE_SUPABASE_SMS }
 
 // 调试日志 - 显示当前使用的短信服务
-console.log('📱 短信服务配置:', {
+console.log('📱 短信服务配置 [BUILD TIME]:', {
   USE_MOCK,
   USE_SUPABASE, 
+  USE_SUPABASE_SMS,
   USE_TENCENT_SMS,
   NODE_ENV: process.env.NODE_ENV,
   HAS_TENCENT_CONFIG: !!process.env.TENCENT_SMS_SDK_APP_ID,
   NEXT_PUBLIC_USE_TENCENT_SMS: process.env.NEXT_PUBLIC_USE_TENCENT_SMS,
-  selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend',
+  selectedService: USE_TENCENT_SMS ? 'Tencent' : USE_SUPABASE_SMS ? 'Supabase' : USE_MOCK ? 'Mock' : 'Backend',
   // 环境变量检查
   TENCENT_SECRET_ID: !!process.env.TENCENT_SECRET_ID,
   TENCENT_SECRET_KEY: !!process.env.TENCENT_SECRET_KEY,
   TENCENT_SMS_REGION: !!process.env.TENCENT_SMS_REGION,
   TENCENT_SMS_SIGN_NAME: !!process.env.TENCENT_SMS_SIGN_NAME,
-  TENCENT_SMS_TEMPLATE_ID: !!process.env.TENCENT_SMS_TEMPLATE_ID
+  TENCENT_SMS_TEMPLATE_ID: !!process.env.TENCENT_SMS_TEMPLATE_ID,
+  timestamp: new Date().toISOString(),
+  configDecision: `TENCENT=${USE_TENCENT_SMS}, SUPABASE_SMS=${USE_SUPABASE_SMS}, SUPABASE=${USE_SUPABASE}, MOCK=${USE_MOCK}`,
+  productionSmsBlocking: process.env.NODE_ENV === 'production' && USE_TENCENT_SMS ? 'Supabase SMS DISABLED' : 'Supabase SMS enabled'
 })
 
 // ========================= 类型定义 =========================
@@ -142,7 +149,7 @@ export const authApi = {
       ? AuthMockManager.phoneCodeLogin(data)
       : USE_TENCENT_SMS
       ? tencentSmsAuthApi.phoneCodeLogin(data)
-      : USE_SUPABASE
+      : USE_SUPABASE_SMS
       ? supabaseAuthApi.phoneCodeLogin(data)
       : apiClient.post<AuthResponse>('/auth/login/phone-code', data),
 
@@ -161,14 +168,32 @@ export const authApi = {
   /**
    * 手机验证码注册
    */
-  phoneRegister: (data: PhoneRegisterRequest) => 
-    USE_MOCK 
-      ? AuthMockManager.phoneRegister(data)
-      : USE_TENCENT_SMS
-      ? tencentSmsAuthApi.phoneRegister(data)
-      : USE_SUPABASE
-      ? supabaseAuthApi.phoneRegister(data)
-      : apiClient.post<AuthResponse>('/auth/register/phone', data),
+  phoneRegister: (data: PhoneRegisterRequest) => {
+    console.log('📱 phoneRegister [RUNTIME] 路由决策:', {
+      USE_MOCK,
+      USE_TENCENT_SMS,
+      USE_SUPABASE,
+      USE_SUPABASE_SMS,
+      phone: data.phone,
+      decision: USE_MOCK ? 'MockManager' : USE_TENCENT_SMS ? 'TencentSMS' : USE_SUPABASE_SMS ? 'Supabase' : 'Backend',
+      timestamp: new Date().toISOString()
+    });
+
+    if (USE_MOCK) {
+      console.log('📱 -> 使用 AuthMockManager.phoneRegister');
+      return AuthMockManager.phoneRegister(data);
+    }
+    if (USE_TENCENT_SMS) {
+      console.log('📱 -> 使用 tencentSmsAuthApi.phoneRegister');
+      return tencentSmsAuthApi.phoneRegister(data);
+    }
+    if (USE_SUPABASE_SMS) {
+      console.log('📱 -> 使用 supabaseAuthApi.phoneRegister');
+      return supabaseAuthApi.phoneRegister(data);
+    }
+    console.log('📱 -> 使用 backend apiClient');
+    return apiClient.post<AuthResponse>('/auth/register/phone', data);
+  },
 
   // =============== 验证码相关 ===============
   
@@ -183,14 +208,33 @@ export const authApi = {
   /**
    * 发送手机验证码
    */
-  sendPhoneCode: (data: SendPhoneCodeRequest) => 
-    USE_MOCK 
-      ? AuthMockManager.sendPhoneCode(data)
-      : USE_TENCENT_SMS
-      ? tencentSmsAuthApi.sendPhoneCode(data)
-      : USE_SUPABASE
-      ? supabaseAuthApi.sendPhoneCode(data)
-      : apiClient.post<CodeResponse>('/auth/code/phone', data),
+  sendPhoneCode: (data: SendPhoneCodeRequest) => {
+    console.log('📱 sendPhoneCode [RUNTIME] 路由决策:', {
+      USE_MOCK,
+      USE_TENCENT_SMS,
+      USE_SUPABASE,
+      USE_SUPABASE_SMS,
+      phone: data.phone,
+      purpose: data.purpose,
+      decision: USE_MOCK ? 'MockManager' : USE_TENCENT_SMS ? 'TencentSMS' : USE_SUPABASE_SMS ? 'Supabase' : 'Backend',
+      timestamp: new Date().toISOString()
+    });
+
+    if (USE_MOCK) {
+      console.log('📱 -> 使用 AuthMockManager.sendPhoneCode');
+      return AuthMockManager.sendPhoneCode(data);
+    }
+    if (USE_TENCENT_SMS) {
+      console.log('📱 -> 使用 tencentSmsAuthApi.sendPhoneCode');
+      return tencentSmsAuthApi.sendPhoneCode(data);
+    }
+    if (USE_SUPABASE_SMS) {
+      console.log('📱 -> 使用 supabaseAuthApi.sendPhoneCode');
+      return supabaseAuthApi.sendPhoneCode(data);
+    }
+    console.log('📱 -> 使用 backend apiClient');
+    return apiClient.post<CodeResponse>('/auth/code/phone', data);
+  },
 
   /**
    * 验证验证码（邮箱使用Resend，手机使用腾讯云或Supabase）
@@ -202,8 +246,8 @@ export const authApi = {
       ? resendAuthApi.verifyCode(data) // 邮箱验证码使用Resend
       : USE_TENCENT_SMS
       ? tencentSmsAuthApi.verifyCode(data) // 手机验证码优先使用腾讯云
-      : USE_SUPABASE
-      ? supabaseAuthApi.verifyCode(data) // 手机验证码备用Supabase
+      : USE_SUPABASE_SMS
+      ? supabaseAuthApi.verifyCode(data) // 手机验证码备用Supabase（生产环境中被禁用）
       : apiClient.post<{ valid: boolean; message: string }>('/auth/code/verify', data),
 
   // =============== 密码找回 ===============

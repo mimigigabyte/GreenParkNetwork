@@ -19,6 +19,14 @@ export const tencentSmsAuthApi = {
    */
   sendPhoneCode: async (data: SendPhoneCodeRequest) => {
     try {
+      console.log('📱 tencentSmsAuthApi.sendPhoneCode [RUNTIME] 发送请求:', {
+        phone: data.phone,
+        purpose: data.purpose,
+        countryCode: data.countryCode,
+        endpoint: '/api/auth/send-sms-code',
+        timestamp: new Date().toISOString()
+      });
+
       const response = await fetch('/api/auth/send-sms-code', {
         method: 'POST',
         headers: {

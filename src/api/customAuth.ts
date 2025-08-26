@@ -48,10 +48,12 @@ export const customAuthApi = {
    */
   async phoneRegister(data: CustomPhoneRegisterRequest): Promise<ApiResponse<CustomAuthResult>> {
     try {
-      console.log('📱 自定义手机验证码注册请求:', { 
+      console.log('📱 customAuthApi.phoneRegister [RUNTIME] 开始注册:', { 
         phone: data.phone, 
         countryCode: data.countryCode,
-        hasPassword: !!data.password 
+        hasPassword: !!data.password,
+        timestamp: new Date().toISOString(),
+        endpoint: '/api/auth/custom-phone-register'
       })
 
       const response = await safeFetch('/api/auth/custom-phone-register', {
