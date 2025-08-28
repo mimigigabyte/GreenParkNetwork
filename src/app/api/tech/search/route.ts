@@ -19,106 +19,215 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const keyword = searchParams.get('keyword') || '';
-    const category = searchParams.get('category') || '';
-    const subCategory = searchParams.get('subCategory') || '';
-    const country = searchParams.get('country') || '';
-    const province = searchParams.get('province') || '';
-    const developmentZone = searchParams.get('developmentZone') || '';
+    const category = searchParams.get('category') || null;
+    const subCategory = searchParams.get('subCategory') || null;
+    const country = searchParams.get('country') || null;
+    const province = searchParams.get('province') || null;
+    const developmentZone = searchParams.get('developmentZone') || null;
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
     const sortBy = searchParams.get('sortBy') || 'updateTime';
 
     console.log('🔍 技术搜索API调用时间:', new Date().toISOString());
-    console.log('搜索参数:', { keyword, category, subCategory, country, province, developmentZone, page, pageSize, sortBy });
+    console.log('📥 接收到的原始参数:', { keyword, category, subCategory, country, province, developmentZone, page, pageSize, sortBy });
+    console.log('📊 联合筛选条件检查：', {
+      hasKeyword: !!keyword,
+      hasCategory: !!category,
+      hasSubCategory: !!subCategory,
+      hasCountry: !!country,
+      hasProvince: !!province,
+      hasDevelopmentZone: !!developmentZone
+    });
+    
+    // 验证筛选条件的完整性
+    if (province && !country) {
+      console.warn('⚠️ 检测到省份筛选但没有国家筛选，这可能导致结果不准确');
+    }
+    if (developmentZone && !province) {
+      console.warn('⚠️ 检测到经开区筛选但没有省份筛选，这可能导致结果不准确');
+    }
 
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    // 先恢复基本查询，避免关联查询错误
+    // 构建基础查询
     let query = supabaseAdmin
       .from('admin_technologies')
       .select('*', { count: 'exact' })
       .eq('is_active', true) // 只显示启用的技术
       .eq('review_status', 'published'); // 只显示已发布的技术
 
+    // 存储所有需要解析的筛选条件
+    const filterConditions = {
+      keyword: !!keyword,
+      category: !!category, 
+      subCategory: !!subCategory,
+      country: !!country,
+      province: !!province,
+      developmentZone: !!developmentZone
+    };
+
+    console.log('🎯 开始应用联合筛选条件:', filterConditions);
+
     // 关键词搜索
     if (keyword) {
       query = query.or(`name_zh.ilike.%${keyword}%,name_en.ilike.%${keyword}%,description_zh.ilike.%${keyword}%`);
+      console.log('✅ 已应用关键词筛选:', keyword);
     }
 
-    // 分类筛选
+    // 分类筛选 - 优化查询逻辑
     if (category) {
-      // 先查找分类ID
-      const { data: categoryData, error: categoryError } = await supabaseAdmin
-        .from('admin_categories')
-        .select('id')
-        .eq('slug', category)
-        .single();
+      console.log('🔍 开始查找分类:', category);
+      let categoryId = null;
       
-      if (categoryError) {
-        console.log('分类查找错误:', categoryError);
-      } else if (categoryData) {
-        query = query.eq('category_id', categoryData.id);
+      // 优化：先判断是否为UUID格式，减少不必要的查询
+      if (category.includes('-') && category.length > 30) {
+        // 直接使用UUID
+        categoryId = category;
+        console.log('✅ 使用UUID作为分类ID:', categoryId);
+      } else {
+        // 通过slug查找ID
+        const { data: slugData, error: slugError } = await supabaseAdmin
+          .from('admin_categories')
+          .select('id')
+          .eq('slug', category)
+          .single();
+        
+        if (!slugError && slugData) {
+          categoryId = slugData.id;
+          console.log('✅ 通过slug找到分类ID:', category, '->', categoryId);
+        } else {
+          console.log('❌ 未找到分类:', category);
+        }
+      }
+      
+      if (categoryId) {
+        query = query.eq('category_id', categoryId);
+        console.log('✅ 已应用分类筛选条件');
       }
     }
 
-    // 子分类筛选
+    // 子分类筛选 - 优化查询逻辑
     if (subCategory) {
-      const { data: subCategoryData, error: subCategoryError } = await supabaseAdmin
-        .from('admin_subcategories')
-        .select('id')
-        .eq('slug', subCategory)
-        .single();
+      console.log('🔍 开始查找子分类:', subCategory);
+      let subCategoryId = null;
       
-      if (subCategoryError) {
-        console.log('子分类查找错误:', subCategoryError);
-      } else if (subCategoryData) {
-        query = query.eq('subcategory_id', subCategoryData.id);
+      // 优化：先判断是否为UUID格式
+      if (subCategory.includes('-') && subCategory.length > 30) {
+        subCategoryId = subCategory;
+        console.log('✅ 使用UUID作为子分类ID:', subCategoryId);
+      } else {
+        // 通过slug查找ID
+        const { data, error } = await supabaseAdmin
+          .from('admin_subcategories')
+          .select('id')
+          .eq('slug', subCategory)
+          .single();
+        
+        if (!error && data) {
+          subCategoryId = data.id;
+          console.log('✅ 通过slug找到子分类ID:', subCategory, '->', subCategoryId);
+        } else {
+          console.log('❌ 未找到子分类:', subCategory);
+        }
+      }
+      
+      if (subCategoryId) {
+        query = query.eq('subcategory_id', subCategoryId);
+        console.log('✅ 已应用子分类筛选条件');
       }
     }
 
-    // 国别筛选
+    // 国别筛选 - 优化查询逻辑
     if (country) {
-      const { data: countryData, error: countryError } = await supabaseAdmin
-        .from('admin_countries')
-        .select('id')
-        .eq('code', country)
-        .single();
+      console.log('🔍 开始查找国家:', country);
+      let countryId = null;
       
-      if (countryError) {
-        console.log('国别查找错误:', countryError);
-      } else if (countryData) {
-        query = query.eq('company_country_id', countryData.id);
+      // 优化：先判断是否为UUID格式
+      if (country.includes('-') && country.length > 30) {
+        countryId = country;
+        console.log('✅ 使用UUID作为国家ID:', countryId);
+      } else {
+        // 通过code查找ID
+        const { data, error } = await supabaseAdmin
+          .from('admin_countries')
+          .select('id')
+          .eq('code', country)
+          .single();
+        
+        if (!error && data) {
+          countryId = data.id;
+          console.log('✅ 通过code找到国家ID:', country, '->', countryId);
+        } else {
+          console.log('❌ 未找到国家:', country);
+        }
+      }
+      
+      if (countryId) {
+        query = query.eq('company_country_id', countryId);
+        console.log('✅ 已应用国家筛选条件');
       }
     }
 
-    // 省份筛选
+    // 省份筛选 - 优化查询逻辑
     if (province) {
-      const { data: provinceData, error: provinceError } = await supabaseAdmin
-        .from('admin_provinces')
-        .select('id')
-        .eq('code', province)
-        .single();
+      console.log('🔍 开始查找省份:', province);
+      let provinceId = null;
       
-      if (provinceError) {
-        console.log('省份查找错误:', provinceError);
-      } else if (provinceData) {
-        query = query.eq('company_province_id', provinceData.id);
+      // 优化：先判断是否为UUID格式
+      if (province.includes('-') && province.length > 30) {
+        provinceId = province;
+        console.log('✅ 使用UUID作为省份ID:', provinceId);
+      } else {
+        // 通过code查找ID
+        const { data, error } = await supabaseAdmin
+          .from('admin_provinces')
+          .select('id')
+          .eq('code', province)
+          .single();
+        
+        if (!error && data) {
+          provinceId = data.id;
+          console.log('✅ 通过code找到省份ID:', province, '->', provinceId);
+        } else {
+          console.log('❌ 未找到省份:', province);
+        }
+      }
+      
+      if (provinceId) {
+        query = query.eq('company_province_id', provinceId);
+        console.log('✅ 已应用省份筛选条件');
       }
     }
 
-    // 经开区筛选
+    // 经开区筛选 - 优化查询逻辑
     if (developmentZone) {
-      const { data: zoneData, error: zoneError } = await supabaseAdmin
-        .from('admin_development_zones')
-        .select('id')
-        .eq('code', developmentZone)
-        .single();
+      console.log('🔍 开始查找经开区:', developmentZone);
+      let zoneId = null;
       
-      if (zoneError) {
-        console.log('经开区查找错误:', zoneError);
-      } else if (zoneData) {
-        query = query.eq('company_development_zone_id', zoneData.id);
+      // 优化：先判断是否为UUID格式
+      if (developmentZone.includes('-') && developmentZone.length > 30) {
+        zoneId = developmentZone;
+        console.log('✅ 使用UUID作为经开区ID:', zoneId);
+      } else {
+        // 通过code查找ID
+        const { data, error } = await supabaseAdmin
+          .from('admin_development_zones')
+          .select('id')
+          .eq('code', developmentZone)
+          .single();
+        
+        if (!error && data) {
+          zoneId = data.id;
+          console.log('✅ 通过code找到经开区ID:', developmentZone, '->', zoneId);
+        } else {
+          console.log('❌ 未找到经开区:', developmentZone);
+        }
+      }
+      
+      if (zoneId) {
+        query = query.eq('company_development_zone_id', zoneId);
+        console.log('✅ 已应用经开区筛选条件');
       }
     }
 
@@ -141,6 +250,9 @@ export async function GET(request: NextRequest) {
         break;
     }
 
+    // 执行联合查询
+    console.log('🎯 开始执行联合查询，应用的筛选条件总数:', Object.values(filterConditions).filter(Boolean).length);
+    
     const { data: technologies, error, count } = await query
       .order(orderField, { ascending: orderAscending })
       .range(from, to);
@@ -153,7 +265,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`找到 ${count} 个技术，返回 ${technologies?.length} 个`);
+    console.log(`🎯 联合查询完成: 找到 ${count} 个技术，返回 ${technologies?.length} 个`);
+    console.log('📊 筛选效果:', {
+      appliedFilters: Object.values(filterConditions).filter(Boolean).length,
+      totalResults: count,
+      returnedResults: technologies?.length
+    });
     
     // 详细日志：显示前几个技术的关键信息
     if (technologies && technologies.length > 0) {
@@ -163,25 +280,34 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 获取所有需要的关联数据ID
-    const categoryIds = [...new Set(technologies?.map(tech => tech.category_id).filter(Boolean))];
-    const subcategoryIds = [...new Set(technologies?.map(tech => tech.subcategory_id).filter(Boolean))];
-    const countryIds = [...new Set(technologies?.map(tech => tech.company_country_id).filter(Boolean))];
-    const developmentZoneIds = [...new Set(technologies?.map(tech => tech.company_development_zone_id).filter(Boolean))];
+    // 性能优化：批量获取关联数据
+    const categoryIds = Array.from(new Set(technologies?.map(tech => tech.category_id).filter(Boolean)));
+    const subcategoryIds = Array.from(new Set(technologies?.map(tech => tech.subcategory_id).filter(Boolean)));
+    const countryIds = Array.from(new Set(technologies?.map(tech => tech.company_country_id).filter(Boolean)));
+    const developmentZoneIds = Array.from(new Set(technologies?.map(tech => tech.company_development_zone_id).filter(Boolean)));
 
-    // 并行查询所有关联数据
+    console.log('🔄 批量查询关联数据:', {
+      categories: categoryIds.length,
+      subcategories: subcategoryIds.length,
+      countries: countryIds.length,
+      developmentZones: developmentZoneIds.length
+    });
+
+    // 并行查询所有关联数据，优化查询性能
     const [categoriesData, subcategoriesData, countriesData, developmentZonesData] = await Promise.all([
       categoryIds.length > 0 ? supabaseAdmin.from('admin_categories').select('id, name_zh, name_en').in('id', categoryIds) : { data: [] },
       subcategoryIds.length > 0 ? supabaseAdmin.from('admin_subcategories').select('id, name_zh, name_en').in('id', subcategoryIds) : { data: [] },
       countryIds.length > 0 ? supabaseAdmin.from('admin_countries').select('id, name_zh, name_en, logo_url').in('id', countryIds) : { data: [] },
       developmentZoneIds.length > 0 ? supabaseAdmin.from('admin_development_zones').select('id, name_zh, name_en').in('id', developmentZoneIds) : { data: [] }
     ]);
+    
+    console.log('✅ 关联数据查询完成');
 
     // 创建查找映射
-    const categoriesMap = new Map((categoriesData.data || []).map(item => [item.id, item]));
-    const subcategoriesMap = new Map((subcategoriesData.data || []).map(item => [item.id, item]));
-    const countriesMap = new Map((countriesData.data || []).map(item => [item.id, item]));
-    const developmentZonesMap = new Map((developmentZonesData.data || []).map(item => [item.id, item]));
+    const categoriesMap = new Map((categoriesData.data || []).map((item: any) => [item.id, item]));
+    const subcategoriesMap = new Map((subcategoriesData.data || []).map((item: any) => [item.id, item]));
+    const countriesMap = new Map((countriesData.data || []).map((item: any) => [item.id, item]));
+    const developmentZonesMap = new Map((developmentZonesData.data || []).map((item: any) => [item.id, item]));
 
     // 数据转换，使用数据库中的企业信息
     const products = technologies?.map(tech => {
@@ -270,11 +396,17 @@ export async function GET(request: NextRequest) {
       data: result
     });
     
-    // 添加强制禁用缓存的头部
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    response.headers.set('Surrogate-Control', 'no-store');
+    // 性能优化：如果没有筛选条件，允许短期缓存
+    const hasFilters = Object.values(filterConditions).some(Boolean);
+    if (hasFilters || keyword) {
+      // 有筛选条件时，禁用缓存确保数据实时性
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+    } else {
+      // 无筛选条件时，允许短期缓存提高性能
+      response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    }
     
     return response;
 

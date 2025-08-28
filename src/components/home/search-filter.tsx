@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Select,
@@ -14,12 +14,21 @@ import { useFilterData, transformFilterDataForComponents } from '@/hooks/admin/u
 import { MainCategory } from '@/api/tech';
 import { Search, User } from 'lucide-react';
 
+interface FilterState {
+  category: string | null;
+  subCategory: string | null;
+  country: string | null;
+  province: string | null;
+  developmentZone: string | null;
+}
+
 interface SearchFilterProps {
   onSearch: (keyword: string) => void;
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: FilterState) => void;
   onOpenAuth?: () => void;
   totalResults: number;
   currentCategory: string;
+  currentFilters?: FilterState;
   locale?: string;
 }
 
@@ -29,6 +38,7 @@ export function SearchFilter({
   onOpenAuth,
   totalResults, 
   currentCategory,
+  currentFilters,
   locale 
 }: SearchFilterProps) {
   const { user, loading } = useAuthContext();
@@ -36,16 +46,63 @@ export function SearchFilter({
   const t = useTranslations('home');
   const common = useTranslations('common');
   const [keyword, setKeyword] = useState('');
-  const [filters, setFilters] = useState({
-    category: 'all',
-    subCategory: 'all',
-    country: 'all',
-    province: 'all',
-    developmentZone: 'all'
+  const [filters, setFilters] = useState<FilterState>({
+    category: null,
+    subCategory: null,
+    country: null,
+    province: null,
+    developmentZone: null
   });
   
   const [mainCategories, setMainCategories] = useState<MainCategory[]>([]);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<string>('all');
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
+  
+  // 防抖相关状态
+  const debounceTimerRef = useRef<NodeJS.Timeout>();
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+
+  // 防抖筛选函数
+  const debouncedFilterChange = useCallback((newFilters: FilterState) => {
+    console.log('🔍 SearchFilter debouncedFilterChange 收到新筛选条件:', newFilters);
+    setIsFilterLoading(true);
+    
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      console.log('🔍 SearchFilter 防抖完成，调用onFilterChange:', newFilters);
+      onFilterChange(newFilters);
+      setIsFilterLoading(false);
+    }, 500);
+  }, [onFilterChange]);
+
+  // 同步外部状态到本地状态
+  useEffect(() => {
+    console.log('🔍 SearchFilter useEffect 同步外部状态:', {
+      currentFilters,
+      当前本地filters: filters
+    });
+    
+    if (currentFilters) {
+      console.log('🔍 SearchFilter 更新本地状态为外部状态:', currentFilters);
+      setFilters(currentFilters);
+      setSelectedMainCategory(currentFilters.category);
+    }
+  }, [currentFilters]);
+  
+  // 同步左侧分类选择到筛选面板（仅当没有外部筛选状态时）
+  useEffect(() => {
+    if (!currentFilters) {
+      if (currentCategory && currentCategory !== selectedMainCategory) {
+        setSelectedMainCategory(currentCategory);
+        setFilters(prev => ({ ...prev, category: currentCategory }));
+      } else if (!currentCategory && selectedMainCategory !== null) {
+        setSelectedMainCategory(null);
+        setFilters(prev => ({ ...prev, category: null }));
+      }
+    }
+  }, [currentCategory, selectedMainCategory, currentFilters]);
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
   const [developmentZones, setDevelopmentZones] = useState<{ value: string; label: string }[]>([]);
 
@@ -59,48 +116,76 @@ export function SearchFilter({
     }
   }, [filterData, locale]);
 
+  // 清理防抖定时器
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleSearch = () => {
     onSearch(keyword);
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    const newFilters = { ...filters, [key]: value };
+  const handleFilterChange = useCallback((key: string, value: string) => {
+    console.log('🔍 SearchFilter handleFilterChange 开始:', { key, value, currentFilters: filters });
+    
+    // 统一处理"all"选项为null值
+    const normalizedValue = value === 'all' ? null : value;
+    const newFilters = { ...filters, [key]: normalizedValue };
+    
+    console.log('🔍 SearchFilter 构建新的过滤器状态:', { 
+      originalFilters: filters, 
+      key, 
+      normalizedValue, 
+      newFilters 
+    });
     
     // 如果选择了新的主分类，重置子分类
-    if (key === 'category' && value !== 'all') {
-      newFilters.subCategory = 'all';
-      setSelectedMainCategory(value);
+    if (key === 'category' && normalizedValue !== null) {
+      newFilters.subCategory = null;
+      setSelectedMainCategory(normalizedValue);
+      console.log('🔍 SearchFilter 选择新主分类，重置子分类:', normalizedValue);
+    } else if (key === 'category' && normalizedValue === null) {
+      setSelectedMainCategory(null);
+      console.log('🔍 SearchFilter 清除主分类选择');
     }
     
     // 如果选择了非中国，重置省份选择
-    if (key === 'country' && value !== 'china') {
-      newFilters.province = 'all';
-      newFilters.developmentZone = 'all';
+    if (key === 'country' && normalizedValue !== 'china') {
+      newFilters.province = null;
+      newFilters.developmentZone = null;
       setProvinces([]);
       setDevelopmentZones([]);
+      console.log('🔍 SearchFilter 选择非中国国家，重置省份和经开区');
     }
     
     // 如果选择了中国，加载省份数据
-    if (key === 'country' && value === 'china') {
+    if (key === 'country' && normalizedValue === 'china') {
       // 查找中国的ID
       const chinaCountry = filterData.countries.find(c => c.code === 'china');
       if (chinaCountry) {
+        console.log('🔍 SearchFilter 选择中国，开始加载省份数据');
         loadProvinces(chinaCountry.id).then(provincesData => {
           const transformedProvinces = provincesData.map(p => ({
             value: p.code,
             label: locale === 'en' ? (p.name_en || p.name_zh) : p.name_zh
           }));
           setProvinces(transformedProvinces);
+          console.log('🔍 SearchFilter 省份数据加载完成:', transformedProvinces.length, '个省份');
         });
       }
     }
     
     // 如果选择了新的省份，重置经开区选择并加载新的经开区
-    if (key === 'province' && value !== 'all') {
-      newFilters.developmentZone = 'all';
+    if (key === 'province' && normalizedValue !== null) {
+      newFilters.developmentZone = null;
       // 查找省份ID
-      const province = filterData.provinces.find(p => p.code === value);
+      const province = filterData.provinces.find(p => p.code === normalizedValue);
       if (province) {
+        console.log('🔍 SearchFilter 选择新省份，开始加载经开区数据:', normalizedValue);
         loadDevelopmentZones(province.id).then(zonesData => {
           const transformedZones = zonesData.map(z => ({
             value: z.code,
@@ -118,23 +203,32 @@ export function SearchFilter({
               : z.name_zh
           }));
           setDevelopmentZones(transformedZones);
+          console.log('🔍 SearchFilter 经开区数据加载完成:', transformedZones.length, '个经开区');
         });
       }
     }
     
-    // 如果选择了all省份，清空经开区
-    if (key === 'province' && value === 'all') {
+    // 如果选择了null省份，清空经开区
+    if (key === 'province' && normalizedValue === null) {
       setDevelopmentZones([]);
+      console.log('🔍 SearchFilter 清除省份选择，重置经开区');
     }
     
+    console.log('🔍 SearchFilter 最终状态更新前:', { 
+      currentFilters: filters, 
+      newFilters,
+      willCallOnFilterChange: true
+    });
+    
     setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
+    debouncedFilterChange(newFilters);
+  }, [filters, filterData.countries, filterData.provinces, loadProvinces, loadDevelopmentZones, locale, debouncedFilterChange]);
 
-  const handleMainCategoryChange = (categoryId: string) => {
-    setSelectedMainCategory(categoryId);
+  const handleMainCategoryChange = useCallback((categoryId: string) => {
+    const normalizedCategoryId = categoryId === 'all' ? null : categoryId;
+    setSelectedMainCategory(normalizedCategoryId);
     handleFilterChange('category', categoryId);
-  };
+  }, [handleFilterChange]);
 
   const getCategoryName = (categoryId: string) => {
     const categoryMap: { [key: string]: string } = {
@@ -148,7 +242,7 @@ export function SearchFilter({
 
   // 获取当前选中主分类的子分类
   const getCurrentSubCategories = () => {
-    if (selectedMainCategory === 'all') return [];
+    if (selectedMainCategory === null) return [];
     const mainCategory = mainCategories.find(cat => cat.id === selectedMainCategory);
     return mainCategory?.subCategories || [];
   };
@@ -175,7 +269,7 @@ export function SearchFilter({
 
   // 获取当前选中省份的经开区
   const getCurrentDevelopmentZones = () => {
-    if (filters.country !== 'china' || filters.province === 'all') return [];
+    if (filters.country !== 'china' || filters.province === null) return [];
     return developmentZones;
   };
 
@@ -307,14 +401,46 @@ export function SearchFilter({
       <div className="pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {/* 筛选状态指示器 */}
+            {(isFilterLoading || (() => {
+              const activeFilters = Object.values(filters).filter(v => v !== null).length;
+              return activeFilters > 0;
+            })()) && (
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isFilterLoading && (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                      <span className="text-sm text-gray-600">
+                        {locale === 'en' ? 'Updating results...' : '正在更新结果...'}
+                      </span>
+                    </>
+                  )}
+                  
+                  {/* 应用的筛选条件计数 - 左对齐 */}
+                  {(() => {
+                    const activeFilters = Object.values(filters).filter(v => v !== null).length;
+                    return activeFilters > 0 ? (
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        {locale === 'en' 
+                          ? `${activeFilters} filters active`
+                          : `${activeFilters} 个筛选条件`
+                        }
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
+              </div>
+            )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* 产业分类 */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">{t('categoryLabel')}</label>
               <select
-                value={selectedMainCategory}
+                value={selectedMainCategory || 'all'}
                 onChange={(e) => handleMainCategoryChange(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={isFilterLoading}
               >
                 <option value="all">{t('allCategories')}</option>
                 {mainCategories.map((category) => (
@@ -329,10 +455,10 @@ export function SearchFilter({
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">{t('subCategoryLabel')}</label>
               <select
-                value={filters.subCategory}
+                value={filters.subCategory || 'all'}
                 onChange={(e) => handleFilterChange('subCategory', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                disabled={selectedMainCategory === 'all'}
+                disabled={selectedMainCategory === null || isFilterLoading}
               >
                 <option value="all">{t('allSubCategories')}</option>
                 {getCurrentSubCategories().map((subCategory) => (
@@ -346,7 +472,11 @@ export function SearchFilter({
             {/* 国别 */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">{t('countryLabel')}</label>
-              <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
+              <Select 
+                value={filters.country || 'all'} 
+                onValueChange={(value) => handleFilterChange('country', value)}
+                disabled={isFilterLoading}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t('allCountries')} />
                 </SelectTrigger>
@@ -378,11 +508,11 @@ export function SearchFilter({
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">{t('provinceLabel')}</label>
               <select
-                value={filters.province}
+                value={filters.province || 'all'}
                 onChange={(e) => handleFilterChange('province', e.target.value)}
-                disabled={filters.country !== 'china'}
+                disabled={filters.country !== 'china' || isFilterLoading}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  filters.country !== 'china' ? 'bg-gray-100 text-gray-400' : ''
+                  filters.country !== 'china' || isFilterLoading ? 'bg-gray-100 text-gray-400' : ''
                 }`}
               >
                 <option value="all">{t('allProvinces')}</option>
@@ -398,11 +528,11 @@ export function SearchFilter({
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">{t('developmentZoneLabel')}</label>
               <select
-                value={filters.developmentZone}
+                value={filters.developmentZone || 'all'}
                 onChange={(e) => handleFilterChange('developmentZone', e.target.value)}
-                disabled={filters.country !== 'china' || filters.province === 'all'}
+                disabled={filters.country !== 'china' || filters.province === null || isFilterLoading}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  filters.country !== 'china' || filters.province === 'all' ? 'bg-gray-100 text-gray-400' : ''
+                  filters.country !== 'china' || filters.province === null || isFilterLoading ? 'bg-gray-100 text-gray-400' : ''
                 }`}
               >
                 <option value="all">{t('allDevelopmentZones')}</option>

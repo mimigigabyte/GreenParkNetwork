@@ -26,6 +26,15 @@ function HomePageContent({ locale }: { locale: string }) {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [products, setProducts] = useState<TechProduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  
+  // 统一的筛选状态管理
+  const [filterState, setFilterState] = useState({
+    category: null as string | null,
+    subCategory: null as string | null,
+    country: null as string | null,
+    province: null as string | null,
+    developmentZone: null as string | null
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(20);
   const [isLoading, setIsLoading] = useState(true);
@@ -121,18 +130,26 @@ function HomePageContent({ locale }: { locale: string }) {
     loadInitialData();
   }, []);
 
-  // 加载产品数据
+  // 加载产品数据 - 使用统一的筛选状态
   useEffect(() => {
     const loadProducts = async () => {
-      // 允许无分类加载所有产品
-      
       try {
         const searchParams: SearchParams = {
-          category: selectedCategory,
+          category: filterState.category || selectedCategory || undefined,
+          subCategory: filterState.subCategory || undefined,
+          country: filterState.country || undefined,
+          province: filterState.province || undefined,
+          developmentZone: filterState.developmentZone || undefined,
           page: currentPage,
           pageSize: 20,
           sortBy: currentSort
         };
+        
+        console.log('🔍 loadProducts 使用统一筛选状态:', {
+          filterState,
+          selectedCategory,
+          finalSearchParams: searchParams
+        });
         
         const response = await searchTechProducts(searchParams);
         if (response.success && response.data) {
@@ -151,12 +168,55 @@ function HomePageContent({ locale }: { locale: string }) {
     };
 
     loadProducts();
-  }, [selectedCategory, currentPage, currentSort]);
+  }, [selectedCategory, currentPage, currentSort, filterState]);
 
   // 处理分类选择
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
+    
+    // 更新统一的筛选状态，保持所有现有筛选条件
+    const newFilterState = {
+      ...filterState,
+      category: categoryId || null
+    };
+    
+    setFilterState(newFilterState);
+    
+    // 构建完整的搜索参数，确保所有筛选条件都被保持
+    const searchParams: SearchParams = {
+      category: categoryId || undefined,
+      subCategory: newFilterState.subCategory || undefined,
+      country: newFilterState.country || undefined,
+      province: newFilterState.province || undefined,
+      developmentZone: newFilterState.developmentZone || undefined,
+      page: 1,
+      pageSize: 20,
+      sortBy: currentSort
+    };
+    
+    console.log('🔍 左侧分类选择统一状态管理:', {
+      selectedCategory: categoryId,
+      previousFilterState: filterState,
+      newFilterState,
+      finalSearchParams: searchParams
+    });
+    
+    try {
+      const response = await searchTechProducts(searchParams);
+      if (response.success && response.data) {
+        setProducts(response.data.products);
+        setTotalPages(Math.ceil(response.data.total / response.data.pageSize));
+        
+        // 更新统计数据
+        if (response.data.stats) {
+          setCompanyCount(response.data.stats.companyCount);
+          setTechnologyCount(response.data.stats.technologyCount);
+        }
+      }
+    } catch (error) {
+      console.error('分类选择查询失败:', error);
+    }
   };
 
   // 处理搜索
@@ -188,31 +248,68 @@ function HomePageContent({ locale }: { locale: string }) {
   };
 
   // 处理筛选
-  const handleFilterChange = async (filters: any) => {
+  const handleFilterChange = async (filters: {
+    category: string | null;
+    subCategory: string | null;
+    country: string | null;
+    province: string | null;
+    developmentZone: string | null;
+  }) => {
     try {
+      console.log('🔍 HomePage handleFilterChange 接收到筛选条件:', {
+        incomingFilters: filters,
+        currentFilterState: filterState,
+        currentSelectedCategory: selectedCategory
+      });
+      
+      // 更新统一的筛选状态
+      setFilterState(filters);
+      
+      // 如果筛选条件包含分类变化，同步更新selectedCategory状态
+      if (filters.category && filters.category !== selectedCategory) {
+        console.log('🔍 HomePage 同步更新左侧分类选择:', filters.category);
+        setSelectedCategory(filters.category);
+      } else if (filters.category === null && selectedCategory) {
+        console.log('🔍 HomePage 筛选面板选择全部分类，清除左侧分类选择');
+        setSelectedCategory('');
+      }
+      
+      // 构建完整的搜索参数，直接使用筛选条件（不再有冲突的状态合并）
       const searchParams: SearchParams = {
-        category: filters.category === 'all' ? undefined : filters.category,
-        subCategory: filters.subCategory === 'all' ? undefined : filters.subCategory,
-        country: filters.country === 'all' ? undefined : filters.country,
-        province: filters.province === 'all' ? undefined : filters.province,
-        developmentZone: filters.developmentZone === 'all' ? undefined : filters.developmentZone,
+        category: filters.category || undefined,
+        subCategory: filters.subCategory || undefined,
+        country: filters.country || undefined,
+        province: filters.province || undefined,
+        developmentZone: filters.developmentZone || undefined,
         page: 1,
         pageSize: 20,
         sortBy: currentSort
       };
       
+      console.log('🔍 HomePage 构建最终查询参数:', { 
+        统一筛选状态: filters,
+        finalSearchParams: searchParams,
+        详细字段检查: {
+          category: searchParams.category,
+          subCategory: searchParams.subCategory,
+          country: searchParams.country,
+          province: searchParams.province,
+          developmentZone: searchParams.developmentZone
+        }
+      });
+      
       const response = await searchTechProducts(searchParams);
+      console.log('🔍 HomePage 查询响应结果:', {
+        success: response.success,
+        productCount: response.data?.products?.length || 0,
+        total: response.data?.total || 0,
+        查询参数回显: searchParams
+      });
+      
       if (response.success && response.data) {
         setProducts(response.data.products);
         setTotalPages(Math.ceil(response.data.total / response.data.pageSize));
         setCurrentPage(1);
-        
-        // 如果筛选条件包含分类变化，更新selectedCategory状态
-        if (filters.category && filters.category !== 'all' && filters.category !== selectedCategory) {
-          setSelectedCategory(filters.category);
-        } else if (filters.category === 'all') {
-          setSelectedCategory('');
-        }
         
         // 更新统计数据
         if (response.data.stats) {
@@ -284,6 +381,7 @@ function HomePageContent({ locale }: { locale: string }) {
           onOpenAuth={openAuthModal}
           totalResults={getCurrentCategoryCount()}
           currentCategory={selectedCategory}
+          currentFilters={filterState}
           locale={locale}
         />
         
