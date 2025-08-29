@@ -267,21 +267,21 @@ export function SearchResults({
                   <div className="flex flex-wrap gap-2">
                     {/* 产业分类标签 */}
                     {(product.categoryName || product.categoryNameEn) && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-400 transition-colors cursor-pointer">
                         {locale === 'en' ? (product.categoryNameEn || product.categoryName) : product.categoryName}
                       </span>
                     )}
                     
                     {/* 子分类标签 */}
                     {(product.subCategoryName || product.subCategoryNameEn) && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-400 transition-colors cursor-pointer">
                         {locale === 'en' ? (product.subCategoryNameEn || product.subCategoryName) : product.subCategoryName}
                       </span>
                     )}
                     
                     {/* 国别标签（带国旗） */}
                     {(product.countryName || product.countryNameEn) && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-400 transition-colors cursor-pointer">
                         {product.countryFlagUrl && (
                           <img 
                             src={product.countryFlagUrl} 
@@ -299,7 +299,7 @@ export function SearchResults({
                     
                     {/* 国家级经开区标签 */}
                     {(product.developmentZoneName || product.developmentZoneNameEn) && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-400 transition-colors cursor-pointer">
                         {locale === 'en' ? (product.developmentZoneNameEn || product.developmentZoneName) : product.developmentZoneName}
                       </span>
                     )}

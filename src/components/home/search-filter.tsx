@@ -77,6 +77,26 @@ export function SearchFilter({
     }, 500);
   }, [onFilterChange]);
 
+  // 重置所有筛选条件
+  const handleResetFilters = useCallback(() => {
+    const resetFilters: FilterState = {
+      category: null,
+      subCategory: null,
+      country: null,
+      province: null,
+      developmentZone: null
+    };
+    
+    // 重置本地状态
+    setFilters(resetFilters);
+    setSelectedMainCategory(null);
+    setProvinces([]);
+    setDevelopmentZones([]);
+    
+    // 调用回调通知父组件
+    debouncedFilterChange(resetFilters);
+  }, [debouncedFilterChange]);
+
   // 同步外部状态到本地状态
   useEffect(() => {
     console.log('🔍 SearchFilter useEffect 同步外部状态:', {
@@ -406,7 +426,7 @@ export function SearchFilter({
               const activeFilters = Object.values(filters).filter(v => v !== null).length;
               return activeFilters > 0;
             })()) && (
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4">
                 <div className="flex items-center gap-2">
                   {isFilterLoading && (
                     <>
@@ -417,7 +437,7 @@ export function SearchFilter({
                     </>
                   )}
                   
-                  {/* 应用的筛选条件计数 - 左对齐 */}
+                  {/* 应用的筛选条件计数 */}
                   {(() => {
                     const activeFilters = Object.values(filters).filter(v => v !== null).length;
                     return activeFilters > 0 ? (
@@ -427,6 +447,20 @@ export function SearchFilter({
                           : `${activeFilters} 个筛选条件`
                         }
                       </span>
+                    ) : null;
+                  })()}
+                  
+                  {/* 重置筛选按钮 */}
+                  {(() => {
+                    const activeFilters = Object.values(filters).filter(v => v !== null).length;
+                    return activeFilters > 0 ? (
+                      <button
+                        onClick={handleResetFilters}
+                        disabled={isFilterLoading}
+                        className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-100 px-2 py-1 rounded-full border border-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {locale === 'en' ? 'Reset filters' : '重置筛选'}
+                      </button>
                     ) : null;
                   })()}
                 </div>
