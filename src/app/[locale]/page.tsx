@@ -37,6 +37,7 @@ function HomePageContent({ locale }: { locale: string }) {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(20);
+  const [pageSize, setPageSize] = useState(20);
   const [isLoading, setIsLoading] = useState(true);
   const [currentSort, setCurrentSort] = useState<SortType>('updateTime');
   
@@ -141,7 +142,7 @@ function HomePageContent({ locale }: { locale: string }) {
           province: filterState.province || undefined,
           developmentZone: filterState.developmentZone || undefined,
           page: currentPage,
-          pageSize: 20,
+          pageSize: pageSize,
           sortBy: currentSort
         };
         
@@ -168,7 +169,7 @@ function HomePageContent({ locale }: { locale: string }) {
     };
 
     loadProducts();
-  }, [selectedCategory, currentPage, currentSort, filterState]);
+  }, [selectedCategory, currentPage, currentSort, filterState, pageSize]);
 
   // 处理分类选择
   const handleCategorySelect = async (categoryId: string) => {
@@ -191,7 +192,7 @@ function HomePageContent({ locale }: { locale: string }) {
       province: newFilterState.province || undefined,
       developmentZone: newFilterState.developmentZone || undefined,
       page: 1,
-      pageSize: 20,
+      pageSize: pageSize,
       sortBy: currentSort
     };
     
@@ -226,7 +227,7 @@ function HomePageContent({ locale }: { locale: string }) {
         keyword,
         category: selectedCategory,
         page: 1,
-        pageSize: 20,
+        pageSize: pageSize,
         sortBy: currentSort
       };
       
@@ -282,7 +283,7 @@ function HomePageContent({ locale }: { locale: string }) {
         province: filters.province || undefined,
         developmentZone: filters.developmentZone || undefined,
         page: 1,
-        pageSize: 20,
+        pageSize: pageSize,
         sortBy: currentSort
       };
       
@@ -333,6 +334,13 @@ function HomePageContent({ locale }: { locale: string }) {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     // 分页逻辑通过useEffect中的loadProducts处理
+  };
+
+  // 处理每页条数变化
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // 重置到第一页
+    // 数据重新加载通过useEffect中的loadProducts处理
   };
 
   // 获取当前分类的产品数量
@@ -390,10 +398,12 @@ function HomePageContent({ locale }: { locale: string }) {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          totalResults={products.length}
+          totalResults={technologyCount}
           currentCategory={selectedCategory}
           onSortChange={handleSortChange}
           locale={locale}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
         />
       </main>
       

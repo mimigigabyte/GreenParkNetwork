@@ -28,7 +28,9 @@
       "Bash(sips:*)",
       "WebSearch",
       "WebFetch(domain:www.vecteezy.com)",
-      "WebFetch(domain:freesvg.org)"
+      "WebFetch(domain:freesvg.org)",
+      "mcp__context7__get-library-docs",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": []
   }

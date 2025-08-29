@@ -6,6 +6,7 @@ import { TechProduct, SortType } from '@/api/tech';
 import { Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown, ChevronDown as ChevronDownIcon, FileText, Download, Mail } from 'lucide-react';
 import { ContactUsModal } from '@/components/contact/contact-us-modal';
 import { useAuthContext } from '@/components/auth/auth-provider';
+import { SimplePagination } from '@/components/ui/simple-pagination';
 
 interface SearchResultsProps {
   products: TechProduct[];
@@ -19,6 +20,9 @@ interface SearchResultsProps {
   technologyCount?: number;
   onSortChange?: (sortType: SortType) => void;
   locale?: string;
+  // 分页器新增参数
+  pageSize?: number;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 export function SearchResults({ 
@@ -31,7 +35,9 @@ export function SearchResults({
   companyCount, // 可选参数，如果未提供则基于搜索结果计算
   technologyCount, // 可选参数，如果未提供则使用totalResults
   onSortChange,
-  locale
+  locale,
+  pageSize = 20,
+  onPageSizeChange
 }: SearchResultsProps) {
   const { user } = useAuthContext();
   const t = useTranslations('home');
@@ -443,62 +449,19 @@ export function SearchResults({
           ))}
         </div>
 
-        {/* 分页 */}
-        <div className="mt-8 flex flex-col items-center space-y-4">
-          <div className="text-sm text-gray-600">
-{locale === 'en' 
-              ? `10 items per page, total ${products.length * totalPages} records`
-              : `每页10条 共${products.length * totalPages}条记录`}
+        {/* 简化分页器 */}
+        {totalPages > 0 && (
+          <div className="mt-8">
+            <SimplePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange || (() => {})}
+              locale={locale}
+            />
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              &lt;
-            </button>
-            
-            {/* 页码 */}
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const page = i + 1;
-              return (
-                <button
-                  key={page}
-                  onClick={() => onPageChange(page)}
-                  className={`px-3 py-2 text-sm font-medium rounded-md ${
-                    currentPage === page
-                      ? 'bg-green-600 text-white'
-                      : 'text-gray-500 bg-white border border-gray-300 hover:bg-green-50'
-                  }`}
-                >
-                  {page}
-                </button>
-              );
-            })}
-            
-            {totalPages > 5 && (
-              <>
-                <span className="px-2 text-gray-500">...</span>
-                <button
-                  onClick={() => onPageChange(totalPages)}
-                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-green-50"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-            
-            <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              &gt;
-            </button>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* 联系我们对话框 */}
