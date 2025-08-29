@@ -358,12 +358,12 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       newErrors.name_zh = '技术中文名称不能为空'
     }
 
-    if (formData.description_zh && formData.description_zh.length > 500) {
-      newErrors.description_zh = '技术介绍不能超过500字'
+    if (formData.description_zh && formData.description_zh.length > 3000) {
+      newErrors.description_zh = '技术介绍不能超过3000字'
     }
 
-    if (formData.description_en && formData.description_en.length > 500) {
-      newErrors.description_en = '技术介绍不能超过500字'
+    if (formData.description_en && formData.description_en.length > 3000) {
+      newErrors.description_en = '技术介绍不能超过3000字'
     }
 
     setErrors(newErrors)

@@ -382,7 +382,7 @@ export function SearchResults({
                         </p>
                         
                         {/* 展开更多按钮 */}
-                        {(product.fullDescription || product.solutionDescription.length > 400) && (
+                        {(product.fullDescription || product.solutionDescription.length > 3000) && (
                           <button
                             onClick={() => toggleDescription(product.id)}
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-flex items-center"
