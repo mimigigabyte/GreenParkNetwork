@@ -59,15 +59,23 @@ export function ProductCategories({
     <section className="py-12" style={{backgroundColor: '#edeef7'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center mb-12">
-          {/* 左侧装饰图案 */}
+          {/* 左侧橄榄枝装饰 */}
           <div className="hidden md:flex flex-1 items-center justify-end mr-6 lg:mr-8">
-            <svg className="w-16 lg:w-24 h-6 lg:h-8 text-green-500" fill="currentColor" viewBox="0 0 200 32">
-              <path d="M0 16 C20 8, 40 24, 60 16 C80 8, 100 24, 120 16 C140 8, 160 24, 180 16 L200 16" 
-                    stroke="currentColor" strokeWidth="2" fill="none"/>
-              <circle cx="30" cy="16" r="3" fill="currentColor" opacity="0.6"/>
-              <circle cx="90" cy="16" r="2.5" fill="currentColor" opacity="0.4"/>
-              <circle cx="150" cy="16" r="3" fill="currentColor" opacity="0.6"/>
-              <circle cx="170" cy="16" r="2" fill="currentColor" opacity="0.3"/>
+            <svg className="w-20 lg:w-32 h-8 lg:h-12 text-green-500" fill="none" viewBox="0 0 160 48">
+              {/* 橄榄枝主茎 */}
+              <path d="M20 24 Q50 20, 80 24 Q110 28, 140 24" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
+              {/* 左侧叶片组 */}
+              <ellipse cx="35" cy="18" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(-30 35 18)"/>
+              <ellipse cx="42" cy="30" rx="7" ry="3.5" fill="currentColor" opacity="0.5" transform="rotate(25 42 30)"/>
+              {/* 中央叶片组 */}
+              <ellipse cx="65" cy="16" rx="9" ry="4.5" fill="currentColor" opacity="0.7" transform="rotate(-20 65 16)"/>
+              <ellipse cx="75" cy="32" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(30 75 32)"/>
+              {/* 右侧叶片组 */}
+              <ellipse cx="105" cy="18" rx="7" ry="3.5" fill="currentColor" opacity="0.5" transform="rotate(-35 105 18)"/>
+              <ellipse cx="115" cy="30" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(20 115 30)"/>
+              {/* 末端小叶片 */}
+              <ellipse cx="130" cy="22" rx="6" ry="3" fill="currentColor" opacity="0.7" transform="rotate(-15 130 22)"/>
+              <ellipse cx="135" cy="26" rx="5" ry="2.5" fill="currentColor" opacity="0.5" transform="rotate(15 135 26)"/>
             </svg>
           </div>
           
@@ -76,15 +84,23 @@ export function ProductCategories({
             {t('categories')}
           </h2>
           
-          {/* 右侧装饰图案 */}
+          {/* 右侧橄榄枝装饰 */}
           <div className="hidden md:flex flex-1 items-center justify-start ml-6 lg:ml-8">
-            <svg className="w-16 lg:w-24 h-6 lg:h-8 text-green-500" fill="currentColor" viewBox="0 0 200 32">
-              <path d="M200 16 C180 8, 160 24, 140 16 C120 8, 100 24, 80 16 C60 8, 40 24, 20 16 L0 16" 
-                    stroke="currentColor" strokeWidth="2" fill="none"/>
-              <circle cx="170" cy="16" r="3" fill="currentColor" opacity="0.6"/>
-              <circle cx="110" cy="16" r="2.5" fill="currentColor" opacity="0.4"/>
-              <circle cx="50" cy="16" r="3" fill="currentColor" opacity="0.6"/>
-              <circle cx="30" cy="16" r="2" fill="currentColor" opacity="0.3"/>
+            <svg className="w-20 lg:w-32 h-8 lg:h-12 text-green-500" fill="none" viewBox="0 0 160 48" style={{transform: 'scaleX(-1)'}}>
+              {/* 橄榄枝主茎 */}
+              <path d="M20 24 Q50 20, 80 24 Q110 28, 140 24" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
+              {/* 左侧叶片组 */}
+              <ellipse cx="35" cy="18" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(-30 35 18)"/>
+              <ellipse cx="42" cy="30" rx="7" ry="3.5" fill="currentColor" opacity="0.5" transform="rotate(25 42 30)"/>
+              {/* 中央叶片组 */}
+              <ellipse cx="65" cy="16" rx="9" ry="4.5" fill="currentColor" opacity="0.7" transform="rotate(-20 65 16)"/>
+              <ellipse cx="75" cy="32" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(30 75 32)"/>
+              {/* 右侧叶片组 */}
+              <ellipse cx="105" cy="18" rx="7" ry="3.5" fill="currentColor" opacity="0.5" transform="rotate(-35 105 18)"/>
+              <ellipse cx="115" cy="30" rx="8" ry="4" fill="currentColor" opacity="0.6" transform="rotate(20 115 30)"/>
+              {/* 末端小叶片 */}
+              <ellipse cx="130" cy="22" rx="6" ry="3" fill="currentColor" opacity="0.7" transform="rotate(-15 130 22)"/>
+              <ellipse cx="135" cy="26" rx="5" ry="2.5" fill="currentColor" opacity="0.5" transform="rotate(15 135 26)"/>
             </svg>
           </div>
         </div>

@@ -54,22 +54,23 @@ export async function GET(request: NextRequest) {
     try {
       console.log('📊 从数据库获取分类数据...');
 
-      // 获取所有分类（先不筛选启用状态）
+      // 获取所有启用的分类（与管理后台保持一致的查询逻辑）
       const { data: categories, error } = await supabaseAdmin
         .from('admin_categories')
         .select('id, name_zh, name_en, slug, sort_order')
+        .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
       if (error) {
         console.error('❌ 获取分类失败:', error);
-        console.warn('🔄 使用fallback数据');
+        console.warn('🔄 数据库查询失败，返回空分类列表');
         return NextResponse.json({
           success: true,
-          data: fallbackCategories
+          data: []
         });
       }
 
-      console.log(`✅ 找到 ${categories?.length} 个分类`);
+      console.log(`✅ 找到 ${categories?.length} 个启用的分类`);
 
       // 英文名称映射表
       const englishNameMap: { [key: string]: string } = {
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
         return {
           id: categoryId,
           name: category.name_zh || category.name_en || '未命名分类',
-          nameEn: englishNameMap[categoryId] || 'UNNAMED CATEGORY',
+          nameEn: category.name_en || englishNameMap[categoryId] || 'UNNAMED CATEGORY',
           icon: 'default', // 暂时固定图标
           count: 10, // 暂时固定数量，后续优化
           color: '#3B82F6' // 默认颜色，因为color字段不存在
@@ -94,28 +95,35 @@ export async function GET(request: NextRequest) {
 
       console.log('✅ 返回分类数据:', categoriesWithCount);
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         data: categoriesWithCount
       });
+
+      // 添加缓存控制头，确保数据实时性
+      response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+
+      return response;
       
     } catch (dbError) {
       console.error('❌ 数据库查询失败:', dbError);
-      console.warn('🔄 使用fallback数据');
+      console.warn('🔄 数据库连接异常，返回空分类列表');
       return NextResponse.json({
         success: true,
-        data: fallbackCategories
+        data: []
       });
     }
 
   } catch (error) {
     console.error('❌ 获取分类API错误:', error);
-    console.warn('🔄 最终fallback: 返回默认分类数据');
+    console.warn('🔄 最终fallback: 返回空分类列表');
     
-    // 最终fallback，确保API始终返回数据
+    // 最终fallback，确保API始终返回数据但避免显示过期数据
     return NextResponse.json({
       success: true,
-      data: fallbackCategories
+      data: []
     });
   }
 }

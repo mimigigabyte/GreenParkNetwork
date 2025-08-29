@@ -34,7 +34,13 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data || [])
+    const response = NextResponse.json(data || []);
+    
+    // 添加缓存控制头，确保管理后台数据实时性
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
   } catch (error) {
     console.error('API错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -24,7 +24,11 @@
       "Bash(npm run lint)",
       "mcp__playwright__browser_snapshot",
       "Bash(npx tsc:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(sips:*)",
+      "WebSearch",
+      "WebFetch(domain:www.vecteezy.com)",
+      "WebFetch(domain:freesvg.org)"
     ],
     "deny": []
   }

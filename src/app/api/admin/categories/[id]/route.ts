@@ -92,7 +92,14 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 })
+    console.log(`✅ 分类删除成功: ${id}`);
+
+    const response = NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
+    
+    // 添加缓存控制头，确保删除操作后前端能获取最新数据
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    
+    return response;
   } catch (error) {
     console.error('API错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
