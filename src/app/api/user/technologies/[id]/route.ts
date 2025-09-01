@@ -41,6 +41,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
+      custom_label: technologyData.custom_label, // 自定义标签
       // 处理附件数据：支持新旧格式
       attachment_urls: (() => {
         // 如果有新的attachments数组，提取URL

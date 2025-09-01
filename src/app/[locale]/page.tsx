@@ -332,12 +332,26 @@ function HomePageContent({ locale }: { locale: string }) {
 
   // 处理分页
   const handlePageChange = (page: number) => {
+    // 检查用户登录状态 - 未登录用户只能查看第一页
+    if (!user && page > 1) {
+      alert(locale === 'en' ? 'Please register and login to view more content' : '请注册登录后查看更多精彩内容');
+      openAuthModal();
+      return;
+    }
+    
     setCurrentPage(page);
     // 分页逻辑通过useEffect中的loadProducts处理
   };
 
   // 处理每页条数变化
   const handlePageSizeChange = (newPageSize: number) => {
+    // 检查用户登录状态 - 未登录用户只能使用默认的20条显示
+    if (!user && newPageSize !== 20) {
+      alert(locale === 'en' ? 'Please register and login to view more content' : '请注册登录后查看更多精彩内容');
+      openAuthModal();
+      return;
+    }
+    
     setPageSize(newPageSize);
     setCurrentPage(1); // 重置到第一页
     // 数据重新加载通过useEffect中的loadProducts处理

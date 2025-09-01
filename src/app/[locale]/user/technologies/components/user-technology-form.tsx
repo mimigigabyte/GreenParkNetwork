@@ -38,6 +38,7 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     acquisition_method: (technology?.acquisition_method || 'enterprise_report') as TechAcquisitionMethod,
     category_id: technology?.category_id || '',
     subcategory_id: technology?.subcategory_id || '',
+    custom_label: technology?.custom_label || '', // 自定义标签
     image_url: technology?.image_url || '',
     attachment_urls: technology?.attachment_urls || [],
     attachments: technology?.attachments || [],
@@ -444,6 +445,40 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
                 </div>
 
                 {/* 技术获取方式字段已隐藏，用户创建的技术自动设置为"企业上报" */}
+              </div>
+              
+              {/* 自定义标签 */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {locale === 'en' ? 'Custom Label (Optional)' : '自定义标签（可选）'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.custom_label}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value.length <= 20) {
+                        handleInputChange('custom_label', value)
+                      }
+                    }}
+                    placeholder={locale === 'en' 
+                      ? 'Enter custom label, e.g.: Energy Saving, Smart Manufacturing...'
+                      : '输入自定义标签，如：节能环保、智能制造...'
+                    }
+                    maxLength={20}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pr-16"
+                  />
+                  <div className="absolute right-3 top-2 text-xs text-gray-400">
+                    {formData.custom_label.length}/20
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {locale === 'en' 
+                    ? 'Custom labels for display on technology showcase pages, maximum 20 characters'
+                    : '用于在技术展示页面显示的自定义标签，最多20个字符'
+                  }
+                </p>
               </div>
             </div>
 

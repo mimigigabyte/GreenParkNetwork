@@ -1,0 +1,84 @@
+{
+  "totalTechnologies": 3,
+  "companiesCount": 3,
+  "countriesCount": 1,
+  "processingDate": "2025-09-01T08:05:58.671Z",
+  "topCompanies": [
+    {
+      "company": "J-Power",
+      "count": 1
+    },
+    {
+      "company": "A-WING",
+      "count": 1
+    },
+    {
+      "company": "Mitsubishi Heavy Industries, Ltd.",
+      "count": 1
+    }
+  ],
+  "topCountries": [
+    {
+      "country": "日本",
+      "count": 3
+    }
+  ],
+  "keywordFrequency": [
+    {
+      "keyword": "风",
+      "count": 2
+    },
+    {
+      "keyword": "基础",
+      "count": 1
+    },
+    {
+      "keyword": "塔架",
+      "count": 1
+    },
+    {
+      "keyword": "三桩",
+      "count": 1
+    },
+    {
+      "keyword": "单桩",
+      "count": 1
+    },
+    {
+      "keyword": "振动",
+      "count": 1
+    },
+    {
+      "keyword": "地震",
+      "count": 1
+    },
+    {
+      "keyword": "叶片",
+      "count": 1
+    },
+    {
+      "keyword": "发电机",
+      "count": 1
+    },
+    {
+      "keyword": "控制",
+      "count": 1
+    },
+    {
+      "keyword": "小型",
+      "count": 1
+    },
+    {
+      "keyword": "效率",
+      "count": 1
+    },
+    {
+      "keyword": "功率",
+      "count": 1
+    },
+    {
+      "keyword": "浮动",
+      "count": 1
+    }
+  ]
+}

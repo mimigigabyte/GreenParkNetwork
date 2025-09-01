@@ -37,6 +37,7 @@ export interface TechProduct {
   countryFlagUrl?: string; // 国旗logo URL
   developmentZoneName?: string; // 国家级经开区名称
   developmentZoneNameEn?: string; // 国家级经开区英文名称
+  custom_label?: string; // 自定义标签
 }
 
 // 子分类类型

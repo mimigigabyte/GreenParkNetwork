@@ -314,6 +314,7 @@ export async function POST(request: NextRequest) {
       acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
+      custom_label: technologyData.custom_label,
       attachment_urls: technologyData.attachment_urls,
       attachments: technologyData.attachments,
       is_active: technologyData.is_active,

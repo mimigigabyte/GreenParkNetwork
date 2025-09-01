@@ -366,6 +366,7 @@ export async function GET(request: NextRequest) {
         countryFlagUrl: countriesMap.get(tech.company_country_id)?.logo_url || '',
         developmentZoneName: developmentZonesMap.get(tech.company_development_zone_id)?.name_zh || '',
         developmentZoneNameEn: developmentZonesMap.get(tech.company_development_zone_id)?.name_en || '',
+        custom_label: tech.custom_label || '', // 自定义标签
         // 原有字段保持兼容性
         category: category || '',
         subCategory: '',

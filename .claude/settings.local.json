@@ -30,7 +30,14 @@
       "WebFetch(domain:www.vecteezy.com)",
       "WebFetch(domain:freesvg.org)",
       "mcp__context7__get-library-docs",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "mcp__firecrawl__firecrawl_scrape",
+      "Bash(python3:*)",
+      "mcp__serena__think_about_task_adherence",
+      "Read(/tmp/**)",
+      "Read(/tmp/**)",
+      "mcp__zen__thinkdeep",
+      "mcp__firecrawl__firecrawl_extract"
     ],
     "deny": []
   }

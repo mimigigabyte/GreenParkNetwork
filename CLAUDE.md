@@ -27,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 限制
 - 不要在前端页面中定义测试数据，所有的数据必须来自后端服务或mock接口
 - 不要创建测试文档
+- 每次在运行npm run dev之前征求我的同意
 
 
 

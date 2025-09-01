@@ -900,6 +900,20 @@ export default function TechnologiesPage() {
                         </p>
                       </div>
 
+                      {/* 自定义标签 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">自定义标签</label>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          {viewingTechnology.custom_label ? (
+                            <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 bg-blue-50 border border-blue-400 rounded">
+                              {viewingTechnology.custom_label}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-500">-</span>
+                          )}
+                        </div>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">审核状态</label>
                         <div className="flex items-center space-x-2">
