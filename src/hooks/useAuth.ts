@@ -65,13 +65,19 @@ export function useAuth() {
       
       if (session?.user && !error) {
         console.log('✅ Supabase认证验证成功')
+        // 调用 getUser() 获取实时最新的用户信息，避免会话缓存导致的邮箱/手机号不同步
+        const { data: freshUserData, error: freshUserError } = await supabase.auth.getUser();
+        if (freshUserError) {
+          console.warn('获取最新用户信息失败，回退使用会话中的用户:', freshUserError)
+        }
+        const supaUser = freshUserData?.user ?? session.user
         const mappedUser: UnifiedUser = {
-          id: session.user.id,
-          email: session.user.email,
-          phone: session.user.phone,
-          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-          avatar_url: session.user.user_metadata?.avatar_url,
-          company_name: session.user.user_metadata?.company_name,
+          id: supaUser.id,
+          email: supaUser.email,
+          phone: supaUser.phone,
+          name: supaUser.user_metadata?.name || supaUser.email?.split('@')[0] || 'User',
+          avatar_url: supaUser.user_metadata?.avatar_url,
+          company_name: supaUser.user_metadata?.company_name,
           authType: 'supabase'
         };
         setUser(mappedUser);
@@ -158,13 +164,16 @@ export function useAuth() {
               // 只有在没有自定义认证时才更新Supabase用户
               const customToken = localStorage.getItem('custom_auth_token');
               if (!customToken) {
+                // TOKEN刷新后，同步获取一次最新用户信息
+                const { data: freshUserData } = await supabase.auth.getUser();
+                const supaUser = freshUserData?.user ?? session.user
                 const mappedUser: UnifiedUser = {
-                  id: session.user.id,
-                  email: session.user.email,
-                  phone: session.user.phone,
-                  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                  avatar_url: session.user.user_metadata?.avatar_url,
-                  company_name: session.user.user_metadata?.company_name,
+                  id: supaUser.id,
+                  email: supaUser.email,
+                  phone: supaUser.phone,
+                  name: supaUser.user_metadata?.name || supaUser.email?.split('@')[0] || 'User',
+                  avatar_url: supaUser.user_metadata?.avatar_url,
+                  company_name: supaUser.user_metadata?.company_name,
                   authType: 'supabase'
                 };
                 setUser(mappedUser);

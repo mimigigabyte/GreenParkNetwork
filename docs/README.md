@@ -55,7 +55,8 @@
 │   │       └── floating-actions.tsx  # 浮动操作按钮
 │   ├── lib/                  # 工具库
 │   │   ├── utils.ts          # 通用工具函数
-│   │   └── mock-data.ts      # Mock数据
+│   │   ├── mock-data.ts      # Mock数据
+│   │   └── validators.ts     # 表单校验工具（邮箱/手机号）
 │   └── api/                  # API调用封装
 │       ├── index.ts          # API客户端基础配置
 │       ├── auth.ts           # 用户认证API（包含验证码登录）
@@ -175,6 +176,14 @@ npm start
 6. **Mock数据**: 在 `src/lib/mock-data.ts` 中添加测试数据
 
 ## 更新记录
+
+### 2025年9月
+
+- 修复：管理员后台 `/admin/users` 分页只显示前10条的问题，改为后端合并后统一分页，支持完整翻页。
+- 同步：管理员在 `/admin/users` 修改用户邮箱/手机号后，同步到：
+  - 用户个人中心 `/[locale]/profile`（通过拉取最新 Supabase 用户信息避免会话缓存）
+  - 若该用户已关联企业，则同步到 `admin_companies.contact_email/phone`
+- 体验：用户端 `/[locale]/user/companies` 表单默认显示账号的邮箱/手机号，保存时写回后端，确保与管理端一致。
 
 ### 2025年8月
 

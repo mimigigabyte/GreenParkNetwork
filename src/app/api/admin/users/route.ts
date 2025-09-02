@@ -20,10 +20,12 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const search = searchParams.get('search') || '';
 
-    // 1. 获取 Supabase Auth 用户列表
+    // 1. 获取 Supabase Auth 用户列表（为确保前端分页正常，这里拉取足够大的页容量并在服务端统一分页）
+    // 注意：如果用户量增长很大，可改为循环分页累积或改造为后端合并分页查询
+    const perPageForFetch = 1000; // 单次拉取上限，当前规模足够
     const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
-      page: page,
-      perPage: pageSize,
+      page: 1,
+      perPage: perPageForFetch,
     });
 
     if (authError) {
@@ -121,7 +123,7 @@ export async function GET(request: NextRequest) {
     // 按创建时间排序（最新的在前）
     allUsers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-    // 应用分页
+    // 应用分页（基于合并后的完整列表）
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
     const paginatedUsers = allUsers.slice(from, to);

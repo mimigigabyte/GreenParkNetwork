@@ -7,6 +7,7 @@ import { I18nCompactImageUpload } from '@/components/ui/i18n-compact-image-uploa
 import { useAuthContext } from '@/components/auth/auth-provider';
 import { useFilterData, transformFilterDataForComponents } from '@/hooks/admin/use-filter-data';
 import { COMPANY_TYPE_OPTIONS } from '@/lib/types/admin';
+import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators';
 
 // 企业信息数据类型
 interface CompanyInfo {
@@ -87,8 +88,9 @@ export default function UserCompaniesPage({ params }: PageProps) {
           industryCode: companyData.industry_code || '',
           annualOutput: companyData.annual_output_value?.toString() || '',
           contactPerson: companyData.contact_person || '',
-          contactPhone: companyData.contact_phone || '',
-          contactEmail: companyData.contact_email || ''
+          // 始终以账号信息为准进行展示，确保与管理端修改保持同步；保存时会写回后端
+          contactPhone: (user?.phone || companyData.contact_phone || ''),
+          contactEmail: (user?.email || companyData.contact_email || '')
         });
 
         // 如果有省份信息，加载省份列表
@@ -151,11 +153,11 @@ export default function UserCompaniesPage({ params }: PageProps) {
     );
   }
 
-  const { 
-    countries, 
-    provinces, 
-    developmentZones 
-  } = transformFilterDataForComponents(filterData);
+  const {
+    countries,
+    provinces,
+    developmentZones
+  } = transformFilterDataForComponents(filterData, params.locale === 'en' ? 'en' : 'zh');
 
   const handleInputChange = (field: string, value: string | File | null) => {
     setCompanyInfo(prev => ({
@@ -194,6 +196,7 @@ export default function UserCompaniesPage({ params }: PageProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    const localeTag = (params.locale === 'en' ? 'en' : 'zh') as 'en' | 'zh'
     
     if (!companyInfo.companyName) newErrors.companyName = t('validation.companyNameRequired');
     if (!companyInfo.country) newErrors.country = t('validation.countryRequired');
@@ -202,8 +205,16 @@ export default function UserCompaniesPage({ params }: PageProps) {
     }
     if (!companyInfo.companyType) newErrors.companyType = t('validation.companyTypeRequired');
     if (!companyInfo.contactPerson) newErrors.contactPerson = t('validation.contactPersonRequired');
-    if (!companyInfo.contactPhone) newErrors.contactPhone = t('validation.contactPhoneRequired');
-    if (!companyInfo.contactEmail) newErrors.contactEmail = t('validation.contactEmailRequired');
+    if (!companyInfo.contactPhone) {
+      newErrors.contactPhone = t('validation.contactPhoneRequired');
+    } else if (!isValidPhone(companyInfo.contactPhone, '+86')) {
+      newErrors.contactPhone = phoneError(localeTag);
+    }
+    if (!companyInfo.contactEmail) {
+      newErrors.contactEmail = t('validation.contactEmailRequired');
+    } else if (!isValidEmail(companyInfo.contactEmail)) {
+      newErrors.contactEmail = emailError(localeTag);
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

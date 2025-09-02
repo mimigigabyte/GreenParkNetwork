@@ -88,6 +88,24 @@ export async function PUT(
       .eq('is_active', true)
       .single();
 
+    // 如果管理员更新了邮箱/手机号，并且存在关联企业，同步更新企业的联系邮箱/电话
+    if ((email || phone_number) && company?.id) {
+      const contactUpdate: Record<string, string> = {}
+      if (email) contactUpdate.contact_email = email
+      if (phone_number) contactUpdate.contact_phone = phone_number
+      try {
+        const { error: contactErr } = await supabaseAdmin
+          .from('admin_companies')
+          .update(contactUpdate)
+          .eq('id', company.id)
+        if (contactErr) {
+          console.warn('同步更新企业联系信息失败（忽略，不阻断流程）:', contactErr)
+        }
+      } catch (e) {
+        console.warn('同步更新企业联系信息异常（忽略）:', e)
+      }
+    }
+
     const formattedUser = {
       id: userData.user.id,
       email: userData.user.email,
