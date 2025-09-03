@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
     console.log('🔍 开始获取产品分类...');
     
     // 检查管理员客户端是否可用
-    if (!supabaseAdmin) {
+    const db = supabaseAdmin;
+    if (!db) {
       console.warn('⚠️ supabaseAdmin 不可用，使用fallback数据');
       return NextResponse.json({
         success: true,
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
       console.log('📊 从数据库获取分类数据...');
 
       // 获取所有启用的分类（与管理后台保持一致的查询逻辑）
-      const { data: categories, error } = await supabaseAdmin
+      const { data: categories, error } = await db
         .from('admin_categories')
         .select('id, name_zh, name_en, slug, sort_order')
         .eq('is_active', true)
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
           const categorySlug = category.slug || String(category.id);
           
           // 使用 head + count 提高性能，仅返回计数
-          const { count: techCount, error: countError } = await supabaseAdmin
+          const { count: techCount, error: countError } = await db
             .from('admin_technologies')
             .select('id', { count: 'exact', head: true })
             .eq('is_active', true)
