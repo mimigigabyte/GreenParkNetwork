@@ -68,6 +68,24 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
       return;
     }
 
+    // 管理员直通登录（在任何格式校验与人机验证之前）
+    if (loginData.account === 'admin' && loginData.password === 'Ecocenter2025') {
+        const currentTime = Date.now().toString();
+        
+        // 管理员登录
+        localStorage.setItem('admin_authenticated', 'true');
+        localStorage.setItem('admin_auth_time', currentTime);
+        
+        // 设置cookie用于API请求验证
+        document.cookie = `admin_authenticated=true; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
+        document.cookie = `admin_auth_time=${currentTime}; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
+        
+        alert('管理员登录成功！');
+        onClose(); // 关闭登录弹窗
+        router.push('/admin'); // 跳转到管理员控制台
+        return;
+    }
+
     // 基本账号格式校验（邮箱或手机号）
     const accountType = detectAccountType(loginData.account);
     if (accountType === 'email') {
@@ -83,34 +101,15 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
       }
     }
 
-    // 检查人机验证（管理员账号除外）
-    if (!(loginData.account === 'admin' && loginData.password === 'Ecocenter2025')) {
-      if (!turnstileToken) {
-        alert('请完成人机验证');
-        return;
-      }
+    // 检查人机验证
+    if (!turnstileToken) {
+      alert('请完成人机验证');
+      return;
     }
 
     setLoginLoading(true);
 
     try {
-      // 检查是否是管理员账号
-      if (loginData.account === 'admin' && loginData.password === 'Ecocenter2025') {
-        const currentTime = Date.now().toString();
-        
-        // 管理员登录
-        localStorage.setItem('admin_authenticated', 'true');
-        localStorage.setItem('admin_auth_time', currentTime);
-        
-        // 设置cookie用于API请求验证
-        document.cookie = `admin_authenticated=true; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
-        document.cookie = `admin_auth_time=${currentTime}; path=/; max-age=${8 * 60 * 60}; SameSite=strict`;
-        
-        alert('管理员登录成功！');
-        onClose(); // 关闭登录弹窗
-        router.push('/admin'); // 跳转到管理员控制台
-        return;
-      }
 
       // 普通用户登录
       // accountType 已在前置校验中计算
