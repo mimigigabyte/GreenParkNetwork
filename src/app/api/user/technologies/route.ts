@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     let finalImageUrl = technologyData.image_url
     if (!finalImageUrl && technologyData.subcategory_id) {
       try {
-        const { data: subcategory } = await supabaseAdmin
+        const { data: subcategory } = await db
           .from('admin_subcategories')
           .select('default_tech_image_url')
           .eq('id', technologyData.subcategory_id)
