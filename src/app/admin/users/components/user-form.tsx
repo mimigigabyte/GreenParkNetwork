@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { AdminUser, AdminCompany } from '@/lib/types/admin'
-import { createUserApi, updateUserApi, getCompaniesForSelectApi } from '@/api/admin-users'
+import { AdminUser } from '@/lib/types/admin'
+import { createUserApi, updateUserApi, getCompaniesForSelectApi, type CompanyOption } from '@/api/admin-users'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -33,7 +33,7 @@ interface UserFormProps {
 
 export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [companies, setCompanies] = useState<AdminCompany[]>([])
+  const [companies, setCompanies] = useState<CompanyOption[]>([])
   const isEditMode = !!user
 
   const form = useForm<UserFormValues>({

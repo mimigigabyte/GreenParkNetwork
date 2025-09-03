@@ -1,5 +1,8 @@
 import { AdminUser, PaginationParams, PaginatedResponse, AdminCompany } from '@/lib/types/admin'
 
+// 仅用于下拉选择的精简企业选项类型
+export type CompanyOption = Pick<AdminCompany, 'id' | 'name_zh' | 'name_en'>
+
 /**
  * 获取用户列表
  * @param params - 分页和过滤参数
@@ -151,7 +154,7 @@ export const deleteUserApi = async (userId: string): Promise<void> => {
  * 获取企业列表 (用于表单选择)
  * @returns 企业列表
  */
-export const getCompaniesForSelectApi = async (): Promise<AdminCompany[]> => {
+export const getCompaniesForSelectApi = async (): Promise<CompanyOption[]> => {
   try {
     // 拉取较大的页尺寸，避免分页遗漏
     const params = new URLSearchParams({ page: '1', pageSize: '1000', sortBy: 'name_zh', sortOrder: 'asc' })
@@ -179,10 +182,10 @@ export const getCompaniesForSelectApi = async (): Promise<AdminCompany[]> => {
       throw new Error(result.error || 'Failed to fetch companies')
     }
 
-    return list.map((company: AdminCompany) => ({
+    return list.map((company: AdminCompany): CompanyOption => ({
       id: company.id,
       name_zh: company.name_zh,
-      name_en: (company as any).name_en,
+      name_en: company.name_en,
     }))
   } catch (error) {
     console.error('Error fetching companies for select:', error)
