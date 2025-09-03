@@ -63,6 +63,9 @@
 │       ├── tech.ts           # 技术产品API
 │       └── company.ts        # 企业信息API
 ├── package.json              # 项目依赖配置
+├── scripts/
+│   └── mcp/
+│       └── run-mcp-tool.js   # 通用 MCP 客户端脚本（可调用 Firecrawl MCP，不依赖Claude）
 ├── next.config.mjs          # Next.js配置
 ├── tsconfig.json            # TypeScript配置
 ├── tailwind.config.ts       # Tailwind CSS配置
@@ -79,6 +82,12 @@
 │       ├── categories/     # 分类图片
 │       └── hero/           # 首页背景图片
 └── README.md                # 项目说明文档
+
+### 数据处理脚本
+
+```
+middle_process_scripts/      # 中间处理脚本暂存目录（可按需迁移脚本）
+```
 ```
 
 ## 开发规范
@@ -137,6 +146,36 @@ npm run dev
 npm run build
 npm start
 ```
+
+## Firecrawl 集成（不使用 Claude）
+
+- 脚本：`scripts/mcp/run-mcp-tool.js` 使用 `@modelcontextprotocol/sdk` 以 `stdio` 方式直连本地/全局 MCP 服务器可执行文件。
+- 适用于 Firecrawl MCP 或其它 MCP 服务器，完全不依赖 Claude。
+
+### 环境变量
+- `FIRECRAWL_API_KEY`: Firecrawl API Key（必需，若 MCP/HTTP 端要求）
+- `FIRECRAWL_BASE_URL`: Firecrawl API 基地址（可选，默认官方地址）
+- `FIRECRAWL_MCP_COMMAND`: MCP 服务器可执行命令（如已全局安装的 `firecrawl-mcp`）
+- `FIRECRAWL_MCP_ARGS`: 传给 MCP 可执行命令的参数（JSON 数组字符串），如 `["--transport","stdio"]`
+
+### 使用示例
+1) 列出可用工具
+```bash
+FIRECRAWL_API_KEY=... \
+FIRECRAWL_MCP_COMMAND="firecrawl-mcp" \
+node scripts/mcp/run-mcp-tool.js --list
+```
+
+2) 调用具体工具（示例工具名：`firecrawl_extract`，参数从 JSON 文件读取）
+```bash
+FIRECRAWL_API_KEY=... \
+FIRECRAWL_MCP_COMMAND="firecrawl-mcp" \
+node scripts/mcp/run-mcp-tool.js \
+  --tool firecrawl_extract \
+  --params ./data/firecrawl-params.json
+```
+
+注：`firecrawl-mcp` 为示意名，请根据你本机安装的 Firecrawl MCP 可执行名称/路径进行替换，或使用 `--command` 与 `--args` 手动指定。
 
 ## 可用组件
 

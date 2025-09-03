@@ -8,7 +8,7 @@ const fallbackCategories = [
     name: '节能',
     nameEn: 'ENERGY SAVING',
     icon: 'default',
-    count: 10,
+    count: 0,
     color: '#3B82F6'
   },
   {
@@ -16,7 +16,7 @@ const fallbackCategories = [
     name: '清洁能源',
     nameEn: 'CLEAN ENERGY',
     icon: 'default',
-    count: 8,
+    count: 0,
     color: '#10B981'
   },
   {
@@ -24,7 +24,7 @@ const fallbackCategories = [
     name: '清洁生产',
     nameEn: 'CLEAN PRODUCTION',
     icon: 'default',
-    count: 12,
+    count: 0,
     color: '#F59E0B'
   },
   {
@@ -32,7 +32,7 @@ const fallbackCategories = [
     name: '新能源汽车',
     nameEn: 'NEW ENERGY VEHICLE',
     icon: 'default',
-    count: 15,
+    count: 0,
     color: '#EF4444'
   }
 ];
@@ -80,18 +80,33 @@ export async function GET(request: NextRequest) {
         'new-energy-vehicle': 'NEW ENERGY VEHICLE'
       };
 
-      // 简化处理，暂时不统计技术数量
-      const categoriesWithCount = categories?.map(category => {
-        const categoryId = category.slug || category.id.toString();
-        return {
-          id: categoryId,
-          name: category.name_zh || category.name_en || '未命名分类',
-          nameEn: category.name_en || englishNameMap[categoryId] || 'UNNAMED CATEGORY',
-          icon: 'default', // 暂时固定图标
-          count: 10, // 暂时固定数量，后续优化
-          color: '#3B82F6' // 默认颜色，因为color字段不存在
-        };
-      }) || [];
+      // 为每个分类统计对应的技术数量（仅统计启用且已发布的技术）
+      const categoriesWithCount = await Promise.all(
+        (categories || []).map(async (category: any) => {
+          const categorySlug = category.slug || String(category.id);
+          
+          // 使用 head + count 提高性能，仅返回计数
+          const { count: techCount, error: countError } = await supabaseAdmin
+            .from('admin_technologies')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true)
+            .eq('review_status', 'published')
+            .eq('category_id', category.id);
+
+          if (countError) {
+            console.warn(`⚠️ 统计分类(${categorySlug})技术数量失败:`, countError);
+          }
+
+          return {
+            id: categorySlug, // 前端按slug识别分类
+            name: category.name_zh || category.name_en || '未命名分类',
+            nameEn: category.name_en || englishNameMap[categorySlug] || 'UNNAMED CATEGORY',
+            icon: 'default',
+            count: techCount || 0,
+            color: '#3B82F6'
+          };
+        })
+      );
 
       console.log('✅ 返回分类数据:', categoriesWithCount);
 

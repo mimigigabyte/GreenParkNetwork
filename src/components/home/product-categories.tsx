@@ -147,8 +147,8 @@ export function ProductCategories({
 
                                  {/* 内容区域 */}
                  <div className="relative p-6 h-full flex flex-col text-white text-center">
-                   {/* 顶部标题区域 - 向下调整位置 */}
-                   <div className="mt-8 mb-6">
+                   {/* 顶部标题区域 - 固定高度以对齐下方统计 */}
+                   <div className="mt-8 mb-6 flex-none h-24 md:h-28 flex flex-col justify-end overflow-hidden">
                      <h3 className="text-xl lg:text-2xl font-bold mb-1">
                        {locale === 'en' ? category.nameEn : category.name}
                      </h3>
@@ -157,13 +157,13 @@ export function ProductCategories({
                      </p>
                    </div>
 
-                   {/* 数字统计区域 - 居中定位 */}
-                   <div className="flex-1 flex flex-col justify-center items-center">
-                     <div className="text-4xl lg:text-5xl font-bold mb-2">
-                       {category.count}
+                   {/* 数字统计区域 - 贴近卡片底部，跨卡水平对齐 */}
+                   <div className="mt-auto flex flex-col items-center justify-center pb-4">
+                     <div className="flex items-baseline gap-2 justify-center">
+                       <span className="tabular-nums text-4xl lg:text-5xl font-bold">{category.count}</span>
                        <span className="text-2xl font-normal">+</span>
                      </div>
-                     <div className="text-sm text-white/80 font-medium">
+                     <div className="text-sm text-white/80 font-medium mt-1">
                        {t('relatedTechnology')}
                      </div>
                    </div>
