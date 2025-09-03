@@ -9,6 +9,7 @@ import { createUserTechnologyApi, updateUserTechnologyApi } from '@/lib/api/user
 import { CompactImageUpload } from '@/components/ui/compact-image-upload'
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { uploadMultipleFilesWithInfo, FileAttachment } from '@/lib/supabase-storage'
+import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
 import { useAuthContext } from '@/components/auth/auth-provider'
 
 interface UserTechnologyFormProps {
