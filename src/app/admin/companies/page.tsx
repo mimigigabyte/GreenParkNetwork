@@ -68,7 +68,7 @@ export default function CompaniesPage() {
       setIsLoading(true)
       
       const searchParams = new URLSearchParams({
-        page: String(pagination.current),
+        page: String(params?.page ?? pagination.current),
         pageSize: String(pagination.pageSize),
         ...(params?.search && { search: params.search }),
         ...(params?.sortBy && { sortBy: params.sortBy }),
@@ -92,7 +92,7 @@ export default function CompaniesPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [pagination.current, pagination.pageSize])
 
   useEffect(() => {
     loadCompanies()
@@ -101,7 +101,8 @@ export default function CompaniesPage() {
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
-    loadCompanies({ search })
+    // 显式第一页，避免使用旧页码
+    loadCompanies({ search, page: 1 })
   }
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
@@ -411,6 +412,7 @@ export default function CompaniesPage() {
         }}
         onSearch={handleSearch}
         onSort={handleSort}
+        searchMode="enter"
         searchPlaceholder="搜索企业名称、联系人或行业代码..."
         className="shadow-sm"
       />

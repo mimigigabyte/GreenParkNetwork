@@ -6,19 +6,38 @@ import { useRouter } from 'next/navigation';
 export default function PrivacyPolicy() {
   const router = useRouter();
 
+  const handleBack = () => {
+    try {
+      // @ts-ignore
+      const idx = typeof window !== 'undefined' && window.history?.state?.idx;
+      const hasIdx = typeof idx === 'number' && idx > 0;
+      const sameOriginReferrer = typeof document !== 'undefined'
+        && document.referrer
+        && (() => { try { return new URL(document.referrer).origin === window.location.origin; } catch { return false; } })();
+      if (hasIdx || sameOriginReferrer) {
+        router.back();
+      } else {
+        router.push('/zh');
+      }
+    } catch {
+      router.push('/zh');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 头部 */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
+            <a
+              href="/zh"
+              onClick={(e) => { e.preventDefault(); handleBack(); }}
               className="flex items-center text-gray-600 hover:text-gray-800 transition-colors mr-4"
             >
               <ArrowLeft size={20} className="mr-2" />
               返回
-            </button>
+            </a>
             <h1 className="text-2xl font-bold text-gray-900">隐私条款</h1>
           </div>
         </div>

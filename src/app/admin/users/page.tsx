@@ -45,7 +45,8 @@ export default function UsersPage() {
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
-    loadUsers({ search })
+    // 显式从第一页搜索，避免使用旧页码
+    loadUsers({ search, page: 1 })
   }
 
   const handlePaginationChange = (page: number, pageSize: number) => {
@@ -186,6 +187,7 @@ export default function UsersPage() {
           onChange: handlePaginationChange,
         }}
         onSearch={handleSearch}
+        searchMode="enter"
         searchPlaceholder="搜索邮箱、手机号或企业名称..."
         className="shadow-sm"
       />

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators'
 
 interface BasicInfoProps {
   locale: string
@@ -59,6 +60,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
 
   // 发送邮箱验证码
   const sendEmailCode = () => {
+    if (!isValidEmail(newEmail)) {
+      alert(emailError(locale as 'en' | 'zh'))
+      return
+    }
     setIsEmailCodeSent(true)
     // TODO: 调用发送邮箱验证码的API
     console.log('发送邮箱验证码到:', newEmail)
@@ -78,6 +83,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
 
   // 发送手机验证码
   const sendPhoneCode = () => {
+    if (!isValidPhone(newPhone, '+86')) {
+      alert(phoneError(locale as 'en' | 'zh'))
+      return
+    }
     setIsPhoneCodeSent(true)
     // TODO: 调用发送手机验证码的API
     console.log('发送手机验证码到:', newPhone)
@@ -98,6 +107,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
   // 确认修改邮箱
   const handleConfirmEmailChange = async () => {
     try {
+      if (!isValidEmail(newEmail)) {
+        alert(emailError(locale as 'en' | 'zh'))
+        return
+      }
       // TODO: 调用修改邮箱的API
       console.log('修改邮箱:', { newEmail, emailCode })
       setIsEmailDialogOpen(false)
@@ -113,6 +126,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
   // 确认修改手机号
   const handleConfirmPhoneChange = async () => {
     try {
+      if (!isValidPhone(newPhone, '+86')) {
+        alert(phoneError(locale as 'en' | 'zh'))
+        return
+      }
       // TODO: 调用修改手机号的API
       console.log('修改手机号:', { newPhone, phoneCode })
       setIsPhoneDialogOpen(false)

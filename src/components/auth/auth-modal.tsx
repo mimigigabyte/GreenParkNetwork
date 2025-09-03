@@ -11,6 +11,7 @@ import { ResetPasswordModal } from './reset-password-modal';
 import { TurnstileWidget } from './turnstile-widget';
 import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
+import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators';
 
 import { useAuthContext } from './auth-provider';
 
@@ -55,8 +56,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
 
   // 检测账号类型（邮箱或手机号）
   const detectAccountType = (account: string): 'email' | 'phone' => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(account) ? 'email' : 'phone';
+    return isValidEmail(account) ? 'email' : 'phone';
   };
 
   // 密码登录处理
@@ -66,6 +66,21 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
     if (!loginData.account || !loginData.password) {
       alert('请填写完整的登录信息');
       return;
+    }
+
+    // 基本账号格式校验（邮箱或手机号）
+    const accountType = detectAccountType(loginData.account);
+    if (accountType === 'email') {
+      if (!isValidEmail(loginData.account)) {
+        alert(emailError(locale as 'en' | 'zh'))
+        return
+      }
+    } else {
+      // 登录未提供国家代码，默认+86
+      if (!isValidPhone(loginData.account, '+86')) {
+        alert(phoneError(locale as 'en' | 'zh'))
+        return
+      }
     }
 
     // 检查人机验证（管理员账号除外）
@@ -98,7 +113,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
       }
 
       // 普通用户登录
-      const accountType = detectAccountType(loginData.account);
+      // accountType 已在前置校验中计算
       console.log('🔐 密码登录尝试:', { account: loginData.account, type: accountType });
       
       let loginSuccess = false;

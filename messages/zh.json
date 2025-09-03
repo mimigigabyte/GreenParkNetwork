@@ -15,7 +15,12 @@
     "previous": "上一步",
     "close": "关闭",
     "select": "选择",
-    "all": "全部"
+    "all": "全部",
+    "optional": "可选",
+    "nextStep": "下一步",
+    "previousStep": "上一步",
+    "submitting": "提交中...",
+    "complete": "完成确认"
   },
   "header": {
     "platformName": "国家级经开区绿色低碳技术推广平台",
@@ -143,17 +148,59 @@
   },
   "companyProfile": {
     "title": "企业信息完善",
-    "step1": "基本信息",
-    "step2": "详细信息",
-    "companyName": "企业名称",
-    "country": "国别",
-    "province": "省份",
-    "economicZone": "国家级经开区",
-    "companyType": "企业类型",
-    "address": "详细地址",
-    "contactPerson": "联系人",
-    "contactPhone": "联系电话",
-    "contactEmail": "联系邮箱"
+    "subtitle": "完善信息，即刻开启绿色低碳之旅 (第 {step}/{totalSteps} 步)",
+    "submitSuccess": "企业信息提交成功！即将跳转到首页...",
+    "submitFailed": "提交失败，请稍后重试",
+    "requirements": {
+      "publishTech": "发布我的绿色低碳技术",
+      "findTech": "寻找特定绿色低碳技术",
+      "industryInsights": "了解业界前沿动态"
+    },
+    "step1": {
+      "requirement": "您的需求",
+      "selectRequirement": "请选择您的需求",
+      "companyName": "企业名称",
+      "companyNamePlaceholder": "请输入企业名称，系统将自动搜索匹配",
+      "autoFillSuccess": "已自动获取企业工商信息",
+      "country": "国别",
+      "selectCountry": "请选择国别",
+      "province": "省份",
+      "selectProvince": "请选择省份",
+      "economicZone": "所属国家级经开区",
+      "selectEconomicZone": "请选择经开区",
+      "notInZone": "不位于国家级经开区内",
+      "logo": "上传企业Logo",
+      "selectFile": "选择文件",
+      "logoPreview": "系统生成预览",
+      "logoPreviewDesc": "系统将根据企业名称自动生成logo，您也可以上传自定义logo",
+      "logoHint": "建议上传 PNG 或 JPG 格式，尺寸不超过 2MB"
+    },
+    "step2": {
+      "companyType": "企业性质",
+      "selectCompanyType": "请选择企业性质",
+      "address": "地址信息",
+      "addressPlaceholder": "请输入详细地址",
+      "industryCode": "行业代码",
+      "industryCodePlaceholder": "请输入行业代码",
+      "annualOutput": "工业总产值(亿元)",
+      "annualOutputPlaceholder": "请输入产值",
+      "contactPerson": "联系人",
+      "contactPersonPlaceholder": "请输入联系人姓名",
+      "contactPhone": "联系电话",
+      "contactPhonePlaceholder": "请输入联系电话",
+      "contactEmail": "联系邮箱",
+      "contactEmailPlaceholder": "请输入联系邮箱"
+    },
+    "validation": {
+      "requirementRequired": "请选择您的需求",
+      "companyNameRequired": "请输入企业名称",
+      "countryRequired": "请选择国别",
+      "provinceRequired": "请选择省份",
+      "companyTypeRequired": "请选择企业性质",
+      "contactPersonRequired": "请输入联系人",
+      "contactPhoneRequired": "请输入联系电话",
+      "contactEmailRequired": "请输入联系邮箱"
+    }
   },
   "user": {
     "companies": {

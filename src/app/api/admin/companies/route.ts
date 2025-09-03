@@ -22,12 +22,15 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('admin_companies')
-      .select(`
+      .select(
+        `
         *,
         country:admin_countries(id, name_zh, name_en, code),
         province:admin_provinces(id, name_zh, name_en, code),
         development_zone:admin_development_zones(id, name_zh, name_en, code)
-      `)
+      `,
+        { count: 'exact' }
+      )
 
     // 搜索过滤
     if (search) {
@@ -49,13 +52,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // 某些情况下Supabase不会返回count（复杂select或环境差异），做一次兜底统计
+    let total = count ?? 0
+    if (total === 0) {
+      try {
+        let countQuery = supabase
+          .from('admin_companies')
+          .select('id', { count: 'exact', head: true })
+        if (search) {
+          // 与数据查询保持相同的搜索过滤
+          countQuery = countQuery.or(
+            `name_zh.ilike.%${search}%,name_en.ilike.%${search}%,contact_person.ilike.%${search}%,industry_code.ilike.%${search}%`
+          )
+        }
+        const { count: fallbackCount, error: countError } = await countQuery
+        if (!countError && typeof fallbackCount === 'number') {
+          total = fallbackCount
+        }
+      } catch (e) {
+        console.warn('企业总数统计兜底失败:', e)
+      }
+    }
+
     return NextResponse.json({
       data: data || [],
       pagination: {
         page,
         pageSize,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / pageSize)
+        total,
+        totalPages: Math.ceil(total / pageSize)
       }
     })
   } catch (error) {

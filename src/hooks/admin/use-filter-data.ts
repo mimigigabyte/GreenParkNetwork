@@ -131,6 +131,123 @@ const developmentZoneTranslations: { [key: string]: string } = {
 };
 
 /**
+ * 中文省份名称到英文的映射（用于补齐缺失的英文名）
+ */
+const provinceTranslations: { [key: string]: string } = {
+  // 直辖市
+  '北京': 'Beijing',
+  '天津': 'Tianjin',
+  '上海': 'Shanghai',
+  '重庆': 'Chongqing',
+  // 省份
+  '河北': 'Hebei',
+  '山西': 'Shanxi',
+  '辽宁': 'Liaoning',
+  '吉林': 'Jilin',
+  '黑龙江': 'Heilongjiang',
+  '江苏': 'Jiangsu',
+  '浙江': 'Zhejiang',
+  '安徽': 'Anhui',
+  '福建': 'Fujian',
+  '江西': 'Jiangxi',
+  '山东': 'Shandong',
+  '河南': 'Henan',
+  '湖北': 'Hubei',
+  '湖南': 'Hunan',
+  '广东': 'Guangdong',
+  '海南': 'Hainan',
+  '四川': 'Sichuan',
+  '贵州': 'Guizhou',
+  '云南': 'Yunnan',
+  '陕西': 'Shaanxi',
+  '甘肃': 'Gansu',
+  '青海': 'Qinghai',
+  '台湾': 'Taiwan',
+  // 自治区
+  '内蒙古': 'Inner Mongolia',
+  '广西': 'Guangxi',
+  '西藏': 'Tibet',
+  '宁夏': 'Ningxia',
+  '新疆': 'Xinjiang',
+  // 特别行政区
+  '香港': 'Hong Kong',
+  '澳门': 'Macao'
+};
+
+/**
+ * 常见国家中文到英文映射（用于补齐缺失的英文名）
+ */
+const countryTranslations: { [key: string]: string } = {
+  '中国': 'China',
+  '日本': 'Japan',
+  '美国': 'United States',
+  '英国': 'United Kingdom',
+  '德国': 'Germany',
+  '法国': 'France',
+  '韩国': 'South Korea',
+  '朝鲜': 'North Korea',
+  '印度': 'India',
+  '加拿大': 'Canada',
+  '澳大利亚': 'Australia',
+  '意大利': 'Italy',
+  '西班牙': 'Spain',
+  '荷兰': 'Netherlands',
+  '瑞典': 'Sweden',
+  '丹麦': 'Denmark',
+  '挪威': 'Norway',
+  '芬兰': 'Finland',
+  '瑞士': 'Switzerland',
+  '俄罗斯': 'Russia',
+  '新加坡': 'Singapore',
+  '马来西亚': 'Malaysia',
+  '泰国': 'Thailand',
+  '菲律宾': 'Philippines',
+  '印度尼西亚': 'Indonesia'
+};
+
+// 常见城市/区域翻译（用于经开区前缀翻译）
+const cityAreaTranslations: { [key: string]: string } = {
+  // 直辖市与常见城市
+  '北京': 'Beijing', '天津': 'Tianjin', '上海': 'Shanghai', '重庆': 'Chongqing',
+  '广州': 'Guangzhou', '深圳': 'Shenzhen', '杭州': 'Hangzhou', '南京': 'Nanjing', '苏州': 'Suzhou', '无锡': 'Wuxi',
+  '宁波': 'Ningbo', '青岛': 'Qingdao', '大连': 'Dalian', '武汉': 'Wuhan', '成都': 'Chengdu', '西安': "Xi'an",
+  '沈阳': 'Shenyang', '长春': 'Changchun', '哈尔滨': 'Harbin', '郑州': 'Zhengzhou', '济南': 'Jinan', '合肥': 'Hefei',
+  '福州': 'Fuzhou', '厦门': 'Xiamen', '南昌': 'Nanchang', '长沙': 'Changsha', '南宁': 'Nanning', '昆明': 'Kunming',
+  '海口': 'Haikou', '兰州': 'Lanzhou', '西宁': 'Xining', '银川': 'Yinchuan', '乌鲁木齐': 'Urumqi', '呼和浩特': 'Hohhot',
+  '石家庄': 'Shijiazhuang', '唐山': 'Tangshan', '保定': 'Baoding', '廊坊': 'Langfang', '东营': 'Dongying', '南通': 'Nantong',
+  '昆山': 'Kunshan', '江宁': 'Jiangning', '金华': 'Jinhua', '嘉兴': 'Jiaxing', '绍兴': 'Shaoxing', '常州': 'Changzhou',
+  '徐州': 'Xuzhou', '泰州': 'Taizhou', '温州': 'Wenzhou', '扬州': 'Yangzhou', '盐城': 'Yancheng', '威海': 'Weihai',
+  '烟台': 'Yantai', '潍坊': 'Weifang', '洛阳': 'Luoyang', '太原': 'Taiyuan', '呼伦贝尔': 'Hulunbuir'
+};
+
+// 常见区域/园区专有名词
+const areaTranslations: { [key: string]: string } = {
+  '金桥': 'Jinqiao',
+  '张江': 'Zhangjiang',
+  '苏州工业园区': 'Suzhou Industrial Park',
+  '漕河泾': 'Caohejing'
+};
+
+function translateCityAreaPrefix(prefix: string): string {
+  // 完全匹配专有名词
+  if (areaTranslations[prefix]) return areaTranslations[prefix];
+
+  // 尝试城市+区域拆分（如 上海金桥 => Shanghai Jinqiao）
+  for (const cityZh of Object.keys(cityAreaTranslations)) {
+    if (prefix.startsWith(cityZh)) {
+      const cityEn = cityAreaTranslations[cityZh];
+      const rest = prefix.slice(cityZh.length);
+      if (!rest) return cityEn;
+      const restEn = areaTranslations[rest] || rest; // 若未知区域，原样返回（避免空）
+      return `${cityEn} ${restEn}`.trim();
+    }
+  }
+  // 仅城市映射
+  if (cityAreaTranslations[prefix]) return cityAreaTranslations[prefix];
+  return prefix; // 回退
+}
+
+/**
  * 自动翻译经开区名称（如果英文名称为空或包含中文）
  */
 function translateDevelopmentZoneName(nameZh: string, nameEn: string): string {
@@ -138,23 +255,58 @@ function translateDevelopmentZoneName(nameZh: string, nameEn: string): string {
   if (nameEn && !/[\u4e00-\u9fff]/.test(nameEn)) {
     return nameEn;
   }
-  
   // 查找预定义的翻译
   if (developmentZoneTranslations[nameZh]) {
     return developmentZoneTranslations[nameZh];
   }
-  
-  // 简单的自动翻译规则
-  return nameZh
-    .replace(/经济技术开发区/g, 'Economic and Technological Development Zone')
-    .replace(/经济开发区/g, 'Economic Development Zone')
-    .replace(/高新技术开发区/g, 'High-Tech Development Zone')
-    .replace(/工业园区/g, 'Industrial Park')
-    .replace(/科技园/g, 'Science Park')
-    .replace(/新区/g, 'New Area')
-    .replace(/开发区/g, 'Development Zone')
-    .replace(/自贸区/g, 'Free Trade Zone')
-    .replace(/保税区/g, 'Bonded Zone');
+  // 结构化匹配：前缀(城市/区域) + 后缀(类型)
+  const suffixMap: Array<[RegExp, string]> = [
+    [/经济技术开发区$/, 'Economic and Technological Development Zone'],
+    [/经济开发区$/, 'Economic Development Zone'],
+    [/高新技术开发区$/, 'High-Tech Development Zone'],
+    [/工业园区$/, 'Industrial Park'],
+    [/科技园$/, 'Science Park'],
+    [/新区$/, 'New Area'],
+    [/开发区$/, 'Development Zone'],
+    [/自贸区$/, 'Free Trade Zone'],
+    [/保税区$/, 'Bonded Zone']
+  ];
+  for (const [re, enSuffix] of suffixMap) {
+    const m = nameZh.match(re);
+    if (m) {
+      const prefix = nameZh.replace(re, '');
+      const prefixEn = translateCityAreaPrefix(prefix);
+      return `${prefixEn} ${enSuffix}`.trim();
+    }
+  }
+  // 无法匹配后缀时，返回原文（或英文名）
+  return nameEn || nameZh;
+}
+
+/**
+ * 自动翻译省份名称（如果英文为空或仍为中文）
+ */
+function translateProvinceName(nameZh: string, nameEn: string): string {
+  if (nameEn && !/[\u4e00-\u9fff]/.test(nameEn)) {
+    return nameEn;
+  }
+  if (provinceTranslations[nameZh]) {
+    return provinceTranslations[nameZh];
+  }
+  return nameEn || nameZh; // 回退
+}
+
+/**
+ * 自动翻译国家名称（如果英文为空或仍为中文）
+ */
+function translateCountryName(nameZh: string, nameEn: string): string {
+  if (nameEn && !/[\u4e00-\u9fff]/.test(nameEn)) {
+    return nameEn;
+  }
+  if (countryTranslations[nameZh]) {
+    return countryTranslations[nameZh];
+  }
+  return nameEn || nameZh; // 回退
 }
 
 /**
@@ -176,14 +328,18 @@ export function transformFilterDataForComponents(data: FilterData, locale: strin
     // 转换国家格式
     countries: (data.countries || []).map(country => ({
       value: country.code,
-      label: locale === 'en' ? (country.name_en || country.name_zh) : country.name_zh,
+      label: locale === 'en' 
+        ? translateCountryName(country.name_zh, country.name_en || '')
+        : country.name_zh,
       logo_url: country.logo_url
     })),
 
     // 转换省份格式
     provinces: (data.provinces || []).map(province => ({
       value: province.code,
-      label: locale === 'en' ? (province.name_en || province.name_zh) : province.name_zh
+      label: locale === 'en' 
+        ? translateProvinceName(province.name_zh, province.name_en || '')
+        : province.name_zh
     })),
 
     // 转换经开区格式

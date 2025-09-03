@@ -146,6 +146,13 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
           : `文件 "${file.name}" 超过10MB限制，请选择更小的文件`)
         return
       }
+      // 类型限制
+      if (!isAllowedTechAttachment(file)) {
+        alert(locale === 'en'
+          ? `File type not allowed: ${file.name}\n${allowedAttachmentHint('en')}`
+          : `不允许的文件类型：${file.name}\n${allowedAttachmentHint('zh')}`)
+        return
+      }
     }
 
     // 设置上传状态
@@ -232,6 +239,12 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     
     if (!formData.category_id) {
       alert(locale === 'en' ? 'Please select technology category' : '请选择技术分类')
+      return
+    }
+
+    // 子分类必填
+    if (!formData.subcategory_id) {
+      alert(locale === 'en' ? 'Please select technology subcategory' : '请选择技术子分类')
       return
     }
     
@@ -404,13 +417,14 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {locale === 'en' ? 'Technology Subcategory' : '技术子分类'}
+                    {locale === 'en' ? 'Technology Subcategory' : '技术子分类'} <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.subcategory_id}
                     onChange={(e) => handleInputChange('subcategory_id', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     disabled={!formData.category_id}
+                    required
                   >
                     <option value="">
                       {locale === 'en' ? 'Please select technology subcategory' : '请选择技术子分类'}
@@ -554,7 +568,7 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
                     <input
                       type="file"
                       multiple
-                      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg"
                       onChange={(e) => {
                         if (e.target.files) {
                           handleAttachmentUpload(Array.from(e.target.files))

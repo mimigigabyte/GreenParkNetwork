@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ChevronUp, ChevronDown, Search, Filter } from 'lucide-react'
 import { TablePagination } from './table-pagination'
 
@@ -25,6 +25,10 @@ interface DataTableProps<T> {
   onSort?: (field: string, order: 'asc' | 'desc') => void
   onSearch?: (value: string) => void
   searchPlaceholder?: string
+  // 搜索触发模式：debounce（默认）或 enter
+  searchMode?: 'debounce' | 'enter'
+  // 当使用 debounce 模式时的延迟毫秒数
+  searchDelay?: number
   actions?: React.ReactNode
   rowKey?: keyof T | ((record: T) => string)
   className?: string
@@ -39,6 +43,8 @@ export function DataTable<T extends Record<string, any>>({
   onSort,
   onSearch,
   searchPlaceholder = '搜索...',
+  searchMode = 'debounce',
+  searchDelay = 300,
   actions,
   rowKey = 'id',
   className = '',
@@ -68,10 +74,32 @@ export function DataTable<T extends Record<string, any>>({
     onSort(field, newOrder)
   }
 
-  const handleSearch = (value: string) => {
+  // 输入时仅更新本地状态，由useEffect做300ms防抖触发
+  const handleSearchInput = (value: string) => {
     setSearchValue(value)
-    onSearch?.(value)
   }
+
+  // onSearch 引用保持稳定，避免父组件每次渲染更换函数触发本地effect
+  const onSearchRef = useRef<typeof onSearch>(onSearch)
+  useEffect(() => {
+    onSearchRef.current = onSearch
+  }, [onSearch])
+
+  // 防抖触发外部搜索回调，减少请求频率（仅在 debounce 模式生效）
+  // 跳过首次挂载，避免在父组件loading切换导致的卸载/重挂载时循环触发搜索
+  const didMountRef = useRef(false)
+  useEffect(() => {
+    if (!onSearchRef.current) return
+    if (searchMode !== 'debounce') return
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      return
+    }
+    const t = setTimeout(() => {
+      onSearchRef.current && onSearchRef.current(searchValue)
+    }, searchDelay)
+    return () => clearTimeout(t)
+  }, [searchValue, searchMode, searchDelay])
 
   const getCellValue = (record: T, column: Column<T>): T[keyof T] => {
     if (typeof column.key === 'string' && column.key.includes('.')) {
@@ -124,7 +152,15 @@ export function DataTable<T extends Record<string, any>>({
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchValue}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  onChange={(e) => handleSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      if (searchMode === 'enter') {
+                        onSearchRef.current && onSearchRef.current(searchValue)
+                      }
+                    }
+                  }}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-64"
                 />
               </div>

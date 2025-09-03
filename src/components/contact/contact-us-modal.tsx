@@ -17,6 +17,7 @@ import { useAuthContext } from '@/components/auth/auth-provider';
 import { Mail, Phone, User, MessageSquare, Send, X } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { createContactMessage } from '@/lib/supabase/contact-messages';
+import { isValidEmail, isValidPhone } from '@/lib/validators';
 
 interface ContactUsModalProps {
   isOpen: boolean;
@@ -169,15 +170,24 @@ export function ContactUsModal({
       return false;
     }
 
-    // 简单的邮箱格式验证
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.contactEmail)) {
+    // 邮箱格式验证
+    if (!isValidEmail(formData.contactEmail)) {
       toast({
         title: t.validation.title,
         description: t.validation.emailFormat,
         variant: "destructive"
       });
       return false;
+    }
+
+    // 手机号格式验证（默认+86）
+    if (!isValidPhone(formData.contactPhone, '+86')) {
+      toast({
+        title: t.validation.title,
+        description: locale === 'en' ? 'Please enter a valid phone number' : '请输入正确的手机号码',
+        variant: 'destructive'
+      })
+      return false
     }
 
     if (!formData.message.trim()) {

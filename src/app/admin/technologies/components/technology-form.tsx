@@ -6,6 +6,7 @@ import { AdminTechnology, TECH_SOURCE_OPTIONS, TECH_ACQUISITION_METHOD_OPTIONS, 
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
+import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
 import { getCountries } from '@/lib/supabase/admin-locations'
 import { generateCompanyLogo } from '@/lib/logoGenerator'
 import { FileText, Trash2, Upload } from 'lucide-react'
@@ -360,6 +361,11 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       newErrors.name_zh = '技术中文名称不能为空'
     }
 
+    // 子分类必填
+    if (!formData.subcategory_id) {
+      newErrors.subcategory_id = '技术子分类不能为空'
+    }
+
     if (formData.description_zh && formData.description_zh.length > 3000) {
       newErrors.description_zh = '技术介绍不能超过3000字'
     }
@@ -381,6 +387,13 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       
       if (files.length > remainingSlots) {
         alert(`最多只能上传${remainingSlots}个附件（当前已有${currentAttachments.length}个）`)
+        return
+      }
+
+      // 类型校验
+      const invalid = files.find(f => !isAllowedTechAttachment(f))
+      if (invalid) {
+        alert(`文件类型不允许：${invalid.name}\n${allowedAttachmentHint('zh')}`)
         return
       }
 
@@ -435,7 +448,9 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         company_logo_url: formData.company_logo_url || undefined,
         company_country_id: formData.company_country_id || undefined,
         company_province_id: formData.company_province_id || undefined,
-        company_development_zone_id: formData.company_development_zone_id || undefined
+        company_development_zone_id: (formData.company_development_zone_id === 'none')
+          ? undefined
+          : (formData.company_development_zone_id || undefined)
       }
 
       if (technology) {
@@ -626,13 +641,16 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  技术类型（子分类）
+                  技术类型（子分类） <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.subcategory_id}
                   onChange={(e) => setFormData(prev => ({ ...prev, subcategory_id: e.target.value }))}
                   disabled={!formData.category_id}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100 ${
+                    errors.subcategory_id ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  required
                 >
                   <option value="">请选择子分类</option>
                   {subcategories.map(subcategory => (
@@ -641,6 +659,9 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                     </option>
                   ))}
                 </select>
+                {errors.subcategory_id && (
+                  <p className="mt-1 text-xs text-red-600">{errors.subcategory_id}</p>
+                )}
               </div>
             </div>
             
@@ -833,6 +854,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                   <option value="">
                     {Array.isArray(countries) && countries.find(c => c.id === formData.company_country_id)?.code === 'china' ? '请选择开发区（可选）' : '仅限中国企业选择经开区'}
                   </option>
+                  <option value="none">不在国家级经开区内</option>
                   {developmentZones.map(zone => (
                     <option key={zone.id} value={zone.id}>
                       {zone.name_zh}
@@ -861,7 +883,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                   <input
                     type="file"
                     multiple
-                    accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg"
                     className="hidden"
                     id="attachment-upload"
                     onChange={(e) => {

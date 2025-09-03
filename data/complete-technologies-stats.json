@@ -1,0 +1,35 @@
+{
+  "totalTechnologies": 37,
+  "targetCount": 98,
+  "completionRate": 38,
+  "companyCounts": {
+    "J-Power": 1,
+    "Eco Marine Power": 1,
+    "Avant Garde Innovations™": 1,
+    "ZONHAN": 1,
+    "China Longyuan Power Group": 1,
+    "PVMars Solar": 1,
+    "A-WING": 1,
+    "Real Lab": 1,
+    "Koenders": 1,
+    "Ryse Energy": 1,
+    "Mitsubishi Heavy Industries, Ltd.": 13,
+    "Low Carbon Patent Pledge": 1,
+    "University of Arizona / Tech Launch Arizona": 1,
+    "Hitachi, Ltd.": 3,
+    "Challenergy": 1,
+    "STC UNM": 1,
+    "Northeastern University": 1,
+    "University of Louisville": 1,
+    "Case Western Reserve University": 1,
+    "Auburn University": 1,
+    "Green Technology Bank": 1,
+    "ART OF SCIENCE & TECHNIQUE": 1,
+    "LIXIL Corporation": 1
+  },
+  "countryCounts": {
+    "日本": 4,
+    "中国": 2,
+    "美国": 1
+  }
+}

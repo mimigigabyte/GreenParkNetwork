@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { Plus, Edit, Trash2, Lightbulb, Tag, FileText, Image as ImageIcon, RefreshCw, MessageSquare, Eye, Download, X } from 'lucide-react'
-import { AdminTechnology, AdminCategory, AdminSubcategory, AdminCountry, AdminProvince, AdminDevelopmentZone, AdminCompany, TechnologyAttachment, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus } from '@/lib/types/admin'
+import { AdminTechnology, AdminCategory, AdminSubcategory, AdminCountry, AdminProvince, AdminDevelopmentZone, AdminCompany, TechnologyAttachment, PaginationParams, TECH_SOURCE_OPTIONS, TECH_REVIEW_STATUS_OPTIONS, TechReviewStatus, TECH_ACQUISITION_METHOD_OPTIONS } from '@/lib/types/admin'
 import { DataTable } from '@/components/admin/data-table/data-table'
 import { UserTechnologyForm } from './components/user-technology-form'
 import { getUserTechnologiesApi, deleteUserTechnologyApi } from '@/lib/api/user-technologies'
@@ -68,7 +68,8 @@ export default function UserTechnologiesPage() {
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
-    loadTechnologies({ search })
+    // 确保搜索从第一页开始
+    loadTechnologies({ search, page: 1 })
   }
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
@@ -184,6 +185,11 @@ export default function UserTechnologiesPage() {
 
   const getTechSourceLabel = (source?: string) => {
     const option = TECH_SOURCE_OPTIONS.find(opt => opt.value === source)
+    return locale === 'en' ? option?.label_en || 'Unknown' : option?.label_zh || '未知'
+  }
+
+  const getTechAcquisitionMethodLabel = (method?: string) => {
+    const option = TECH_ACQUISITION_METHOD_OPTIONS.find(opt => opt.value === method)
     return locale === 'en' ? option?.label_en || 'Unknown' : option?.label_zh || '未知'
   }
 
@@ -473,6 +479,7 @@ export default function UserTechnologiesPage() {
         columns={columns}
         data={technologies}
         loading={isLoading}
+        searchMode="enter"
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
@@ -518,11 +525,138 @@ export default function UserTechnologiesPage() {
             </div>
 
             {/* 弹窗内容 */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-8">
-              {/* 详细内容这里可以进一步国际化，但由于篇幅限制，保持基本的中文显示 */}
-              {/* 实际项目中可以继续添加国际化 */}
-              <div className="text-center text-gray-500">
-                {locale === 'en' ? 'Detailed view content would be internationalized here' : '详细视图内容在此处'}
+            <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="p-6 space-y-8">
+                {/* 基本信息 */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+                    {locale === 'en' ? 'Basic Information' : '基本信息'}
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Chinese Name' : '技术名称（中文）'}</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTechnology.name_zh || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'English Name' : '技术名称（英文）'}</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTechnology.name_en || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Tech Source' : '技术来源'}</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">{getTechSourceLabel(viewingTechnology.tech_source)}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Category' : '技术分类'}</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
+                          {locale === 'en' 
+                            ? (viewingTechnology.category?.name_en || viewingTechnology.category?.name_zh || '-')
+                            : (viewingTechnology.category?.name_zh || '-')}
+                          {viewingTechnology.subcategory && (
+                            <span className="text-gray-500">
+                              {' / '} 
+                              {locale === 'en' 
+                                ? (viewingTechnology.subcategory.name_en || viewingTechnology.subcategory.name_zh)
+                                : viewingTechnology.subcategory.name_zh}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Acquisition Method' : '技术获取方式'}</label>
+                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">{getTechAcquisitionMethodLabel(viewingTechnology.acquisition_method)}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Custom Label' : '自定义标签'}</label>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          {viewingTechnology.custom_label ? (
+                            <span className="inline-flex items-center px-2 py-1 text-xs text-blue-600 bg-blue-50 border border-blue-400 rounded">
+                              {viewingTechnology.custom_label}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-500">-</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Review Status' : '审核状态'}</label>
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getReviewStatusBadge(viewingTechnology.review_status)}`}>
+                            {getReviewStatusLabel(viewingTechnology.review_status)}
+                          </span>
+                          {viewingTechnology.review_status === 'rejected' && viewingTechnology.reject_reason && (
+                            <span className="text-xs text-red-600">{locale === 'en' ? `Reason: ${viewingTechnology.reject_reason}` : `原因：${viewingTechnology.reject_reason}`}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Technology Image' : '技术图片'}</label>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        {viewingTechnology.image_url ? (
+                          <img
+                            src={viewingTechnology.image_url}
+                            alt={viewingTechnology.name_zh}
+                            className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                            onClick={() => handlePreviewImage(viewingTechnology.image_url!)}
+                          />
+                        ) : (
+                          <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <ImageIcon className="w-12 h-12 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 技术描述 */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">{locale === 'en' ? 'Description' : '技术描述'}</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Chinese Description' : '中文描述'}</label>
+                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">{viewingTechnology.description_zh || '-'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'English Description' : '英文描述'}</label>
+                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">{viewingTechnology.description_en || '-'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 用户视图不显示企业信息 */}
+
+                {/* 技术资料 */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">{locale === 'en' ? 'Attachments' : '技术资料'}</h3>
+                  {(viewingTechnology.attachments && viewingTechnology.attachments.length > 0) || (viewingTechnology.attachment_urls && viewingTechnology.attachment_urls.length > 0) ? (
+                    <div className="space-y-2">
+                      {(viewingTechnology.attachments && viewingTechnology.attachments.length > 0
+                        ? viewingTechnology.attachments
+                        : (viewingTechnology.attachment_urls || []).map(url => ({ url }))
+                      ).map((att: any, index: number) => (
+                        <div key={`${att.url}-${index}`} className="flex items-center justify-between bg-gray-50 p-3 rounded">
+                          <div className="flex items-center">
+                            <FileText className="w-4 h-4 text-blue-500 mr-2" />
+                            <div className="flex flex-col">
+                              <span className="text-sm text-gray-700">{att.filename || getDisplayFilename(att.url)}</span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadAttachment(att.url, att.filename)}
+                            className="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700"
+                          >
+                            {locale === 'en' ? 'Download' : '下载'}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500">{locale === 'en' ? 'No attachments' : '暂无技术资料'}</div>
+                  )}
+                </div>
               </div>
             </div>
 

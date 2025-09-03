@@ -184,6 +184,11 @@ export async function POST(request: NextRequest) {
     const technologyData = await request.json()
     
     console.log('接收到的技术数据:', technologyData)
+
+    // 校验：子分类必填
+    if (!technologyData?.subcategory_id) {
+      return NextResponse.json({ error: '技术子分类不能为空' }, { status: 400 })
+    }
     
     // 如果没有技术图片且指定了子分类，获取子分类的默认技术图片
     let finalImageUrl = technologyData.image_url

@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { TablePagination } from '@/components/admin/data-table/table-pagination';
 
 interface MessageFilters {
   status: 'all' | 'pending' | 'processed';
@@ -564,31 +565,14 @@ export default function AdminMessagesPage() {
         )}
 
         {/* 分页 */}
-        {pagination.totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              共 {pagination.totalCount} 条消息，第 {pagination.page} / {pagination.totalPages} 页
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={pagination.page === 1}
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-              >
-                上一页
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={pagination.page === pagination.totalPages}
-                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-              >
-                下一页
-              </Button>
-            </div>
-          </div>
-        )}
+        <div className="border-t border-gray-200">
+          <TablePagination
+            current={pagination.page}
+            pageSize={pagination.pageSize}
+            total={pagination.totalCount}
+            onChange={(page, pageSize) => setPagination({ ...pagination, page, pageSize })}
+          />
+        </div>
       </div>
 
       {/* 站内信回复对话框 */}

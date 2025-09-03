@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 // 强制动态渲染，避免缓存
 export const dynamic = 'force-dynamic'
@@ -7,12 +8,7 @@ export const dynamic = 'force-dynamic'
 // GET - 获取用户创建的技术
 export async function GET(request: NextRequest) {
   try {
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase管理员客户端未配置' },
-        { status: 500 }
-      )
-    }
+    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -32,7 +28,7 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
-    let query = supabaseAdmin.from('admin_technologies').select(
+    let query = db.from('admin_technologies').select(
       `
       *,
       category:category_id(name_zh, name_en, slug),
@@ -77,16 +73,16 @@ export async function GET(request: NextRequest) {
 // POST - 用户创建新技术
 export async function POST(request: NextRequest) {
   try {
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase管理员客户端未配置' },
-        { status: 500 }
-      )
-    }
+    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const technologyData = await request.json()
     
     console.log('用户创建技术数据:', technologyData)
+
+    // 校验：子分类必填
+    if (!technologyData?.subcategory_id) {
+      return NextResponse.json({ error: '技术子分类不能为空' }, { status: 400 })
+    }
     
     // 如果没有技术图片且指定了子分类，获取子分类的默认技术图片
     let finalImageUrl = technologyData.image_url
@@ -118,7 +114,7 @@ export async function POST(request: NextRequest) {
       company_development_zone_id?: string;
     } = {}
     if (technologyData.company_id) {
-      const { data: company, error: companyError } = await supabaseAdmin
+      const { data: company, error: companyError } = await db
         .from('admin_companies')
         .select('id, name_zh, name_en, logo_url, country_id, province_id, development_zone_id')
         .eq('id', technologyData.company_id)
@@ -192,7 +188,7 @@ export async function POST(request: NextRequest) {
     
     console.log('用户技术插入数据:', filteredData)
     
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from('admin_technologies')
       .insert(filteredData)
       .select()

@@ -15,7 +15,12 @@
     "previous": "Previous",
     "close": "Close",
     "select": "Select",
-    "all": "All"
+    "all": "All",
+    "optional": "optional",
+    "nextStep": "Next Step",
+    "previousStep": "Previous Step",
+    "submitting": "Submitting...",
+    "complete": "Complete"
   },
   "header": {
     "platformName": "National Economic Development Zone Green Low-Carbon Technology Promotion Platform",
@@ -205,17 +210,59 @@
   },
   "companyProfile": {
     "title": "Company Profile Setup",
-    "step1": "Basic Information",
-    "step2": "Detailed Information",
-    "companyName": "Company Name",
-    "country": "Country",
-    "province": "Province/State",
-    "economicZone": "Economic Development Zone",
-    "companyType": "Company Type",
-    "address": "Address",
-    "contactPerson": "Contact Person",
-    "contactPhone": "Contact Phone",
-    "contactEmail": "Contact Email"
+    "subtitle": "Complete your information to start your green low-carbon journey (Step {step}/{totalSteps})",
+    "submitSuccess": "Company information submitted successfully! Redirecting to homepage...",
+    "submitFailed": "Submission failed, please try again later",
+    "requirements": {
+      "publishTech": "Publish my green low-carbon technology",
+      "findTech": "Find specific green low-carbon technology",
+      "industryInsights": "Learn about industry insights"
+    },
+    "step1": {
+      "requirement": "Your Requirements",
+      "selectRequirement": "Please select your requirements",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "Enter company name, system will auto-search for matches",
+      "autoFillSuccess": "Company information auto-filled successfully",
+      "country": "Country",
+      "selectCountry": "Please select country",
+      "province": "Province/State",
+      "selectProvince": "Please select province",
+      "economicZone": "National Economic Development Zone",
+      "selectEconomicZone": "Please select development zone",
+      "notInZone": "Not located in national development zone",
+      "logo": "Upload Company Logo",
+      "selectFile": "Select File",
+      "logoPreview": "System Generated Preview",
+      "logoPreviewDesc": "System will auto-generate logo based on company name, you can also upload custom logo",
+      "logoHint": "Recommended PNG or JPG format, max size 2MB"
+    },
+    "step2": {
+      "companyType": "Company Type",
+      "selectCompanyType": "Please select company type",
+      "address": "Address Information",
+      "addressPlaceholder": "Enter detailed address",
+      "industryCode": "Industry Code",
+      "industryCodePlaceholder": "Enter industry code",
+      "annualOutput": "Annual Output Value (100M CNY)",
+      "annualOutputPlaceholder": "Enter output value",
+      "contactPerson": "Contact Person",
+      "contactPersonPlaceholder": "Enter contact person name",
+      "contactPhone": "Contact Phone",
+      "contactPhonePlaceholder": "Enter contact phone",
+      "contactEmail": "Contact Email",
+      "contactEmailPlaceholder": "Enter contact email"
+    },
+    "validation": {
+      "requirementRequired": "Please select your requirements",
+      "companyNameRequired": "Please enter company name",
+      "countryRequired": "Please select country",
+      "provinceRequired": "Please select province",
+      "companyTypeRequired": "Please select company type",
+      "contactPersonRequired": "Please enter contact person",
+      "contactPhoneRequired": "Please enter contact phone",
+      "contactEmailRequired": "Please enter contact email"
+    }
   },
   "user": {
     "companies": {

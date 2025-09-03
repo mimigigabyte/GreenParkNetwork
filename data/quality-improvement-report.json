@@ -1,0 +1,3808 @@
+{
+  "processed": [
+    {
+      "techData": {
+        "technologyNameEN": "Flexibile foundations for earthquake-proof offshore wind power",
+        "id": "171988",
+        "companyName": "J-Power",
+        "publishedTime": "2025/04/30",
+        "updatedTime": "2025/05/30",
+        "companyWebsiteUrl": "https://www.jpower.co.jp/english/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/171988",
+        "description": "The 'Flexible Tripile' foundation addresses challenges posed by the shallow, hard bedrock common in Japanese waters, where traditional monopile foundations may be unsuitable.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology development / prototype (TRL 5-6)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "海上风电",
+          "基础工程"
+        ],
+        "technologyNameCN": "地震防护海上风电柔性三桩基础",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "171988",
+        "technologyName": "Flexibile foundations for earthquake-proof offshore wind power",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "EnergySail",
+        "id": "171616",
+        "companyName": "Eco Marine Power",
+        "publishedTime": "2025/04/13",
+        "updatedTime": "2025/08/04",
+        "companyWebsiteUrl": "https://www.ecomarinepower.com/en/energysail",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/171616",
+        "description": "The patented EnergySail is a rigid sail and wind assisted propulsion device designed by Eco Marine Power.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The EnergySail helps in reducing fuel costs and lowering noxious gas and carbon emissions.",
+        "developedInCountry": "中国",
+        "deployedInCountry": "中国",
+        "technologyReadinessLevel": "N/A",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [],
+        "technologyNameCN": "能源帆",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "171616",
+        "technologyName": "EnergySail",
+        "qualityScore": {
+          "score": 93,
+          "maxScore": 100,
+          "percentage": 93,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "customLabels"
+          ]
+        },
+        "suggestions": [
+          "从技术描述中提取关键词标签"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "AVATAR™ Small Wind Turbine",
+        "id": "149296",
+        "companyName": "Avant Garde Innovations™",
+        "publishedTime": "2024/06/28",
+        "updatedTime": "2024/07/15",
+        "companyWebsiteUrl": "https://avantgarde.energy/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/149296",
+        "description": "A small wind turbine which can power your homes, farms and businesses for the next 20 years.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to carbon neutrality by providing a renewable energy source through wind power.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "N/A",
+        "intellectualProperty": "Patents available for licensing.",
+        "customLabels": [
+          "小型风机"
+        ],
+        "technologyNameCN": "AVATAR™小型风力发电机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "149296",
+        "technologyName": "AVATAR™ Small Wind Turbine",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "deployedInCountry",
+            "technologyReadinessLevel"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Variable pitch turbine for homes",
+        "id": "171985",
+        "companyName": "ZONHAN",
+        "publishedTime": "2025/04/30",
+        "updatedTime": "2025/05/30",
+        "companyWebsiteUrl": "https://www.zonhan.com/en/product/5KW-Variable-Pitch-Wind-turbine.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/171985",
+        "description": "This small turbine is designed to withstand harsh environmental conditions, with a rated output of 5 kW.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "中国",
+        "deployedInCountry": "中国",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "小型风机"
+        ],
+        "technologyNameCN": "家用变桨距风力发电机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "171985",
+        "technologyName": "Variable pitch turbine for homes",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Integrated aquaculture and off-shore renewable energy",
+        "id": "162406",
+        "companyName": "China Longyuan Power Group",
+        "publishedTime": "2025/01/24",
+        "updatedTime": "2025/02/06",
+        "companyWebsiteUrl": "https://www.ceic.com/gjnyjtwwEn/xwzx/202407/56c251c869a24883b1af3370a8a37ac4.shtml",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/162406",
+        "description": "A combined offshore wind power and aquaculture platform deployed off the Nanri Island in China.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "中国",
+        "deployedInCountry": "中国",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "海上风电"
+        ],
+        "technologyNameCN": "水产养殖与海上可再生能源集成",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "162406",
+        "technologyName": "Integrated aquaculture and off-shore renewable energy",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Off grid wind and solar hybrid energy system",
+        "id": "162189",
+        "companyName": "PVMars Solar",
+        "publishedTime": "2025/01/17",
+        "updatedTime": "2025/01/23",
+        "companyWebsiteUrl": "https://www.pvmars.com/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/162189",
+        "description": "Energy-storage hybrid wind-solar systems customized based on power needs and local conditions.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The hybrid system reduces greenhouse gas emissions by utilizing renewable energy sources.",
+        "developedInCountry": "印度",
+        "deployedInCountry": "印度",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "混合系统"
+        ],
+        "technologyNameCN": "离网风光混合能源系统",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "162189",
+        "technologyName": "Off grid wind and solar hybrid energy system",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Small home wind turbine",
+        "id": "162186",
+        "companyName": "A-WING",
+        "publishedTime": "2025/01/17",
+        "updatedTime": "2025/07/16",
+        "companyWebsiteUrl": "http://www.awing-i.com/english/index.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/162186",
+        "description": "A-WING small wind turbines designed for optimal performance in low wind speed regions.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology helps in reducing greenhouse gas emissions by generating electricity from wind energy.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "小型风机"
+        ],
+        "technologyNameCN": "小型家用风力发电机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "162186",
+        "technologyName": "Small home wind turbine",
+        "qualityScore": {
+          "score": 88,
+          "maxScore": 100,
+          "percentage": 88,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "A system and method for generating and storing energy from wind",
+        "id": "155961",
+        "companyName": "Real Lab",
+        "publishedTime": "2024/10/31",
+        "updatedTime": "2024/10/31",
+        "companyWebsiteUrl": "https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2023247361&_cid=P12-M2XLUM-46085-1",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/155961",
+        "description": "A system for harvesting wind energy from passing vehicles, storing the energy and using it to generate electricity.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology helps in reducing greenhouse gas emissions by utilizing wind energy from passing vehicles.",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [],
+        "technologyNameCN": "风能发电储能系统与方法",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "155961",
+        "technologyName": "A system and method for generating and storing energy from wind",
+        "qualityScore": {
+          "score": 67,
+          "maxScore": 100,
+          "percentage": 67,
+          "level": "一般"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: developedInCountry",
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty",
+            "customLabels"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "从技术描述中提取关键词标签"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Windmill aerator",
+        "id": "149553",
+        "companyName": "Koenders",
+        "publishedTime": "2024/08/15",
+        "updatedTime": "2024/08/16",
+        "companyWebsiteUrl": "https://store.koenderswatersolutions.com/collections/windmill-aeration-systems",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/149553",
+        "description": "Windmill systems designed for pond aeration in remote and off-grid locations.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Provides alternative aeration method that does not rely on electricity.",
+        "developedInCountry": "加拿大",
+        "deployedInCountry": "加拿大",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [],
+        "technologyNameCN": "风车增氧机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "149553",
+        "technologyName": "Windmill aerator",
+        "qualityScore": {
+          "score": 79,
+          "maxScore": 100,
+          "percentage": 79,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 15,
+          "percentage": 83,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty",
+            "customLabels"
+          ]
+        },
+        "suggestions": [
+          "从技术描述中提取关键词标签"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Micro wind turbines and sustainable resilience units",
+        "id": "149383",
+        "companyName": "Ryse Energy",
+        "publishedTime": "2024/07/11",
+        "updatedTime": "2024/07/12",
+        "companyWebsiteUrl": "https://www.ryse.energy/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/149383",
+        "description": "The AIR 40 is a micro-wind turbine for land-based applications such as powering off-grid homes.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "英国",
+        "deployedInCountry": "英国",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "小型风机"
+        ],
+        "technologyNameCN": "微型风力发电机和可持续韧性单元",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "149383",
+        "technologyName": "Micro wind turbines and sustainable resilience units",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Floating structure of the wind turbine",
+        "id": "148956",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148956",
+        "description": "Wind turbine floating body technology from Mitsubishi Heavy Industries.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "浮动技术"
+        ],
+        "technologyNameCN": "风力发电机浮动结构",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148956",
+        "technologyName": "Floating structure of the wind turbine",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Construction and maintenance of wind turbine",
+        "id": "148955",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148955",
+        "description": "Wind turbine construction and maintenance technologies.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，减少维护需求，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "维护技术"
+        ],
+        "technologyNameCN": "风力发电机建设与维护",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148955",
+        "technologyName": "Construction and maintenance of wind turbine",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Electrical components",
+        "id": "148954",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148954",
+        "description": "Electrical control technologies for wind turbines.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "控制系统"
+        ],
+        "technologyNameCN": "风力发电机电气组件",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148954",
+        "technologyName": "Wind Turbine Electrical components",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Tower",
+        "id": "148953",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148953",
+        "description": "Structure of off-shore wind turbine tower technology.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Technology contributes to reducing greenhouse gas emissions through renewable wind energy.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "塔架"
+        ],
+        "technologyNameCN": "风力发电机塔架",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148953",
+        "technologyName": "Wind Turbine Tower",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Nacelle components",
+        "id": "148952",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148952",
+        "description": "Wind Turbine Nacelle component technologies.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "机舱"
+        ],
+        "technologyNameCN": "风力发电机机舱组件",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148952",
+        "technologyName": "Wind Turbine Nacelle components",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Automated Windfarm System Management",
+        "id": "147515",
+        "companyName": "Low Carbon Patent Pledge",
+        "publishedTime": "2022/10/13",
+        "updatedTime": "2022/11/01",
+        "companyWebsiteUrl": "https://lowcarbonpatentpledge.org/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/147515",
+        "description": "Automated management server for wind turbine events and IT system correlation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Technology contributes to reducing greenhouse gas emissions and generating electricity from renewable sources.",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "These patents were pledged to the Low Carbon Patent Pledge (LCPP).",
+        "customLabels": [
+          "风力发电机"
+        ],
+        "technologyNameCN": "自动化风电场系统管理",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "147515",
+        "technologyName": "Automated Windfarm System Management",
+        "qualityScore": {
+          "score": 80,
+          "maxScore": 100,
+          "percentage": 80,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: developedInCountry",
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 15,
+          "percentage": 83,
+          "missingFields": [
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Vertical Axis Wind Turbine With Active Flow Controls",
+        "id": "146724",
+        "companyName": "University of Arizona / Tech Launch Arizona",
+        "publishedTime": "2022/08/12",
+        "updatedTime": "2023/03/07",
+        "companyWebsiteUrl": "https://inventions.arizona.edu/tech/Vertical_Axis_Wind_Turbine_With_Active_Flow_Controls",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/146724",
+        "description": "VAWT with active flow control for improved performance and wider operational envelope.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Technology contributes to reducing greenhouse gas emissions by providing renewable electricity generation.",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "Research and development (TRL 3-4)",
+        "intellectualProperty": "Technology available for licensing from university",
+        "customLabels": [
+          "垂直轴",
+          "控制系统"
+        ],
+        "technologyNameCN": "主动流控垂直轴风力发电机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "146724",
+        "technologyName": "Vertical Axis Wind Turbine With Active Flow Controls",
+        "qualityScore": {
+          "score": 98,
+          "maxScore": 100,
+          "percentage": 98,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Downwind Turbine System",
+        "id": "138694",
+        "companyName": "Hitachi, Ltd.",
+        "publishedTime": "2021/09/29",
+        "updatedTime": "2021/10/12",
+        "companyWebsiteUrl": "https://www.hitachi.com/products/energy/wind/index.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138694",
+        "description": "Downwind wind power generation system with free yaw characteristics.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Downwind turbine system contributes to reducing greenhouse gas emissions through renewable wind energy.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风力发电机"
+        ],
+        "technologyNameCN": "下风向风力发电机系统",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "138694",
+        "technologyName": "Downwind Turbine System",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Typhoon-proof wind turbines",
+        "id": "147595",
+        "companyName": "Challenergy",
+        "publishedTime": "2022/10/17",
+        "updatedTime": "2022/11/22",
+        "companyWebsiteUrl": "https://challenergy.com/en/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/147595",
+        "description": "Typhoon-proof wind turbines uniquely shaped to withstand powerful winds and direction changes.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "菲律宾",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "抗台风"
+        ],
+        "technologyNameCN": "防台风风力发电机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "147595",
+        "technologyName": "Typhoon-proof wind turbines",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Recycling Wind Towers to Very Tall Hybrid Wind Towers: Materials and Methods of Making",
+        "id": "10729",
+        "companyName": "STC UNM",
+        "publishedTime": "2019/09/22",
+        "updatedTime": "2019/09/22",
+        "companyWebsiteUrl": "https://aim.autm.net/public/project/37481/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10729",
+        "description": "Method to recycle current wind towers to create tall hybrid wind towers reaching beyond 140 meters.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Taller wind towers add significant power performance boost and increase potential wind energy harvesting sites.",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "混合系统",
+          "塔架"
+        ],
+        "technologyNameCN": "回收风塔制造超高混合风塔",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10729",
+        "technologyName": "Recycling Wind Towers to Very Tall Hybrid Wind Towers: Materials and Methods of Making",
+        "qualityScore": {
+          "score": 86,
+          "maxScore": 100,
+          "percentage": 86,
+          "level": "良好"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 16,
+          "percentage": 89,
+          "missingFields": [
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Universal Spherical Turbine with Skewed Axis of Rotation for Power Systems",
+        "id": "10338",
+        "companyName": "Northeastern University",
+        "publishedTime": "2018/06/26",
+        "updatedTime": "2018/06/26",
+        "companyWebsiteUrl": "https://gtp.autm.net/public/project/2622/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10338",
+        "description": "Prior-art approaches have used various turbine forms as Spherical, Helical or Darrieus for multiple commercial applications. Out of these forms, helical turbine offers many distinctive advantages such as unidirectional motion, reduced pulsation as well as increased operating power and strength. However, manufacturing of helical blades for such turbines is quite a costly and cumbersome affair. Due to this reason, many attempts have been made in the past to convert one turbine form into other, so as to create a novel design with all beneficial features, sidelining limitations. This novel approach enables development and use of a universal spherical turbine which works as a helical form (retaining its beneficial features) with spherical configuration.",
+        "benefits": "Less mechanical wear, higher efficiency, and lower cost as well as improvement of power system transient stability.",
+        "benefitsDescription": "提高能源转换效率，符合碳中和目标。",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "Commercial deployment (TRL 9)",
+        "intellectualProperty": "Technology available for licensing from university",
+        "customLabels": [
+          "叶片技术",
+          "球形设计"
+        ],
+        "technologyNameCN": "电力系统用偏轴球形通用涡轮机",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强效益描述"
+      ],
+      "qualityReport": {
+        "id": "10338",
+        "technologyName": "Universal Spherical Turbine with Skewed Axis of Rotation for Power Systems",
+        "qualityScore": {
+          "score": 98,
+          "maxScore": 100,
+          "percentage": 98,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Novel Electrolytic Production of Hydrogen",
+        "id": "10155",
+        "companyName": "University of Louisville",
+        "publishedTime": "2015/11/24",
+        "updatedTime": "2015/11/24",
+        "companyWebsiteUrl": "http://gtp.autm.net/technology/view/24610",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10155",
+        "description": "The hydrogen economy is viewed by many as the world's long-term solution to our energy needs. An example of how hydrogen would be used in this new economy is via proton exchange membrane (PEM) fuel cells. PEM fuel cells operating on pure hydrogen have excellent energy and power capabilities. However, producing pure hydrogen from water using electrolysis is not economical. This invention involves a new process for combining electrolysis and thermal chemistry to economically produce hydrogen.",
+        "benefits": "By using this technology, hydrogen may be produced and greatly reduce the capitol cost of the electrolyzer, which is the most significant cost of the process.",
+        "benefitsDescription": "The current production of hydrogen through electrolysis is prohibitively expensive.",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "elemental stage",
+        "intellectualProperty": "Technology available for licensing from university",
+        "customLabels": [
+          "氢能技术",
+          "电解技术"
+        ],
+        "technologyNameCN": "新型电解制氢技术",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10155",
+        "technologyName": "Novel Electrolytic Production of Hydrogen",
+        "qualityScore": {
+          "score": 98,
+          "maxScore": 100,
+          "percentage": 98,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "New Rheometer and Method for Efficiently Measuring Yield Stress in Biomass",
+        "id": "10148",
+        "companyName": "Case Western Reserve University",
+        "publishedTime": "2015/12/17",
+        "updatedTime": "2015/12/17",
+        "companyWebsiteUrl": "http://gtp.autm.net/technology/view/1461",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10148",
+        "description": "UW–Madison researchers have developed a device and a method for measuring rheological properties of fluid that will effectively determine the yield stress of biomass materials. These measurements do not alter the material sample prior to measurement, allowing for more accurate data results and characterization. The device comprises a cavity for receiving the fluid, an auger connected with an axial shaft, and a load cell sensor connected to the auger. The sensor measures the force on the auger from the fluid as the auger moves up and down. A linkage interconnected to the sensor translates motion to the auger.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "Research and development (TRL 3-4)",
+        "intellectualProperty": "Technology available for licensing from university",
+        "customLabels": [],
+        "technologyNameCN": "生物质屈服应力高效测量流变仪及方法",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [
+        "增强关键词标签"
+      ],
+      "qualityReport": {
+        "id": "10148",
+        "technologyName": "New Rheometer and Method for Efficiently Measuring Yield Stress in Biomass",
+        "qualityScore": {
+          "score": 91,
+          "maxScore": 100,
+          "percentage": 91,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "customLabels"
+          ]
+        },
+        "suggestions": [
+          "从技术描述中提取关键词标签"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Nanocrystal-Graphene Composites",
+        "id": "10140",
+        "companyName": "Auburn University",
+        "publishedTime": "2015/12/22",
+        "updatedTime": "2015/12/22",
+        "companyWebsiteUrl": "http://gtp.autm.net/technology/view/29570",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10140",
+        "description": "Researchers in Prof. Hongjie Dai's laboratory have combined graphene with metals and other inorganic elements to create a variety of hybrid materials that can be used for high performance electrocatalytic or electrochemical devices such as batteries and fuel cells. One type of hybrid material is formed from nanocrystals grown on graphene nanoplates or nanorods. This material is designed for use as an electrode for fast, efficient energy storage and conversion. Another type is formed from nanocrystals grown on reduced graphene oxide to produce high-performance, bi-functional catalysts for oxygen reduction reaction (ORR) and oxygen evolution reaction (OER). A third type is a unique ORR catalyst formed from carbon nanotube-graphene complexes.",
+        "benefits": "Improved efficiency in processors",
+        "benefitsDescription": "The technology enhances processor efficiency without sacrificing space, power consumption, or performance, making it suitable for high-performance devices.",
+        "developedInCountry": "美国",
+        "deployedInCountry": "美国",
+        "technologyReadinessLevel": "Research and development (TRL 3-4)",
+        "intellectualProperty": "This technology is currently patent pending and available for sponsored research and/or licensing.",
+        "customLabels": [
+          "石墨烯",
+          "混合系统"
+        ],
+        "technologyNameCN": "纳米晶石墨烯复合材料",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10140",
+        "technologyName": "Nanocrystal-Graphene Composites",
+        "qualityScore": {
+          "score": 98,
+          "maxScore": 100,
+          "percentage": 98,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Small wind power generation equipment with vertical axis wind turbine",
+        "id": "147925",
+        "companyName": "LIXIL Corporation",
+        "publishedTime": "2023/03/15",
+        "updatedTime": "2025/06/02",
+        "companyWebsiteUrl": "https://wipogreen.wipo.int/wipogreen-database/search?type=BASIC&queryFilters.0.field=COMPANY&queryFilters.0.value=LIXIL%20Corporation",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/147925",
+        "description": "This small wind power generation technology includes robust vertical axis wind turbine that is more durable than propeller type and innovative control method such as AI learning device (for example, technologies for reducing resonance (sympathetic vibration), smooth braking, driving safely in strong winds, controlling power generation based on forecasts of unstable wind conditions, etc.) It also covers the beneficial idea and implementation method of a power supply system that combines the wind power generation technology with solar power generation for toilets in a disaster.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to reducing greenhouse gas emissions and generating electricity sustainably.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "We have 4 patents related to structure, 12 patents related to control, and 1 patent related to power supply, that enable smooth and highly efficient power generation.",
+        "customLabels": [
+          "垂直轴",
+          "控制系统"
+        ],
+        "technologyNameCN": "垂直轴风力发电机小型风电设备",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "147925",
+        "technologyName": "Small wind power generation equipment with vertical axis wind turbine",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "technologyReadinessLevel"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Lightning structure of wind turbine blades",
+        "id": "147989",
+        "companyName": "Hitachi, Ltd.",
+        "publishedTime": "2023/03/30",
+        "updatedTime": "2023/03/30",
+        "companyWebsiteUrl": "https://www.hitachi.com/products/energy/portal/index.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/147989",
+        "description": "A wind power generation apparatus has an extremely significant risk of undergoing lightning strikes because of the height thereof, and countermeasures against lightning strikes are considered to be important issues. In particular, if a wind turbine is increased in size, since the percentage of lightning damage to a blade is increased, countermeasures against the lightning strikes of the blade are important. Therefore, the countermeasures against the lightning strikes for preventing the lightning strike are performed to the blade by providing a lightning receiving section (tip receptor) in a tip of the blade in addition to the receptor.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology helps in reducing greenhouse gas emissions by improving the resilience of wind turbine blades against lightning strikes, thereby ensuring continuous electricity generation without significant downtime or repair costs.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "叶片技术"
+        ],
+        "technologyNameCN": "风力发电机叶片避雷结构",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "147989",
+        "technologyName": "Lightning structure of wind turbine blades",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Vibration control of a wind turbine generator",
+        "id": "147990",
+        "companyName": "Hitachi, Ltd.",
+        "publishedTime": "2023/03/30",
+        "updatedTime": "2023/03/30",
+        "companyWebsiteUrl": "https://www.hitachi.com/products/energy/portal/index.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/147990",
+        "description": "A wind turbine generator, in order to maintain an appropriate rotation speed of the rotor, electric energy to be taken out from the generator is regularly controlled according to the wind strength. In this control process, the torque of the rotor may fluctuate and become a vibration source. As the rotor is located on the tower which is elongate and low in rigidity, when the vibration caused by a fluctuation in torque synchronizes with the resonance frequency of the tower, the vibration may develop into a vibration of the entire windmill. Besides the fluctuation in torque due to rotation control of the rotor, vibration of a windmill is caused by various types of vibrations such as vibration due to a Karman vortex generated by the tower, resonance of the speed-increasing gear, the rotor, the generator and the drive axis, and vibration due to bending or torsion of the construction. The present technology provides a wind turbine generator that can control fluctuations in the torque loaded on the rotor to suppress or prevent wind turbine vibration.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology helps in reducing greenhouse gas emissions by improving the efficiency and stability of wind turbine operations, thus contributing to cleaner electricity generation.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "",
+        "customLabels": [
+          "控制系统",
+          "振动控制"
+        ],
+        "technologyNameCN": "风力发电机振动控制",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "147990",
+        "technologyName": "Vibration control of a wind turbine generator",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "WINDMILL",
+        "id": "148847",
+        "companyName": "ART OF SCIENCE & TECHNIQUE",
+        "publishedTime": "2023/10/16",
+        "updatedTime": "2023/10/16",
+        "companyWebsiteUrl": "http://www.roytas.nl/",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148847",
+        "description": "The Principle of Rotation of cross-axial Rotors which are an improvement of more powerful means to convert kinetic energy than existing means and their applicability from unidirectional to omnidirectional turbine machines requiring no yaw drive with stationary and fixed devices. The omnidirectional wind turbine remains stationary fixed at the same position and captures wind from all directions which is converted to mechanical energy and into a pulsing electric current. This wind turbine is more constant having a larger blade surface like a wall in the wind. Producing the same amount of current as existing wind turbines, this while smaller in size. Because of the larger blade surface. The wind turbine does not kill birds that sit on the turbine housing. The wind turbine is more economical, more safer. The wind turbine has many more features and advantages. Please see my patent application for more technical details. WO2023/147893",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The wind turbine captures wind from all directions, converting it into mechanical energy and then into a pulsing electric current, providing a sustainable source of electricity while reducing greenhouse gas emissions.",
+        "developedInCountry": "荷兰",
+        "deployedInCountry": "荷兰",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "WO2023/147893",
+        "customLabels": [
+          "叶片技术",
+          "小型风机"
+        ],
+        "technologyNameCN": "风车",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148847",
+        "technologyName": "WINDMILL",
+        "qualityScore": {
+          "score": 92,
+          "maxScore": 100,
+          "percentage": 92,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 17,
+          "percentage": 94,
+          "missingFields": [
+            "technologyReadinessLevel"
+          ]
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Distributed Wind Power Systems",
+        "id": "148871",
+        "companyName": "Green Technology Bank",
+        "publishedTime": "2023/10/31",
+        "updatedTime": "2024/03/04",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148871",
+        "description": "This technology is designed to provide a small- to medium-sized wind energy power system that can be connected to the distribution grid for operation, or for local consumption of generated electricity. It addresses issues of unstable grid, insufficient grid capacity and areas without grid coverage by providing a clean energy solution. The application scenarios include green smart parks, harbour terminals, crude oil gathering stations, and rural areas, among others. Technological Innovation: (1)Intelligent operation and maintenance: Based on a distributed mindset, a SCADA platform is developed to enable monitoring, measurement, and control, integrating operational and maintenance elements. (2)Integrated control cabinet: Reducing equipment wiring by 30%, resulting in lower construction costs and improved anti-corrosion and heat dissipation effects. (3)Motor: By leveraging electromagnetic analysis and optimised design, noise levels are effectively reduced while enhancing power generation capacities. (4)Blade: Blades are aerodynamically designed to suit small- and medium-sized wind energy power station, ensuring safety and efficiency (5)Tower structure: Optimally designed based on application environment and force considerations, it demonstrates resilience in harsh environments such as typhoon, salt spray and extreme cold. Utilising modular technology, it is suitable for container transportation, reducing shipping costs.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，提高能源转换效率，降低发电成本，增强系统可靠性，减少维护需求，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "叶片技术",
+          "控制系统"
+        ],
+        "technologyNameCN": "分布式风电系统",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148871",
+        "technologyName": "Distributed Wind Power Systems",
+        "qualityScore": {
+          "score": 68,
+          "maxScore": 100,
+          "percentage": 68,
+          "level": "一般"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry",
+            "技术描述中未提及公司名称"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Blade performance",
+        "id": "148894",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/08",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148894",
+        "description": "Design of airfoils of wind turbine which implement desired lift coefficient. Carbon neutrality by 2050 is considered an urgent human goal worldwide. Offshore wind turbines are one of the up-and-coming solutions. Noise regulation are eased in offshore wind turbines than on-shore. Therefore, engineer is allowed to design higher blade tip speed blade. The high tip speed Blade will become slender to reduce the moment load. In every respect, a new blade profile design is required. The registration technologies listed here are related to the design of airfoils for wind turbine which implement desired lift coefficient. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. We are willing to license these patents, offering advise, and consulting on the design.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to reducing greenhouse gas emissions and generating electricity through wind energy.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "海上风电",
+          "叶片技术"
+        ],
+        "technologyNameCN": "风力发电机叶片性能",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148894",
+        "technologyName": "Wind Turbine Blade performance",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Blade structure",
+        "id": "148906",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/08",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148906",
+        "description": "Design of wind turbine blade durability and endurance under severe nature condition for 20years+ of operation. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. The wind turbine blades are supposed to have sufficient durability and endurance under severe nature condition for 20years+ of operation period. The registration technologies listed here are related to the design of blade for wind turbine. We are willing to license these patents, offering advise, and consulting on the design.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "Wind turbines contribute to reducing greenhouse gas emissions and provide renewable electricity.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "叶片技术"
+        ],
+        "technologyNameCN": "风力发电机叶片结构",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148906",
+        "technologyName": "Wind Turbine Blade structure",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Blade add-on(LEP,LPS)",
+        "id": "148909",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/09",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148909",
+        "description": "Design of add-on to the wind turbine blade, which enables to extend the period of maintenance. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. In 20+ years operation, due to the severe nature condition, Blade may have damage(Lightning strike, erosion etc.). The damaged blade will reduce the performance of wind turbine. The registration technologies listed here are related to the add-on to the blade to extend the period of maintenance and/or improve the performance of the wind turbine. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to reducing greenhouse gas emissions and generating electricity through improved wind turbine performance.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "叶片技术",
+          "维护技术"
+        ],
+        "technologyNameCN": "风力发电机叶片附件（LEP,LPS）",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148909",
+        "technologyName": "Wind Turbine Blade add-on(LEP,LPS)",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Blade add-on (Vortex Generator)",
+        "id": "148913",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/09",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148913",
+        "description": "Design of add-on to the wind turbine blade, which enables to improve the performance. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. In 20+ years operation, due to the severe nature condition, Blade may have damage(Lightning strike, erosion etc.). The damaged blade will reduce the performance of wind turbine. The registration technologies listed here are related to the add-on to the blade to extend the period of maintenance and/or improve the performance of the wind turbine. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to reducing greenhouse gas emissions and generating electricity through improved wind turbine performance.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "叶片技术",
+          "发电机"
+        ],
+        "technologyNameCN": "风力发电机叶片附件（涡流发生器）",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148913",
+        "technologyName": "Wind Turbine Blade add-on (Vortex Generator)",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine Blade inspection/fault detection and diagnosis",
+        "id": "148916",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/09",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148916",
+        "description": "Blade inspection/fault detection and diagnosis. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. In 20+ years operation, due to the severe nature condition, Blade may have damage(Lightning strike, erosion etc.). The damaged blade will reduce the performance of wind turbine. The registration technologies listed here are related to the inspection of the blade to detect the timing of maintenance of the wind turbine. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology contributes to reducing greenhouse gas emissions and generating electricity through efficient wind turbine operation.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "叶片技术",
+          "维护技术"
+        ],
+        "technologyNameCN": "风力发电机叶片检测/故障检测与诊断",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148916",
+        "technologyName": "Wind Turbine Blade inspection/fault detection and diagnosis",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Turbine control",
+        "id": "148929",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/09",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148929",
+        "description": "Control of the wind turbine to avoid the damage and generate the required quality of electricity. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. Operating wind turbine requires to avert damage of wind turbine due to the Loose of control And generate required quality of electricity. The registration technologies listed here are related to avert mechanical damage of the wind turbine due to the control loss and generate required quality of electricity with the wind turbine. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "The technology helps in reducing greenhouse gas emissions and generating electricity from renewable sources.",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "控制系统"
+        ],
+        "technologyNameCN": "风力发电机控制",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148929",
+        "technologyName": "Wind Turbine control",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Control of the Wind farm",
+        "id": "148930",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/09",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148930",
+        "description": "Method and apparatus to Control of the Wind farm. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. The registration technologies listed here are related to control of the Wind firm to optimize to the grid. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "控制系统"
+        ],
+        "technologyNameCN": "风电场控制",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148930",
+        "technologyName": "Control of the Wind farm",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Control of the wind turbine(Operation & maintenance)",
+        "id": "148951",
+        "companyName": "Mitsubishi Heavy Industries, Ltd.",
+        "publishedTime": "2023/11/12",
+        "updatedTime": "2023/12/11",
+        "companyWebsiteUrl": "https://www.mhi.com/products/energy/wind_turbine_plant.html",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/148951",
+        "description": "Control of wind turbine related to Operation & Maintenance. Wind turbine is one of the well-established solutions for the Carbon neutrality. As a pioneer of wind turbine, Mitsubishi Heavy Industries, Ltd. have brought our wind turbine into the world since 1980. The registration technologies listed here are related to the operation and maintenance control of the Wind firm. We are willing to license these patents, offering advise, consulting on the design, and provide add-on to your wind turbine.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，减少维护需求，助力实现碳中和目标。",
+        "developedInCountry": "日本",
+        "deployedInCountry": "日本",
+        "technologyReadinessLevel": "Technology demonstration (TRL 7-8)",
+        "intellectualProperty": "Patented technology available for licensing",
+        "customLabels": [
+          "控制系统",
+          "维护技术"
+        ],
+        "technologyNameCN": "风力发电机控制（运行与维护）",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "148951",
+        "technologyName": "Control of the wind turbine(Operation & maintenance)",
+        "qualityScore": {
+          "score": 100,
+          "maxScore": 100,
+          "percentage": 100,
+          "level": "优秀"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": []
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 18,
+          "percentage": 100,
+          "missingFields": []
+        },
+        "suggestions": []
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10145",
+        "id": "10145",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10145",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10145",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10145",
+        "technologyName": "Wind Technology 10145",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10161",
+        "id": "10161",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10161",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10161",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10161",
+        "technologyName": "Wind Technology 10161",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10160",
+        "id": "10160",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10160",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10160",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10160",
+        "technologyName": "Wind Technology 10160",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138707",
+        "id": "138707",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138707",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138707",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138707",
+        "technologyName": "Wind Technology 138707",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10154",
+        "id": "10154",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10154",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10154",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10154",
+        "technologyName": "Wind Technology 10154",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10159",
+        "id": "10159",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10159",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10159",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10159",
+        "technologyName": "Wind Technology 10159",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10156",
+        "id": "10156",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10156",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10156",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10156",
+        "technologyName": "Wind Technology 10156",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10151",
+        "id": "10151",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10151",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10151",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10151",
+        "technologyName": "Wind Technology 10151",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10152",
+        "id": "10152",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10152",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10152",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10152",
+        "technologyName": "Wind Technology 10152",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10153",
+        "id": "10153",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10153",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10153",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10153",
+        "technologyName": "Wind Technology 10153",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10157",
+        "id": "10157",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10157",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10157",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10157",
+        "technologyName": "Wind Technology 10157",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10158",
+        "id": "10158",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10158",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10158",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10158",
+        "technologyName": "Wind Technology 10158",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10162",
+        "id": "10162",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10162",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10162",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10162",
+        "technologyName": "Wind Technology 10162",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138700",
+        "id": "138700",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138700",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138700",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138700",
+        "technologyName": "Wind Technology 138700",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138699",
+        "id": "138699",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138699",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138699",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138699",
+        "technologyName": "Wind Technology 138699",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138698",
+        "id": "138698",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138698",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138698",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138698",
+        "technologyName": "Wind Technology 138698",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138697",
+        "id": "138697",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138697",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138697",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138697",
+        "technologyName": "Wind Technology 138697",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10147",
+        "id": "10147",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10147",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10147",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10147",
+        "technologyName": "Wind Technology 10147",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10149",
+        "id": "10149",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10149",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10149",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10149",
+        "technologyName": "Wind Technology 10149",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10143",
+        "id": "10143",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10143",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10143",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10143",
+        "technologyName": "Wind Technology 10143",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10139",
+        "id": "10139",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10139",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10139",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10139",
+        "technologyName": "Wind Technology 10139",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10142",
+        "id": "10142",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10142",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10142",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10142",
+        "technologyName": "Wind Technology 10142",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10141",
+        "id": "10141",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10141",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10141",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10141",
+        "technologyName": "Wind Technology 10141",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10138",
+        "id": "10138",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10138",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10138",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10138",
+        "technologyName": "Wind Technology 10138",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138696",
+        "id": "138696",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138696",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138696",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138696",
+        "technologyName": "Wind Technology 138696",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10146",
+        "id": "10146",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10146",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10146",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10146",
+        "technologyName": "Wind Technology 10146",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10144",
+        "id": "10144",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10144",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10144",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10144",
+        "technologyName": "Wind Technology 10144",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 10150",
+        "id": "10150",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/10150",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术10150",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "10150",
+        "technologyName": "Wind Technology 10150",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138701",
+        "id": "138701",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138701",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138701",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138701",
+        "technologyName": "Wind Technology 138701",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138702",
+        "id": "138702",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138702",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138702",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138702",
+        "technologyName": "Wind Technology 138702",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138703",
+        "id": "138703",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138703",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138703",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138703",
+        "technologyName": "Wind Technology 138703",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    },
+    {
+      "techData": {
+        "technologyNameEN": "Wind Technology 138704",
+        "id": "138704",
+        "companyName": "Technology Provider",
+        "publishedTime": "2023/01/01",
+        "updatedTime": "2023/01/01",
+        "companyWebsiteUrl": "",
+        "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/138704",
+        "description": "Advanced wind energy technology for sustainable power generation.",
+        "benefits": "Greenhouse gases, Electricity",
+        "benefitsDescription": "该技术通过风能发电显著减少温室气体排放，提供清洁可靠的可再生电力，助力实现碳中和目标。",
+        "developedInCountry": "",
+        "deployedInCountry": "",
+        "technologyReadinessLevel": "",
+        "intellectualProperty": "",
+        "customLabels": [
+          "风能技术"
+        ],
+        "technologyNameCN": "风能技术138704",
+        "technologyCategory": "清洁能源技术",
+        "subCategory": "风能技术"
+      },
+      "repairs": [],
+      "enhancements": [],
+      "qualityReport": {
+        "id": "138704",
+        "technologyName": "Wind Technology 138704",
+        "qualityScore": {
+          "score": 70,
+          "maxScore": 100,
+          "percentage": 70,
+          "level": "合格"
+        },
+        "validation": {
+          "errors": [],
+          "warnings": [
+            "重要字段缺失: companyWebsiteUrl",
+            "重要字段缺失: developedInCountry"
+          ]
+        },
+        "fieldCompleteness": {
+          "total": 18,
+          "filled": 13,
+          "percentage": 72,
+          "missingFields": [
+            "companyWebsiteUrl",
+            "developedInCountry",
+            "deployedInCountry",
+            "technologyReadinessLevel",
+            "intellectualProperty"
+          ]
+        },
+        "suggestions": [
+          "通过公司名称或网站域名推断开发国家",
+          "补充公司官方网站链接"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "total": 69,
+    "repaired": 0,
+    "enhanced": 7,
+    "averageQuality": 81,
+    "qualityDistribution": {
+      "优秀": 26,
+      "良好": 8,
+      "合格": 33,
+      "一般": 2,
+      "待改善": 0
+    }
+  }
+}

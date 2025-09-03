@@ -9,6 +9,7 @@ import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
 import { useAuthContext } from './auth-provider';
 import { TurnstileWidget } from './turnstile-widget';
+import { isValidPhone, phoneError } from '@/lib/validators';
 
 interface VerificationLoginFormProps {
   onSwitchToLogin: () => void;
@@ -39,6 +40,10 @@ export function VerificationLoginForm({ onSwitchToLogin, onSwitchToRegister, onC
     if (!phoneNumber) {
       alert(locale === 'en' ? 'Please enter phone number' : '请输入手机号码');
       return;
+    }
+    if (!isValidPhone(phoneNumber, countryCode)) {
+      alert(phoneError(locale as 'en' | 'zh'))
+      return
     }
     
     try {
@@ -88,6 +93,10 @@ export function VerificationLoginForm({ onSwitchToLogin, onSwitchToRegister, onC
     if (!phoneNumber || !verificationCode) {
       alert(locale === 'en' ? 'Please enter phone number and verification code' : '请输入手机号码和验证码');
       return;
+    }
+    if (!isValidPhone(phoneNumber, countryCode)) {
+      alert(phoneError(locale as 'en' | 'zh'))
+      return
     }
     
     // 检查人机验证

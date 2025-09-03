@@ -72,9 +72,22 @@ export const customAuthApi = {
       // 如果注册成功，保存认证信息
       if (result.success && result.data) {
         console.log('✅ 自定义注册成功，保存认证信息')
+        console.log('🔍 准备保存的数据:', {
+          hasToken: !!result.data.token,
+          hasRefreshToken: !!result.data.refreshToken,
+          hasUser: !!result.data.user,
+          tokenPreview: result.data.token ? result.data.token.substring(0, 20) + '...' : 'null'
+        });
+        
         localStorage.setItem('custom_auth_token', result.data.token)
         localStorage.setItem('custom_refresh_token', result.data.refreshToken)
         localStorage.setItem('custom_user', JSON.stringify(result.data.user))
+        
+        // 验证保存是否成功
+        console.log('✅ token保存验证:', {
+          customToken: localStorage.getItem('custom_auth_token') ? '已保存' : '保存失败',
+          customUser: localStorage.getItem('custom_user') ? '已保存' : '保存失败'
+        });
       }
 
       return result

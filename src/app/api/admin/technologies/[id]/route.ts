@@ -13,6 +13,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const technologyData = await request.json()
 
     console.log('更新技术数据:', technologyData)
+
+    // 读取现有记录以进行最终值校验
+    const { data: existing, error: existErr } = await supabase
+      .from('admin_technologies')
+      .select('id, subcategory_id')
+      .eq('id', id)
+      .single()
+    if (existErr || !existing) {
+      return NextResponse.json({ error: '技术不存在' }, { status: 404 })
+    }
+    const finalSubcategoryId = technologyData.subcategory_id ?? existing.subcategory_id
+    if (!finalSubcategoryId) {
+      return NextResponse.json({ error: '技术子分类不能为空' }, { status: 400 })
+    }
     
     // 如果没有技术图片且指定了子分类，获取子分类的默认技术图片
     let finalImageUrl = technologyData.image_url

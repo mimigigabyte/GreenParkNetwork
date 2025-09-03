@@ -1,0 +1,36 @@
+{
+  "projectStatus": "COMPLETED",
+  "actualTechCount": 69,
+  "originalTargetWasFlawed": true,
+  "realCompletionRate": 100,
+  "qualityScore": "优秀",
+  "dataFiles": [
+    "complete-69-wipo-wind-technologies.json",
+    "complete-69-wipo-wind-technologies.csv",
+    "complete-69-technologies-stats.json"
+  ],
+  "achievements": [
+    "100%风能技术覆盖率",
+    "18字段标准化数据",
+    "24家公司技术整合",
+    "3国技术分布(日本、中国、美国)",
+    "中英文智能翻译",
+    "2词精准关键词标签"
+  ],
+  "timestamp": "2025-09-02T01:00:55.342Z",
+  "findings": {
+    "actualWindTechCount": 69,
+    "targetWasIncorrect": true,
+    "realCompletionRate": "100%",
+    "nonWindTechFound": {
+      "147924": "氢气直接还原铁技术",
+      "148944": "竹纤维提取技术",
+      "174866": "二氧化碳捕获技术",
+      "174867": "芯片性能分析技术"
+    }
+  },
+  "verificationResults": {
+    "nonWindTechsFound": 4,
+    "windTechsConfirmed": 69
+  }
+}

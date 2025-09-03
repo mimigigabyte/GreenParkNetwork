@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
 import { supabaseAuthApi } from '@/api/supabaseAuth'
+import { safeFetch, handleApiResponse } from '@/lib/safe-fetch'
 
 interface AccountSecurityProps {
   locale: string
@@ -19,6 +20,31 @@ export default function AccountSecurity({ locale }: AccountSecurityProps) {
     confirmPassword: ''
   })
   const [isLoading, setIsLoading] = useState(false)
+
+  // 将后端中文错误提示映射为英文，便于双语展示
+  const translateMessage = (msg: string, locale: string) => {
+    if (!msg) return locale === 'en' ? 'Operation failed' : '操作失败'
+    if (locale !== 'en') return msg
+    const map: Record<string, string> = {
+      '当前密码不正确': 'Current password is incorrect',
+      '当前密码验证失败': 'Current password verification failed, please check your password',
+      '请检查密码是否正确': 'Please check if the current password is correct',
+      '新密码不能与当前密码相同': 'New password cannot be the same as current password',
+      '新密码长度不能少于6位': 'New password must be at least 6 characters',
+      '密码长度至少为6位': 'Password must be at least 6 characters long',
+      '用户未登录或会话已过期': 'Not logged in or session expired',
+      '未授权访问': 'Unauthorized access',
+      '用户不存在或已被禁用': 'User does not exist or has been disabled',
+      '密码更新失败': 'Failed to update password',
+      '密码修改失败': 'Failed to change password',
+      '服务器错误': 'Server error'
+    }
+    // 匹配包含关系，返回首个命中的翻译
+    for (const key of Object.keys(map)) {
+      if (msg.includes(key)) return map[key]
+    }
+    return msg
+  }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +63,18 @@ export default function AccountSecurity({ locale }: AccountSecurityProps) {
       toast({
         title: locale === 'en' ? 'Error' : '错误',
         description: locale === 'en' ? 'Please enter new password' : '请输入新密码',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    // 新旧密码相同校验
+    if (password.newPassword === password.currentPassword) {
+      toast({
+        title: locale === 'en' ? 'Error' : '错误',
+        description: locale === 'en' 
+          ? 'New password cannot be the same as current password' 
+          : '新密码不能与当前密码相同',
         variant: 'destructive'
       })
       return
@@ -62,14 +100,28 @@ export default function AccountSecurity({ locale }: AccountSecurityProps) {
 
     setIsLoading(true)
     try {
-      // TODO: 调用修改密码的API
-      console.log('修改密码请求:', {
-        currentPassword: password.currentPassword,
-        newPassword: password.newPassword
-      })
+      // 判断认证方式：有自定义token则走自定义修改密码API，否则走Supabase修改密码
+      const hasCustomToken = typeof window !== 'undefined' && !!localStorage.getItem('custom_auth_token')
 
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      if (hasCustomToken) {
+        const resp = await safeFetch('/api/auth/custom-change-password', {
+          method: 'POST',
+          useAuth: true,
+          body: JSON.stringify({
+            currentPassword: password.currentPassword,
+            newPassword: password.newPassword
+          })
+        })
+        const result = await handleApiResponse(resp)
+        if (!result.success) {
+          throw new Error(result.error || (locale === 'en' ? 'Failed to change password' : '修改密码失败'))
+        }
+      } else {
+        const result = await supabaseAuthApi.updatePassword(password.currentPassword, password.newPassword)
+        if (!result.success) {
+          throw new Error(result.error || (locale === 'en' ? 'Failed to change password' : '修改密码失败'))
+        }
+      }
 
       toast({
         title: locale === 'en' ? 'Success' : '成功',
@@ -84,9 +136,11 @@ export default function AccountSecurity({ locale }: AccountSecurityProps) {
       })
     } catch (error) {
       console.error('密码修改失败:', error)
+      const rawMessage = error instanceof Error ? (error.message || '') : ''
+      const desc = translateMessage(rawMessage, locale) || (locale === 'en' ? 'Failed to change password, please try again' : '密码修改失败，请重试')
       toast({
         title: locale === 'en' ? 'Error' : '错误',
-        description: locale === 'en' ? 'Failed to change password, please try again' : '密码修改失败，请重试',
+        description: desc,
         variant: 'destructive'
       })
     } finally {

@@ -8,7 +8,9 @@ import { authApi } from '@/api/auth';
 import { customAuthApi } from '@/api/customAuth';
 import { emailVerificationApi } from '@/api/emailVerification';
 import { useAuthContext } from './auth-provider';
+import { supabase } from '@/lib/supabase';
 import { CountryCodeSelector } from '@/components/ui/country-code-selector';
+import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -51,6 +53,19 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         ? `Please enter ${isPhoneRegister ? 'phone number' : 'email address'}`
         : `请输入${isPhoneRegister ? '手机号' : '邮箱地址'}`);
       return;
+    }
+
+    // 基本格式校验
+    if (isPhoneRegister) {
+      if (!isValidPhone(formData.phone, countryCode)) {
+        alert(phoneError(locale as 'en' | 'zh'))
+        return
+      }
+    } else {
+      if (!isValidEmail(formData.email)) {
+        alert(emailError(locale as 'en' | 'zh'))
+        return
+      }
     }
 
     setCodeLoading(true);
@@ -125,6 +140,19 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       alert(locale === 'en' ? 'Please enter phone number' : '请输入手机号');
       return;
     }
+
+    // 进一步格式校验
+    if (isPhoneRegister) {
+      if (!isValidPhone(formData.phone, countryCode)) {
+        alert(phoneError(locale as 'en' | 'zh'))
+        return
+      }
+    } else {
+      if (!isValidEmail(formData.email)) {
+        alert(emailError(locale as 'en' | 'zh'))
+        return
+      }
+    }
     
     if (formData.password !== formData.confirmPassword) {
       alert(locale === 'en' ? 'Passwords do not match' : '两次输入的密码不一致');
@@ -163,8 +191,26 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       if (result.success && 'data' in result && result.data) {
         console.log('✅ 注册成功!')
         console.log('🔍 注册成功，token已保存:', !!result.data.token)
+        console.log('🔍 localStorage中的token:', {
+          customToken: localStorage.getItem('custom_auth_token') ? '存在' : '不存在',
+          customUser: localStorage.getItem('custom_user') ? '存在' : '不存在'
+        });
         
-        // 更新认证状态
+        // 邮箱注册走的是 Supabase，会话需在客户端设置
+        if (!isPhoneRegister && result.data.token) {
+          try {
+            console.log('🔑 设置 Supabase 客户端会话...')
+            await supabase.auth.setSession({
+              access_token: result.data.token,
+              refresh_token: result.data.refreshToken || ''
+            })
+            console.log('✅ Supabase 会话已设置')
+          } catch (e) {
+            console.error('❌ 设置 Supabase 会话失败:', e)
+          }
+        }
+
+        // 更新认证状态并等待完成
         console.log('🔄 更新认证状态...')
         await checkUser();
         console.log('✅ 认证状态更新完成')
@@ -173,8 +219,9 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         
         // 稍等一下确保状态更新完成后再跳转
         setTimeout(() => {
-          router.push('/company-profile');
-        }, 100);
+          console.log('🔄 准备跳转到企业完善页面...');
+          router.push(`/${locale}/company-profile`);
+        }, 200);
       } else {
         const errorMessage = 'error' in result ? result.error : (locale === 'en' ? 'Registration failed, please try again later' : '注册失败，请稍后重试');
         alert(errorMessage);

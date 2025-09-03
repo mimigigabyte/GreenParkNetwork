@@ -23,20 +23,20 @@ async function getAuthToken(): Promise<string | null> {
       
       // 1. 优先检查自定义认证token
       const customToken = localStorage.getItem('custom_auth_token');
-      console.log('🔍 自定义token检查:', customToken ? '存在' : '不存在')
+      console.log('🔍 自定义token:', customToken ? '存在' : '不存在');
       if (customToken) {
-        console.log('🔑 使用自定义认证token');
+        console.log('✅ 使用自定义认证token');
         return customToken;
       }
       
       // 2. 尝试从Supabase session获取
       try {
-        console.log('🔍 尝试获取Supabase session...')
+        console.log('🔍 尝试获取Supabase session...');
         const { supabase } = await import('@/lib/supabase');
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('🔍 Supabase session检查:', session?.access_token ? '存在' : '不存在')
+        console.log('🔍 Supabase session:', session?.access_token ? '存在' : '不存在');
         if (session?.access_token) {
-          console.log('🔑 使用Supabase session token');
+          console.log('✅ 使用Supabase session token');
           return session.access_token;
         }
       } catch (error) {
@@ -45,13 +45,13 @@ async function getAuthToken(): Promise<string | null> {
       
       // 3. 回退到传统localStorage token
       const legacyToken = localStorage.getItem('access_token');
-      console.log('🔍 传统token检查:', legacyToken ? '存在' : '不存在')
+      console.log('🔍 传统token:', legacyToken ? '存在' : '不存在');
       if (legacyToken) {
-        console.log('🔑 使用传统localStorage token');
+        console.log('✅ 使用传统localStorage token');
         return legacyToken;
       }
       
-      console.log('❌ 所有token都不存在')
+      console.log('❌ 所有token都不存在');
     }
     return null;
   } catch (error) {
@@ -81,6 +81,9 @@ export async function safeFetch(url: string, options: SafeFetchOptions = {}): Pr
       const token = await getAuthToken();
       if (token) {
         baseHeaders['Authorization'] = createAuthorizationHeader(token);
+        console.log('🔑 已添加Authorization header');
+      } else {
+        console.log('❌ 需要认证但无token可用');
       }
     }
     

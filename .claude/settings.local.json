@@ -37,7 +37,12 @@
       "Read(/tmp/**)",
       "Read(/tmp/**)",
       "mcp__zen__thinkdeep",
-      "mcp__firecrawl__firecrawl_extract"
+      "mcp__firecrawl__firecrawl_extract",
+      "mcp__serena__find_referencing_symbols",
+      "Bash(find:*)",
+      "Read(/Users/Dylan/.Trash/**)",
+      "Bash(mdfind:*)",
+      "Read(/Users/Dylan/.Trash/**)"
     ],
     "deny": []
   }

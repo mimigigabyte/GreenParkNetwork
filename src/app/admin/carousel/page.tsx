@@ -25,8 +25,8 @@ export default function CarouselPage() {
       setIsLoading(true)
       
       const searchParams = new URLSearchParams({
-        page: String(params?.page || pagination.current),
-        pageSize: String(params?.pageSize || pagination.pageSize),
+        page: String(params?.page ?? pagination.current),
+        pageSize: String(params?.pageSize ?? pagination.pageSize),
         ...(params?.search && { search: params.search }),
         ...(params?.sortBy && { sortBy: params.sortBy }),
         ...(params?.sortOrder && { sortOrder: params.sortOrder })
@@ -51,7 +51,7 @@ export default function CarouselPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [pagination.current, pagination.pageSize])
 
   useEffect(() => {
     loadImages()
@@ -59,7 +59,8 @@ export default function CarouselPage() {
 
   const handleSearch = (search: string) => {
     setPagination(prev => ({ ...prev, current: 1 }))
-    loadImages({ search })
+    // 显式第一页，避免使用旧页码
+    loadImages({ search, page: 1 })
   }
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
@@ -326,6 +327,7 @@ export default function CarouselPage() {
           }}
           onSearch={handleSearch}
           onSort={handleSort}
+          searchMode="enter"
           searchPlaceholder="搜索标题或描述..."
           className="shadow-sm"
         />

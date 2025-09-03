@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 前端使用Next.js技术+Tailwind CSS框架 
 - 移动端APP开发使用React Native 
 - 尽量使用shadcn/ui现成的组件,加上Radix UI 和 Framer Motion
-- 使用 GitHub 作为代码托管平台
+- 使用GitHub 作为代码托管平台
 - 使用Upstash Redis作为边缘缓存服务
 - 后端使用FastAPI
 - 数据ORM使用Drizzle
@@ -40,18 +40,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Production**: `npm start` - Start production server
 - **Lint**: `npm run lint` - Run ESLint for code quality
 
-### Backend (Spring Boot)
-- **Development**: `mvn spring-boot:run` - Start Spring Boot application
-- **Build**: `mvn clean install` - Compile and package application
-- **Test**: `mvn test` - Run unit tests
-- **Package**: `mvn package` - Create executable JAR
-
 ### Database Operations
 - **Supabase**: Default development database (PostgreSQL)
-- **HuaweiCloud RDS**: Production database (MySQL) - activate with `spring.profiles.active=huaweicloud`
-- **Test Scripts**: 
-  - Windows: `test-huaweicloud-rds.bat`
-  - Linux/Mac: `test-huaweicloud-rds.sh`
 
 ## Architecture Overview
 
@@ -69,7 +59,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/api/` - Frontend API client functions
 - `backend/src/main/java/com/greentech/platform/` - Spring Boot application
 - `docs/` - Project documentation and setup guides
-- `.cursor/rules/` - Development conventions and best practices
 
 ### Authentication Flow
 1. **SMS Verification**: Primary login method with 60-second cooldown

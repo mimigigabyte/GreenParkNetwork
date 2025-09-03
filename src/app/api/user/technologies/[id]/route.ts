@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 // PUT - 用户更新技术
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase管理员客户端未配置' },
-        { status: 500 }
-      )
-    }
+    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { id } = params
     const technologyData = await request.json()
     
     // 首先检查技术是否存在且是否属于该用户
-    const { data: existingTech, error: checkError } = await supabaseAdmin
+    const { data: existingTech, error: checkError } = await db
       .from('admin_technologies')
-      .select('id, created_by')
+      .select('id, created_by, subcategory_id')
       .eq('id', id)
       .single()
     
@@ -30,6 +26,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: '无权限更新此技术' }, { status: 403 })
     }
     
+    // 校验：子分类必填（使用提交值或沿用原值后的最终结果）
+    const finalSubcategoryId = technologyData.subcategory_id ?? existingTech.subcategory_id
+    if (!finalSubcategoryId) {
+      return NextResponse.json({ error: '技术子分类不能为空' }, { status: 400 })
+    }
+    
     // 准备更新数据
     const updateData = {
       name_zh: technologyData.name_zh,
@@ -40,7 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       tech_source: technologyData.tech_source,
       acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段
       category_id: technologyData.category_id,
-      subcategory_id: technologyData.subcategory_id,
+      subcategory_id: technologyData.subcategory_id ?? existingTech.subcategory_id,
       custom_label: technologyData.custom_label, // 自定义标签
       // 处理附件数据：支持新旧格式
       attachment_urls: (() => {
@@ -76,7 +78,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       Object.entries(updateData).filter(([_, value]) => value !== undefined && value !== null && value !== '')
     )
     
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from('admin_technologies')
       .update(filteredData)
       .eq('id', id)
@@ -98,19 +100,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 // DELETE - 用户删除技术
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase管理员客户端未配置' },
-        { status: 500 }
-      )
-    }
+    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
     const { id } = params
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
     
     // 首先检查技术是否存在且是否属于该用户
-    const { data: existingTech, error: checkError } = await supabaseAdmin
+    const { data: existingTech, error: checkError } = await db
       .from('admin_technologies')
       .select('id, created_by')
       .eq('id', id)
@@ -125,7 +122,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: '无权限删除此技术' }, { status: 403 })
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await db
       .from('admin_technologies')
       .delete()
       .eq('id', id)

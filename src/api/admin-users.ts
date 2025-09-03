@@ -153,32 +153,39 @@ export const deleteUserApi = async (userId: string): Promise<void> => {
  */
 export const getCompaniesForSelectApi = async (): Promise<AdminCompany[]> => {
   try {
-    const response = await fetch('/api/admin/companies', {
+    // 拉取较大的页尺寸，避免分页遗漏
+    const params = new URLSearchParams({ page: '1', pageSize: '1000', sortBy: 'name_zh', sortOrder: 'asc' })
+    const response = await fetch(`/api/admin/companies?${params.toString()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const result = await response.json();
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch companies');
+    const result = await response.json()
+
+    // 兼容两种响应格式：
+    // 1) { data: [...], pagination: {...} }
+    // 2) { success: true, data: [...] }
+    const list: AdminCompany[] = Array.isArray(result)
+      ? (result as AdminCompany[])
+      : (Array.isArray(result.data) ? result.data : [])
+
+    if (!list || !Array.isArray(list)) {
+      throw new Error(result.error || 'Failed to fetch companies')
     }
 
-    // 转换数据格式以匹配前端期望的结构
-    return result.data.map((company: AdminCompany) => ({
+    return list.map((company: AdminCompany) => ({
       id: company.id,
       name_zh: company.name_zh,
-      name_en: company.name_en,
-    }));
-
+      name_en: (company as any).name_en,
+    }))
   } catch (error) {
-    console.error('Error fetching companies for select:', error);
-    throw error;
+    console.error('Error fetching companies for select:', error)
+    throw error
   }
 }

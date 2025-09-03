@@ -1,0 +1,70 @@
+[
+  {
+    "technologyNameEN": "Flexibile foundations for earthquake-proof offshore wind power",
+    "id": "171988",
+    "companyName": "J-Power",
+    "publishedTime": "2025/04/30",
+    "updatedTime": "2025/05/30",
+    "companyWebsiteUrl": "https://www.jpower.co.jp/english/",
+    "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/171988",
+    "description": "The 'Flexible Tripile' foundation addresses challenges posed by the shallow, hard bedrock common in Japanese waters, where traditional monopile foundations may be unsuitable. The new design consists of three piles connected to a central steel main pipe supporting the turbine tower via a base plate. This base plate incorporates square steel pipes, steel plates, and wire ropes, creating a flexible structure that deforms relatively easily. The design provides seismic isolation, allowing the turbine to sway slowly, preventing vibrations, and avoiding resonance-amplified oscillations during earthquakes. Joint research with Professor ISHIHARA Takeshi of the University of Tokyo and model experiments have, according to the company, confirmed the innovation's effectiveness and demonstrated the foundation's enhanced vibration damping compared to conventional designs.",
+    "benefits": "Greenhouse gases, Electricity",
+    "benefitsDescription": "N/A",
+    "developedInCountry": "日本",
+    "deployedInCountry": "日本",
+    "technologyReadinessLevel": "Technology development / prototype (TRL 5-6)",
+    "intellectualProperty": "",
+    "customLabels": [
+      "海上风电",
+      "基础工程"
+    ],
+    "technologyNameCN": "地震防护海上风电柔性三桩基础",
+    "technologyCategory": "清洁能源技术",
+    "subCategory": "风能技术"
+  },
+  {
+    "technologyNameEN": "EnergySail",
+    "id": "171616",
+    "companyName": "Eco Marine Power",
+    "publishedTime": "2025/04/13",
+    "updatedTime": "2025/08/04",
+    "companyWebsiteUrl": "https://www.ecomarinepower.com/en/energysail",
+    "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/171616",
+    "description": "The patented EnergySail is a rigid sail and wind assisted (or sail assisted) propulsion device designed by Eco Marine Power that allows ships to harness the power of the wind and sun in order to reduce fuel costs, plus lower noxious gas and carbon emissions. The patented EnergySail is unlike any other sail - it can be used even when a ship is at anchor or in port and has been designed to withstand high winds or even sudden micro-bursts.",
+    "benefits": "Greenhouse gases, Electricity",
+    "benefitsDescription": "The EnergySail helps in reducing fuel costs and lowering noxious gas and carbon emissions by harnessing wind and solar power for propulsion.",
+    "developedInCountry": "中国",
+    "deployedInCountry": "中国",
+    "technologyReadinessLevel": "N/A",
+    "intellectualProperty": "",
+    "customLabels": [
+      "小型风机"
+    ],
+    "technologyNameCN": "能源帆",
+    "technologyCategory": "清洁能源技术",
+    "subCategory": "风能技术"
+  },
+  {
+    "technologyNameEN": "AVATAR™ Small Wind Turbine",
+    "id": "149296",
+    "companyName": "Avant Garde Innovations™",
+    "publishedTime": "2024/06/28",
+    "updatedTime": "2024/07/15",
+    "companyWebsiteUrl": "https://avantgarde.energy/",
+    "technologyImageUrl": "https://thumbnails.wipogreen.wipo.int/149296",
+    "description": "A small wind turbine which can power your homes, farms and businesses for the next 20 years. The small wind turbine AVATAR™-1 is a multi-phase, multi-voltage, brushless generator with fiber-reinforced glass housing and tale vane with Auto Direction Positioning that can be used for rural electrification in homes and offices and for rural electrification, agriculture, and telecom towers. The startup wind speed is 1.4 m/s and peak power is 1000W. The turbines are suited to perform in diverse weather conditions and automatically face any wind direction. They are noiseless, with less than 10% of the sound of the wind itself at foundation level. The operational lifetime is 20 years.",
+    "benefits": "Greenhouse gases, Electricity",
+    "benefitsDescription": "The technology contributes to carbon neutrality by providing a renewable energy source through wind power, thus reducing greenhouse gas emissions and generating electricity.",
+    "developedInCountry": "日本",
+    "deployedInCountry": "",
+    "technologyReadinessLevel": "N/A",
+    "intellectualProperty": "Patents available for licensing.",
+    "customLabels": [
+      "基础工程",
+      "小型风机"
+    ],
+    "technologyNameCN": "AVATAR™小型风力发电机",
+    "technologyCategory": "清洁能源技术",
+    "subCategory": "风能技术"
+  }
+]
