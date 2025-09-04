@@ -24,6 +24,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     description_zh: '',
     description_en: '',
     image_url: '',
+    website_url: '',
     tech_source: 'self_developed' as TechSource,
     acquisition_method: '' as TechAcquisitionMethod,
     category_id: '',
@@ -228,6 +229,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         description_zh: technology.description_zh || '',
         description_en: technology.description_en || '',
         image_url: technology.image_url || '',
+        website_url: technology.website_url || '',
         tech_source: technology.tech_source || 'self_developed',
         acquisition_method: (technology.acquisition_method || '') as TechAcquisitionMethod,
         category_id: technology.category_id || '',
@@ -366,12 +368,21 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       newErrors.subcategory_id = '技术子分类不能为空'
     }
 
-    if (formData.description_zh && formData.description_zh.length > 3000) {
-      newErrors.description_zh = '技术介绍不能超过3000字'
+    if (formData.description_zh && formData.description_zh.length > 2000) {
+      newErrors.description_zh = '技术介绍不能超过2000字'
     }
 
-    if (formData.description_en && formData.description_en.length > 3000) {
-      newErrors.description_en = '技术介绍不能超过3000字'
+    if (formData.description_en && formData.description_en.length > 2000) {
+      newErrors.description_en = '技术介绍不能超过2000字'
+    }
+
+    if (formData.website_url) {
+      // Accept scheme-less domains like "www.example.com" by using a relaxed regex
+      const url = formData.website_url.trim()
+      const relaxed = /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}([\/:?#].*)?$/i
+      if (!relaxed.test(url)) {
+        newErrors.website_url = '请输入有效的网址链接'
+      }
     }
 
     setErrors(newErrors)
@@ -426,12 +437,20 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       setIsSubmitting(true)
       // 注意：企业logo自动生成现在在后端处理，无需前端处理
 
+      // Normalize website URL (auto-prefix https if scheme missing)
+      const normalizedWebsite = formData.website_url?.trim()
+        ? (/^https?:\/\//i.test(formData.website_url.trim())
+            ? formData.website_url.trim()
+            : `https://${formData.website_url.trim()}`)
+        : undefined
+
       const submitData = {
         name_zh: formData.name_zh.trim(),
         name_en: formData.name_en.trim() || undefined,
         description_zh: formData.description_zh.trim() || undefined,
         description_en: formData.description_en.trim() || undefined,
         image_url: formData.image_url || undefined,
+        website_url: normalizedWebsite,
         tech_source: formData.tech_source,
         acquisition_method: formData.acquisition_method || undefined,
         category_id: formData.category_id || undefined,
@@ -665,8 +684,8 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
               </div>
             </div>
             
-            {/* 自定义标签 */}
-            <div className="mt-4">
+          {/* 自定义标签 */}
+          <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 自定义标签（可选）
               </label>
@@ -690,6 +709,23 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
               </div>
               <p className="text-xs text-gray-500 mt-1">用于在技术展示页面显示的自定义标签，最多20个字符</p>
             </div>
+          </div>
+
+          {/* 技术网址（可选） */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              技术网址链接（可选）
+            </label>
+            <input
+              type="url"
+              value={formData.website_url}
+              onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
+              placeholder="https://example.com/tech"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${errors.website_url ? 'border-red-500' : 'border-gray-300'}`}
+            />
+            {errors.website_url && (
+              <p className="mt-1 text-xs text-red-600">{errors.website_url}</p>
+            )}
           </div>
 
           {/* 企业信息 */}

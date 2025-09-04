@@ -8,7 +8,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "backfill:locations": "node scripts/backfill-location-translations.js"
+    "backfill:locations": "node scripts/backfill-location-translations.js",
+    "crawl:nbc": "node scripts/playwright/crawl-nbc-business.js",
+    "crawl:wipo:article": "node scripts/playwright/scrape-wipo-article.js",
+    "crawl:wipo:csv:first3": "node scripts/playwright/batch-scrape-wipo-from-csv.js data/search-results-2025-09-04.csv --limit 3",
+    "crawl:wipo:csv": "node scripts/playwright/batch-scrape-wipo-from-csv.js data/search-results-2025-09-04.csv",
+    "aggregate:wipo:csv": "node scripts/aggregate-wipo-from-csv.js data/search-results-2025-09-04.csv"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -55,6 +60,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
     "eslint": "^8.0.0",
-    "eslint-config-next": "^14.0.0"
+    "eslint-config-next": "^14.0.0",
+    "playwright": "^1.55.0"
   }
 }

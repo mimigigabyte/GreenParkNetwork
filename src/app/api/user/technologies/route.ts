@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
       name_en: technologyData.name_en,
       description_zh: technologyData.description_zh,
       description_en: technologyData.description_en,
+      website_url: technologyData.website_url,
       image_url: finalImageUrl,
       tech_source: technologyData.tech_source,
       acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段

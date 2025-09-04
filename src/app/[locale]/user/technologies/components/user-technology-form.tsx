@@ -35,6 +35,7 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     name_en: technology?.name_en || '',
     description_zh: technology?.description_zh || '',
     description_en: technology?.description_en || '',
+    website_url: technology?.website_url || '',
     tech_source: (technology?.tech_source || '') as TechSource,
     acquisition_method: (technology?.acquisition_method || 'enterprise_report') as TechAcquisitionMethod,
     category_id: technology?.category_id || '',
@@ -254,12 +255,39 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
       return
     }
 
+    // 描述长度限制 2000 字
+    if (formData.description_zh && formData.description_zh.length > 2000) {
+      alert(locale === 'en' ? 'Chinese description cannot exceed 2000 characters' : '中文技术描述不能超过2000字')
+      return
+    }
+    if (formData.description_en && formData.description_en.length > 2000) {
+      alert(locale === 'en' ? 'English description cannot exceed 2000 characters' : '英文技术描述不能超过2000字')
+      return
+    }
+    // 可选网站URL校验（若填写，放宽为可缺省协议的域名）
+    if (formData.website_url) {
+      const url = formData.website_url.trim()
+      const relaxed = /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}([\/:?#].*)?$/i
+      if (!relaxed.test(url)) {
+        alert(locale === 'en' ? 'Please enter a valid website URL' : '请输入有效的网址链接')
+        return
+      }
+    }
+
     setIsLoading(true)
     
     try {
       // 合并用户企业信息到技术数据
+      // 归一化网址（未写协议时默认加 https://）
+      const normalizedWebsite = formData.website_url?.trim()
+        ? (/^https?:\/\//i.test(formData.website_url.trim())
+            ? formData.website_url.trim()
+            : `https://${formData.website_url.trim()}`)
+        : undefined
+
       const technologyData = {
         ...formData,
+        website_url: normalizedWebsite,
         // 企业关联信息（自动填充）
         ...companyInfo,
         // 添加用户ID用于创建者跟踪
@@ -363,6 +391,19 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
                       onChange={(e) => handleInputChange('name_en', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder={locale === 'en' ? 'Please enter English name' : '请输入英文名称'}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {locale === 'en' ? 'Technology Website (Optional)' : '技术网址链接（可选）'}
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.website_url}
+                      onChange={(e) => handleInputChange('website_url', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="https://example.com/tech"
                     />
                   </div>
                 </div>

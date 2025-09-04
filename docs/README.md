@@ -64,6 +64,9 @@
 │       └── company.ts        # 企业信息API
 ├── package.json              # 项目依赖配置
 ├── scripts/
+│   ├── playwright/
+│   │   ├── crawl-nbc-business.js     # 示例：使用 Playwright 抓取 NBC Business
+│   │   └── scrape-wipo-article.js    # 使用 Playwright 抓取 WIPO Green 技术详情页
 │   └── mcp/
 │       └── run-mcp-tool.js   # 通用 MCP 客户端脚本（可调用 Firecrawl MCP，不依赖Claude）
 ├── next.config.mjs          # Next.js配置

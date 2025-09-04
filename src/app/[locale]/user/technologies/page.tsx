@@ -547,6 +547,23 @@ export default function UserTechnologiesPage() {
                         <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">{getTechSourceLabel(viewingTechnology.tech_source)}</p>
                       </div>
                       <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Technology Website' : '技术网址'}</label>
+                        <div className="text-sm bg-gray-50 p-3 rounded-lg">
+                          {viewingTechnology.website_url ? (
+                            <a
+                              href={viewingTechnology.website_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline break-all"
+                            >
+                              {viewingTechnology.website_url}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500">-</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Category' : '技术分类'}</label>
                         <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
                           {locale === 'en' 

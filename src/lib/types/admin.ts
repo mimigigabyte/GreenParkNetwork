@@ -153,6 +153,7 @@ export interface AdminTechnology extends BaseEntity {
   description_zh?: string
   description_en?: string
   image_url?: string
+  website_url?: string
   tech_source: TechSource // 保持与数据库一致
   acquisition_method?: TechAcquisitionMethod // 技术获取方式
   brief_zh?: string
