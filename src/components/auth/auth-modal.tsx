@@ -419,7 +419,7 @@ export function AuthModal({ isOpen, onClose, initialAction }: AuthModalProps) {
                   <h1 className="text-lg font-bold text-gray-900 mb-0">
                     {locale === 'en' 
                       ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform' 
-                      : '国家级经开区绿色低碳技术推广平台'}
+                      : '国家级经开区绿色技术产品推广平台'}
                   </h1>
                   
                   {/* 副标题 */}

@@ -25,7 +25,7 @@ export function Footer() {
                 <h3 className="text-lg font-bold">
                   {locale === 'en' 
                     ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform'
-                    : '国家级经开区绿色低碳技术推广平台'}
+                    : '国家级经开区绿色技术产品推广平台'}
                 </h3>
                 <p className="text-sm text-green-200">
                   {locale === 'en' 

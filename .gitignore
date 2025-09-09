@@ -40,3 +40,9 @@ next-env.d.ts
 
 #scripts
 /middle_process_scripts
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.csv

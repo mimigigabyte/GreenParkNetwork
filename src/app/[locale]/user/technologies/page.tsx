@@ -633,11 +633,39 @@ export default function UserTechnologiesPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'Chinese Description' : '中文描述'}</label>
-                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">{viewingTechnology.description_zh || '-'}</div>
+                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto whitespace-pre-line">
+                        {(() => {
+                          const text = viewingTechnology.description_zh || '';
+                          const lines = String(text).split(/\r?\n/);
+                          const labelRe = /^(\s*(?:技术描述|收益类型|收益描述|应用地区和国家|技术成熟度|ID)\s*：)/;
+                          return lines.map((line, i) => {
+                            const m = line.match(labelRe);
+                            return (
+                              <div key={i}>
+                                {m ? (<><strong>{m[1].trim()}</strong>{line.slice(m[1].length)}</>) : line}
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{locale === 'en' ? 'English Description' : '英文描述'}</label>
-                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">{viewingTechnology.description_en || '-'}</div>
+                      <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto whitespace-pre-line">
+                        {(() => {
+                          const text = viewingTechnology.description_en || '';
+                          const lines = String(text).split(/\r?\n/);
+                          const labelRe = /^(\s*(?:Description|Benefit\s+Types|Benefit\s+Details|Deployed\s+In|Technology\s+Readiness\s+Level|ID)\s*:)/;
+                          return lines.map((line, i) => {
+                            const m = line.match(labelRe);
+                            return (
+                              <div key={i}>
+                                {m ? (<><strong>{m[1].trim()}</strong>{line.slice(m[1].length)}</>) : line}
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -38,7 +38,7 @@ export function generateCompanyLogo(options: LogoGeneratorOptions): Promise<stri
     const firstFourChars = getFirstFourChars(companyName);
 
     // 创建绿色背景 - 严格参考eo.jpg的绿色风格
-    ctx.fillStyle = '#84c7a3'; // 使用与参考图片一致的亮绿色
+    ctx.fillStyle = '#00b899'; // 统一为平台主绿色
     
     // 绘制圆角矩形背景
     roundRect(ctx, 0, 0, size, size, 16);

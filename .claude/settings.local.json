@@ -42,7 +42,9 @@
       "Bash(find:*)",
       "Read(/Users/Dylan/.Trash/**)",
       "Bash(mdfind:*)",
-      "Read(/Users/Dylan/.Trash/**)"
+      "Read(/Users/Dylan/.Trash/**)",
+      "mcp__context7__resolve-library-id",
+      "Bash(unset:*)"
     ],
     "deny": []
   }

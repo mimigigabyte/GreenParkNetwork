@@ -23,7 +23,7 @@
     "complete": "完成确认"
   },
   "header": {
-    "platformName": "国家级经开区绿色低碳技术推广平台",
+    "platformName": "国家级经开区绿色技术产品推广平台",
     "platformNameEn": "National Economic Development Zone Green Low-Carbon Technology Promotion Platform",
     "language": "语言",
     "chinese": "中文",
@@ -55,7 +55,7 @@
   "home": {
     "loading": "加载中...",
     "technology": "技术",
-    "heroTitle": "国家级经开区绿色低碳技术推广平台",
+    "heroTitle": "国家级经开区绿色技术产品推广平台",
     "heroSubtitle": "推动可持续发展，共建绿色未来",
     "searchPlaceholder": "搜索绿色技术解决方案...",
     "categories": "绿色低碳技术产品分类",
@@ -70,7 +70,7 @@
     "searchTitle": "绿色技术，一键搜索",
     "joinUs": "我要加入",
     "popularSearches": "热门搜索",
-    "relatedTechnology": "相关技术",
+    "relatedTechnology": "相关技术产品",
     "categoryLabel": "产业分类",
     "subCategoryLabel": "子分类",
     "countryLabel": "国别",

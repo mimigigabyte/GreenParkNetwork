@@ -316,7 +316,87 @@ async function main() {
       const idMatch = bodyText.match(/\bID\s*(\d{3,})\b/i);
       const id = idMatch ? idMatch[1] : '';
 
-      const companyName = findValueByLabel('Owner') || findValueByLabel('Applicant') || '';
+      let companyName = findValueByLabel('Owner') || findValueByLabel('Applicant') || '';
+      if (!companyName) {
+        // Specific grid-based extraction: label in .p-col-3 and value in adjacent .p-col
+        const gridRows = all('.p-grid');
+        for (const row of gridRows) {
+          const labelEl = row.querySelector('.p-col-3, .p-col-4');
+          const valEl = row.querySelector('.p-col:not(.p-col-3):not(.p-col-4)');
+          const lab = (labelEl?.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+          if (lab === 'owner' && valEl) {
+            const a = valEl.querySelector('a');
+            const txt = (a ? a.textContent : valEl.textContent) || '';
+            const normalized = txt.replace(/\s+/g, ' ').trim();
+            if (normalized) { companyName = normalized; break; }
+          }
+        }
+      }
+      if (!companyName) {
+        // Fallback: grid rows where first cell is Owner and second cell contains an <a>
+        const rows = all('.p-grid');
+        for (const row of rows) {
+          const cells = Array.from(row.children);
+          if (!cells.length) continue;
+          const label = (cells[0]?.textContent || '').trim().toLowerCase();
+          if (label === 'owner') {
+            const valNode = cells[1] || null;
+            if (valNode) {
+              const a = valNode.querySelector('a');
+              const txt = (a ? a.textContent : valNode.textContent) || '';
+              const normalized = txt.replace(/\s+/g, ' ').trim();
+              if (normalized) { companyName = normalized; break; }
+            }
+          }
+        }
+        if (!companyName) {
+          const ownerLink = sel('a[href*="/wipogreen-database/profile"], a[href*="/wipogreen-database/profiles"], a[href*="/profiles/"]');
+          if (ownerLink) {
+            const txt = (ownerLink.textContent || '').replace(/\s+/g, ' ').trim();
+            if (txt) companyName = txt;
+          }
+        }
+        if (!companyName) {
+          // Text-based fallback: find the line after 'Owner'
+          const lines = (document.body?.innerText || '').split(/\n+/).map(s => s.trim());
+          const idx = lines.findIndex(l => /^owner$/i.test(l));
+          if (idx !== -1) {
+            for (let j = idx + 1; j < Math.min(idx + 6, lines.length); j++) {
+              const candidate = lines[j];
+              if (!candidate) continue;
+              if (/^(id|type|source|published|updated|email owner|visit website)$/i.test(candidate)) break;
+              if (/^(accessibility|terms of use|privacy policy)$/i.test(candidate)) continue;
+              companyName = candidate.replace(/\s+/g, ' ').trim();
+              if (companyName) break;
+            }
+          }
+        }
+        if (!companyName) {
+          // Card-based fallback near 'EMAIL OWNER'
+          const btns = all('a, button');
+          let container = null;
+          for (const b of btns) {
+            const t = (b.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            if (t.includes('email owner')) { container = b; break; }
+          }
+          let up = container;
+          let depth = 0;
+          while (up && depth < 6) {
+            if ((up.className || '').toString().includes('p-card') || (up.className || '').toString().includes('p-grid')) break;
+            up = up.parentElement; depth++;
+          }
+          const scope = up || document.body;
+          const text = (scope.innerText || '').split(/\n+/).map(s => s.trim()).filter(Boolean);
+          // Find last meaningful line that is not the buttons themselves
+          for (let i = text.length - 1; i >= 0; i--) {
+            const line = text[i];
+            if (/^(email owner|visit website)$/i.test(line)) continue;
+            if (/^(accessibility|terms of use|privacy policy)$/i.test(line)) continue;
+            if (/^(id|type|source|published|updated)$/i.test(line)) continue;
+            if (line.length > 2 && line.indexOf('://') === -1) { companyName = line; break; }
+          }
+        }
+      }
       const publishedDate = findValueByLabel('Published') || '';
       const updatedDate = findValueByLabel('Updated') || '';
 
@@ -484,12 +564,92 @@ async function main() {
 
         let benefitsDescription = bulletsBelow('Benefits Description') || valueNextTo('Benefits Description');
         if (!benefitsDescription) {
-          const m2 = pText.match(/Benefits\s*Description\s*\n+([\s\S]*?)(?:\n\s*\n|\n+Additional\s*Information|$)/i);
-          if (m2) {
-            const raw = (m2[1] || '').trim();
-            // Keep only bullet-like lines or short lines
-            const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
-            benefitsDescription = lines.join('\n');
+          // Enhanced DOM-first: find the exact heading element and collect ALL following content
+          let heading = null;
+          const heads = all('h1, h2, h3, h4, h5, h6, strong, b, dt, span, div');
+          for (const h of heads) {
+            const t = (h.textContent || '').trim().toLowerCase();
+            if (t === 'benefits description') { heading = h; break; }
+          }
+          if (heading) {
+            const out = [];
+            let n = heading.nextElementSibling;
+            let guard = 0;
+            // Increased guard limit and improved content collection
+            while (n && guard++ < 500) {
+              const txt = (n.innerText || n.textContent || '').trim();
+              if (txt) {
+                // More specific stop conditions - only stop for clear section headers
+                const low = txt.toLowerCase();
+                if (/^(description|additional\s*information|developed\s+in|deployed\s+in|readiness\s+level)\s*:?\s*$/.test(low)) break;
+                // Don't stop for generic "benefits" - could be part of content
+                if (/^benefits\s*:?\s*$/.test(low) && out.length > 0) break;
+                out.push(txt);
+              }
+              // Only break on clear section headers, not any header
+              const tag = (n.tagName || '').toLowerCase();
+              if (/^h[1-6]$/.test(tag)) {
+                const headerText = (n.textContent || '').trim().toLowerCase();
+                if (/^(description|additional\s*information|developed\s+in|deployed\s+in|readiness\s+level)$/.test(headerText)) break;
+              }
+              n = n.nextElementSibling;
+            }
+            
+            // Also check parent containers and following divs
+            if (!out.length && heading.parentElement) {
+              const parent = heading.parentElement;
+              let nextContainer = parent.nextElementSibling;
+              let containerGuard = 0;
+              while (nextContainer && containerGuard++ < 20) {
+                const containerText = (nextContainer.innerText || nextContainer.textContent || '').trim();
+                if (containerText && !(/^(description|additional\s*information|developed\s+in|deployed\s+in|readiness\s+level)\s*:?\s*$/i.test(containerText))) {
+                  out.push(containerText);
+                  break;
+                }
+                nextContainer = nextContainer.nextElementSibling;
+              }
+            }
+            
+            if (out.length) benefitsDescription = out.join('\n');
+          }
+          
+          // Enhanced text fallback with better content boundaries
+          if (!benefitsDescription) {
+            const lines = pText.split(/\n+/).map(s => s.trim());
+            const startIdx = lines.findIndex(l => /^benefits\s*description$/i.test(l));
+            if (startIdx !== -1) {
+              const out = [];
+              for (let i = startIdx + 1; i < lines.length; i++) {
+                const ln = lines[i];
+                if (!ln) continue;
+                // More specific stop conditions
+                if (/^(description|additional\s*information|developed\s+in|deployed\s+in|readiness\s+level)$/i.test(ln)) break;
+                out.push(ln);
+              }
+              if (out.length) benefitsDescription = out.join('\n');
+            }
+            
+            // Multiple regex patterns for better extraction
+            if (!benefitsDescription) {
+              // Try different patterns to capture content
+              const patterns = [
+                /Benefits\s*Description\s*\n+([\s\S]*?)(?:\n+Additional\s*Information|$)/i,
+                /Benefits\s*Description\s*:?\s*\n+([\s\S]*?)(?:\n+(?:Developed\s+in|Deployed\s+in|Readiness\s+level)|$)/i,
+                /Benefits\s*Description\s*:?\s*([\s\S]*?)(?:Additional\s*Information|Developed\s+in|$)/i
+              ];
+              
+              for (const pattern of patterns) {
+                const m = pText.match(pattern);
+                if (m && m[1]) {
+                  const raw = (m[1] || '').trim();
+                  const ls = raw.split('\n').map(s => s.trim()).filter(Boolean);
+                  if (ls.length) {
+                    benefitsDescription = ls.join('\n');
+                    break;
+                  }
+                }
+              }
+            }
           }
         }
         if (!benefits || !benefitsDescription) {
@@ -517,7 +677,8 @@ async function main() {
                   if (outB) {
                     // Prefer dash bullets even if they are on a single line
                     const bullets = [];
-                    const re = /[-–—•]\s+([^\n]+)/g; // capture text after common bullet markers
+                    // capture after common bullet markers or checkmarks
+                    const re = /(?:[-–—•✓]\s+)([^\n]+)/g;
                     let m;
                     while ((m = re.exec(outB)) !== null) {
                       const item = (m[1] || '').trim();

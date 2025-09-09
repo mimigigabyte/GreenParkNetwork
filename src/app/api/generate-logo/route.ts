@@ -24,7 +24,7 @@ function generateLogoServer(companyName: string, size: number = 256): Buffer {
   // 创建SVG - 严格参考eo.jpg的亮绿色背景和布局
   const svg = `
     <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#84c7a3" rx="8" ry="8"/>
+      <rect width="100%" height="100%" fill="#00b899" rx="8" ry="8"/>
       <text x="${centerX - spacing/2}" y="${centerY - spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[0] || ''}</text>
       <text x="${centerX + spacing/2}" y="${centerY - spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[1] || ''}</text>
       <text x="${centerX - spacing/2}" y="${centerY + spacing/2}" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">${firstFourChars[2] || ''}</text>

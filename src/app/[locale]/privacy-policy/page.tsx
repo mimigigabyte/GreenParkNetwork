@@ -61,7 +61,7 @@ export default function PrivacyPolicyLocalePage({ params }: PageProps) {
             <h2 className="text-xl font-bold text-gray-900 mb-6">
               {isEn
                 ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform — Privacy Policy'
-                : '国家级经开区绿色低碳技术推广平台隐私条款'}
+                : '国家级经开区绿色技术产品推广平台隐私条款'}
             </h2>
 
             <div className="space-y-6 text-gray-700">
@@ -247,7 +247,7 @@ export default function PrivacyPolicyLocalePage({ params }: PageProps) {
                   <div className="mt-2 text-sm">
                     <p>邮箱：privacy@green-tech-platform.com</p>
                     <p>电话：400-123-4567</p>
-                    <p>地址：国家级经开区绿色低碳技术推广平台</p>
+                    <p>地址：国家级经开区绿色技术产品推广平台</p>
                   </div>
                 )}
               </section>

@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="prose prose-gray max-w-none">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">国家级经开区绿色低碳技术推广平台隐私条款</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">国家级经开区绿色技术产品推广平台隐私条款</h2>
             
             <div className="space-y-6 text-gray-700">
               <section>
@@ -151,7 +151,7 @@ export default function PrivacyPolicy() {
                 <div className="mt-2 text-sm">
                   <p>邮箱：privacy@green-tech-platform.com</p>
                   <p>电话：400-123-4567</p>
-                  <p>地址：国家级经开区绿色低碳技术推广平台</p>
+                  <p>地址：国家级经开区绿色技术产品推广平台</p>
                 </div>
               </section>
 

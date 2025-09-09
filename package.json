@@ -13,12 +13,14 @@
     "crawl:wipo:article": "node scripts/playwright/scrape-wipo-article.js",
     "crawl:wipo:csv:first3": "node scripts/playwright/batch-scrape-wipo-from-csv.js data/search-results-2025-09-04.csv --limit 3",
     "crawl:wipo:csv": "node scripts/playwright/batch-scrape-wipo-from-csv.js data/search-results-2025-09-04.csv",
-    "aggregate:wipo:csv": "node scripts/aggregate-wipo-from-csv.js data/search-results-2025-09-04.csv"
+    "aggregate:wipo:csv": "node scripts/aggregate-wipo-from-csv.js data/search-results-2025-09-04.csv",
+    "import:wipo:first3": "node scripts/import-wipo-to-supabase.js --limit 3"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@google-cloud/translate": "^9.2.0",
     "@hookform/resolvers": "^5.2.1",
     "@modelcontextprotocol/sdk": "^1.17.3",
     "@radix-ui/react-avatar": "^1.1.10",

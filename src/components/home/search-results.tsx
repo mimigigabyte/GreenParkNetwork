@@ -351,7 +351,7 @@ export function SearchResults({
                      <img
                        src={product.solutionThumbnail || product.solutionImage}
                        alt={locale === 'en' ? (product.solutionTitleEn || product.solutionTitle) : product.solutionTitle}
-                       className="w-full h-64 object-cover rounded-lg"
+                       className="w-full h-64 object-contain rounded-lg bg-white"
                        onError={(e) => {
                          const target = e.target as HTMLImageElement;
                          target.src = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
@@ -368,26 +368,45 @@ export function SearchResults({
                       
                       {/* 简介文字 - 最多6行 */}
                       <div className="mb-4">
-                        <p className="text-gray-700"
-                        style={
-                          !expandedDescriptions.has(product.id)
-                            ? {
-                                display: '-webkit-box',
-                                WebkitLineClamp: 6,
-                                WebkitBoxOrient: 'vertical' as const,
-                                overflow: 'hidden',
-                                lineHeight: '1.5',
-                                fontSize: '1rem'
+                        {(() => {
+                          const text = (locale === 'en'
+                            ? (product.fullDescriptionEn || product.solutionDescriptionEn || product.fullDescription || product.solutionDescription)
+                            : (product.fullDescription || product.solutionDescription)) || '';
+                          const lines = String(text).split(/\r?\n/);
+                          const makeFragments = () => {
+                            const fragments: (string | JSX.Element)[] = [];
+                            const labelRe = /^(\s*(?:Description|Benefit\s+Types|Benefit\s+Details|Deployed\s+In|Technology\s+Readiness\s+Level|ID)\s*:|(?:技术描述|收益类型|收益描述|应用地区和国家|技术成熟度|ID)\s*：)/;
+                            lines.forEach((line, idx) => {
+                              const m = line.match(labelRe);
+                              if (m) {
+                                const label = m[1];
+                                const rest = line.slice(label.length);
+                                fragments.push(<strong key={`l-${idx}`}>{label.trim()}</strong>);
+                                fragments.push(rest);
+                              } else {
+                                fragments.push(line);
                               }
-                            : {
-                                lineHeight: '1.5'
-                              }
-                        }>
-                          {locale === 'en' ? 
-                            (product.fullDescriptionEn || product.solutionDescriptionEn || product.fullDescription || product.solutionDescription) : 
-                            (product.fullDescription || product.solutionDescription)}
-                        </p>
-                        
+                              if (idx !== lines.length - 1) fragments.push('\n');
+                            });
+                            return fragments;
+                          };
+                          const styleCollapsed = {
+                            display: '-webkit-box',
+                            WebkitLineClamp: 6,
+                            WebkitBoxOrient: 'vertical' as const,
+                            overflow: 'hidden',
+                            lineHeight: '1.5',
+                            fontSize: '1rem',
+                            whiteSpace: 'pre-line' as const
+                          };
+                          const styleExpanded = { lineHeight: '1.5', whiteSpace: 'pre-line' as const };
+                          return (
+                            <p className="text-gray-700" style={expandedDescriptions.has(product.id) ? styleExpanded : styleCollapsed}>
+                              {makeFragments()}
+                            </p>
+                          );
+                        })()}
+                      
                         {/* 展开更多按钮 */}
                         {(product.fullDescription || product.solutionDescription.length > 3000) && (
                           <button

@@ -36,7 +36,13 @@
 │   │   │   └── page.tsx      # 企业信息完善页面组件
 │   │   └── api/              # API路由
 │   │       ├── auth/         # 认证相关API
-│   │       └── company/      # 企业信息相关API
+│   │       ├── company/      # 企业信息相关API
+│   │       └── admin/        # 管理后台API
+│   │           └── wipo-scraper/   # WIPO数据抓取与导入
+│   │               ├── scrape/route.ts        # 单条抓取
+│   │               ├── process/route.ts       # 本地处理与拼装
+│   │               ├── import/route.ts        # 单条导入（包含图片、国家、公司Logo处理）
+│   │               └── batch-import/route.ts  # 批量导入（复用导入逻辑）
 │   ├── components/            # React组件
 │   │   ├── ui/               # shadcn/ui基础组件
 │   │   │   └── button.tsx    # 按钮组件
@@ -276,7 +282,7 @@ node scripts/mcp/run-mcp-tool.js \
   - 统一使用绿色主题（#00b899）的链接和登录按钮
   - 右侧使用浅蓝色背景，展示绿盟logo和平台名称
   - 右侧布局：logo在左侧，文字在右侧，水平对齐显示
-  - 右侧显示：绿盟logo.png图片（48x48）+ "国家级经开区绿色低碳技术推广平台" + 英文副标题
+  - 右侧显示：绿盟logo.png图片（48x48）+ "国家级经开区绿色技术产品推广平台" + 英文副标题
   - 尺寸优化：logo和文字尺寸适中，确保在一行中良好显示
   - 弹窗高度：调整为500px，内容布局更紧凑
   - 顶部对齐：左侧登录表单和右侧logo文字都保持在页面顶部

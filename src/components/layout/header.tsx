@@ -72,7 +72,7 @@ export function Header() {
             
             <div>
               <h1 className={`font-bold text-gray-900 ${locale === 'en' ? 'text-lg' : 'text-xl'}`}>
-                {locale === 'en' ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform' : '国家级经开区绿色低碳技术推广平台'}
+                {locale === 'en' ? 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform' : '国家级经开区绿色技术产品推广平台'}
               </h1>
               <p className="text-xs text-gray-500">
                 National Economic Development Zone Green Low-Carbon Technology Promotion Platform

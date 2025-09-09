@@ -89,6 +89,13 @@ const menuItems: MenuItem[] = [
     icon: Lightbulb,
     href: '/admin/technologies'
   }
+  ,
+  {
+    id: 'wipo-scraper',
+    label: 'WIPO数据爬虫',
+    icon: Lightbulb,
+    href: '/admin/wipo-scraper'
+  }
 ]
 
 export function AdminSidebar() {
