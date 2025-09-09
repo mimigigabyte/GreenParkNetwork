@@ -26,6 +26,7 @@ function HomePageContent({ locale }: { locale: string }) {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [products, setProducts] = useState<TechProduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
   
   // 统一的筛选状态管理
   const [filterState, setFilterState] = useState({
@@ -223,6 +224,7 @@ function HomePageContent({ locale }: { locale: string }) {
   // 处理搜索
   const handleSearch = async (keyword: string) => {
     try {
+      setSearchKeyword(keyword || '');
       const searchParams: SearchParams = {
         keyword,
         category: selectedCategory,
@@ -418,6 +420,7 @@ function HomePageContent({ locale }: { locale: string }) {
           locale={locale}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
+          highlightKeyword={searchKeyword}
         />
       </main>
       

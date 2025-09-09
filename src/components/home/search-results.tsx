@@ -23,6 +23,8 @@ interface SearchResultsProps {
   // 分页器新增参数
   pageSize?: number;
   onPageSizeChange?: (pageSize: number) => void;
+  // 搜索关键词，用于高亮标题与描述中的匹配片段
+  highlightKeyword?: string;
 }
 
 export function SearchResults({ 
@@ -37,7 +39,8 @@ export function SearchResults({
   onSortChange,
   locale,
   pageSize = 20,
-  onPageSizeChange
+  onPageSizeChange,
+  highlightKeyword
 }: SearchResultsProps) {
   const { user } = useAuthContext();
   const t = useTranslations('home');
@@ -134,6 +137,47 @@ export function SearchResults({
 
   const currentSortOption = sortOptions.find(option => option.value === currentSort);
   const CurrentIcon = currentSortOption?.icon || Clock;
+
+  // 将搜索关键词拆分成可匹配的子词，英文按空白/标点分词，中文保持原样
+  const buildKeywords = (kw?: string) => {
+    if (!kw) return [] as string[];
+    const trimmed = kw.trim();
+    if (!trimmed) return [] as string[];
+    // 拆分：中文不分，英文按非字母数字分割
+    const parts = trimmed
+      .split(/\s+|[\,\.\;\:!\?\-\_\(\)\[\]\{\}\|\/+]+/)
+      .filter(Boolean);
+    // 若只有中文或未能拆分，返回原串
+    return parts.length ? parts : [trimmed];
+  };
+
+  const highlightTokens = buildKeywords(highlightKeyword);
+
+  // 高亮函数：将文本中匹配到的关键词片段用黄色背景标注
+  const highlightText = (text: string): (string | JSX.Element)[] => {
+    if (!highlightTokens.length || !text) return [text];
+    try {
+      const escaped = highlightTokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+      const segments = String(text).split(regex);
+      const nodes: (string | JSX.Element)[] = [];
+      segments.forEach((seg, i) => {
+        if (!seg) return;
+        if (regex.test(seg)) {
+          nodes.push(
+            <mark key={`h-${i}`} className="bg-yellow-200 text-gray-900 rounded px-0.5">
+              {seg}
+            </mark>
+          );
+        } else {
+          nodes.push(seg);
+        }
+      });
+      return nodes;
+    } catch {
+      return [text];
+    }
+  };
 
   // 从URL中提取或生成有意义的文件名
   const getDisplayFilename = (url: string, originalName?: string) => {
@@ -363,7 +407,12 @@ export function SearchResults({
                    <div className="lg:w-3/4 flex flex-col justify-between">
                     <div>
                       <h4 className="text-xl font-bold text-gray-900 mb-4">
-                        {locale === 'en' ? (product.solutionTitleEn || product.solutionTitle) : product.solutionTitle}
+                        {(() => {
+                          const title = locale === 'en' 
+                            ? (product.solutionTitleEn || product.solutionTitle) 
+                            : product.solutionTitle;
+                          return highlightText(title || '');
+                        })()}
                       </h4>
                       
                       {/* 简介文字 - 最多6行 */}
@@ -382,9 +431,9 @@ export function SearchResults({
                                 const label = m[1];
                                 const rest = line.slice(label.length);
                                 fragments.push(<strong key={`l-${idx}`}>{label.trim()}</strong>);
-                                fragments.push(rest);
+                                fragments.push(...highlightText(rest));
                               } else {
-                                fragments.push(line);
+                                fragments.push(...highlightText(line));
                               }
                               if (idx !== lines.length - 1) fragments.push('\n');
                             });
