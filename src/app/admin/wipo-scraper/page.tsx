@@ -590,7 +590,7 @@ function ImageRow({ label, left, right }: { label: string, left?: string | null,
   )
 }
 
-export function DuplicateCompareModal({ open, oldRec, newItem, categories, subcategories, onClose }: any) {
+function DuplicateCompareModal({ open, oldRec, newItem, categories, subcategories, onClose }: any) {
   if (!open) return null
   // 映射新数据的类别名称（从页面已有的列表取）
   const newCatName = categories.find((c: any) => c.id === newItem?.category_id)?.name_zh || ''
