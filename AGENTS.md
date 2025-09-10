@@ -3,26 +3,27 @@
 This file provides guidance to Codex when working with code in this repository.
 ## 技术栈
 - 前端使用Next.js技术+Tailwind CSS框架 
-- 移动端APP开发使用React Native 
+- 移动端H5页面开发使用React+Next.js  
 - 尽量使用shadcn/ui现成的组件,加上Radix UI 和 Framer Motion
 - 使用GitHub 作为代码托管平台
 - 使用Upstash Redis作为边缘缓存服务
 - 后端使用FastAPI
-- 数据ORM使用Drizzle
+- 数据ORM使用Prisma
 - 邮件服务使用Resend
 - 使用Cloudflare作为CDN网络服务
 - 使用Vercel进行一键部署
 - 使用Open Router作为多模型AI接口
 - 使用Stripe和微信支付作为安全支付服务
+
+
+## 项目结构
+- 每次更新完文件都需要更新项目结构目录，信息在  [README.md](/docs/README.md) 中
+- 使用真实的 UI 图片，而非占位符图片（可从 Unsplash、Pexels、Apple 官方 UI 资源中选择）
 - 所有调用后端服务都必须使用API，目录在src/api
 - 你在进行页面开发时，可以扫描 @README.md 的项目结构，查看是否有可用的组件或工具方法
 - 所有调用后端服务都必须使用API，目录在src/api
 - 页面的组件嵌套不要超过三层
 - 你在进行页面开发时，可以扫描 [README.md](/docs/README.md) 的项目结构，看下是否有可用的组件或者工具方法
-
-## 项目结构
-- 每次更新完文件都需要更新项目结构目录，信息在  [README.md](/docs/README.md) 中
-- 使用真实的 UI 图片，而非占位符图片（可从 Unsplash、Pexels、Apple 官方 UI 资源中选择）
 
 ## 限制
 - 不要在前端页面中定义测试数据，所有的数据必须来自后端服务或mock接口
