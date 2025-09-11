@@ -137,12 +137,11 @@ export default function MobileLoginPage() {
                 <input type="text" value={code} onChange={(e)=>setCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
                 <button type="button" onClick={handleSendCode} disabled={sending||countdown>0||!isValidPhone(phone,'+86')} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${sending||countdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{countdown>0?`${countdown}s`:'发送验证码'}</button>
               </div>
-              {/* 辅助链接 */}
-              <div className="flex items-center justify-between text-[13px] mt-1">
+              {/* 辅助链接（验证码登录不显示“忘记密码”） */}
+              <div className="flex items-center justify-start text-[13px] mt-1 gap-3">
                 <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
                   没有账户？<span className="text-[#00b899]">立即注册</span>
                 </button>
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">忘记密码</button>
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
             </form>
@@ -159,8 +158,8 @@ export default function MobileLoginPage() {
         </div>
       </div>
 
-      {/* 协议放到页面底部，字号更小 */}
-      <div className="px-3 mt-3 text-[11px] text-gray-500 text-center">
+      {/* 协议固定在页面底部（登录页无底部导航） */}
+      <div className="px-3 mt-auto pb-6 text-[11px] text-gray-500 text-center">
         <label className="inline-flex items-center gap-2 cursor-pointer">
           <input type="checkbox" defaultChecked className="accent-[#6b6ee2] w-3.5 h-3.5 rounded" />
           <span>
