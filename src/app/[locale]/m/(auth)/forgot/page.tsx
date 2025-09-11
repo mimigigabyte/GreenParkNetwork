@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators'
 import { authApi } from '@/api/auth'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
+import { ArrowLeft } from 'lucide-react'
 
 export default function MobileForgotPasswordPage() {
   return (
@@ -105,6 +106,37 @@ function ForgotContent() {
 
   return (
     <div className="px-3 pt-12 pb-6 flex-1">
+      {/* 顶部左侧返回按钮（iPhone 安全区适配，固定视口） */}
+      <div
+        className="fixed z-50"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          left: 'calc(env(safe-area-inset-left, 0px) + 8px)'
+        }}
+      >
+        <button
+          onClick={() => {
+            try {
+              // Prefer history back if available and referrer is same-origin
+              // @ts-ignore idx from Next.js
+              const idx = (window.history as any)?.state?.idx
+              const sameOriginReferrer = document.referrer && (() => { try { return new URL(document.referrer).origin === window.location.origin } catch { return false } })()
+              if ((typeof idx === 'number' && idx > 0) || sameOriginReferrer) {
+                router.back()
+              } else {
+                router.replace(`/${locale}/m/login`)
+              }
+            } catch {
+              router.replace(`/${locale}/m/login`)
+            }
+          }}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/80 backdrop-blur border border-gray-200 text-gray-700 hover:bg-white"
+          aria-label={locale==='en' ? 'Back' : '返回'}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-[12px]">{locale==='en' ? 'Back' : '返回'}</span>
+        </button>
+      </div>
       <div className="mx-auto w-full max-w-[360px] rounded-[18px] bg-white/70 backdrop-blur-md p-4 shadow-sm border border-white/50">
         <h1 className="text-[16px] font-semibold text-gray-900 text-center mb-3">{locale==='en'?'Password Recovery':'密码找回'}</h1>
 
@@ -143,4 +175,3 @@ function ForgotContent() {
     </div>
   )
 }
-
