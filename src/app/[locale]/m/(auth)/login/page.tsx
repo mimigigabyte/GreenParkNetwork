@@ -233,7 +233,7 @@ function LoginContent() {
           right: 'calc(env(safe-area-inset-right, 0px) + 8px)'
         }}
       >
-        <LanguageSwitcher className="text-[12px]" />
+        <LanguageSwitcher className="text-[12px]" hideIcon />
       </div>
       {/* 顶部 Logo 与标题（更紧凑） */}
       <div className="px-4 pt-10 pb-4 text-center">
@@ -249,10 +249,10 @@ function LoginContent() {
           {/* Tabs：根据模式切换标题 */}
           <div className="mb-3 grid grid-cols-2 bg-[#f5f6ff] rounded-full p-0.5">
             <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
-              {isRegister ? '邮箱注册' : '密码登录'}
+              {isRegister ? (locale==='en' ? 'Email Register' : '邮箱注册') : t('loginWithPassword')}
             </button>
             <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
-              {isRegister ? '手机验证码注册' : '验证码登录'}
+              {isRegister ? (locale==='en' ? 'Phone Code Register' : '手机验证码注册') : t('loginWithVerification')}
             </button>
           </div>
 
@@ -266,12 +266,10 @@ function LoginContent() {
               </div>
               {/* 辅助链接：注册 / 忘记密码 */}
               <div className="flex items-center justify-between text-[13px] mt-1">
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
-                  没有账户？<span className="text-[#00b899]">立即注册</span>
-                </button>
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">忘记密码</button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">{t('switchToRegister')}</button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">{t('forgotPassword')}</button>
               </div>
-              <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
+              <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('login')}</button>
             </form>
             ) : (
               <form className="space-y-3" onSubmit={handleSmsLogin}>
@@ -283,11 +281,9 @@ function LoginContent() {
               </div>
               {/* 辅助链接（验证码登录不显示“忘记密码”） */}
               <div className="flex items-center justify-start text-[13px] mt-1 gap-3">
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
-                  没有账户？<span className="text-[#00b899]">立即注册</span>
-                </button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">{t('switchToRegister')}</button>
               </div>
-              <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
+              <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('login')}</button>
             </form>
             )
           ) : (
@@ -307,11 +303,9 @@ function LoginContent() {
                   <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
                 </div>
                 <div className="flex items-center justify-between text-[13px] mt-1">
-                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
-                    已有账户？<span className="text-[#00b899]">去登录</span>
-                  </button>
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">{t('switchToLogin')}</button>
                 </div>
-                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>注册</button>
+                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('register')}</button>
               </form>
             ) : (
               <form className="space-y-3" onSubmit={handleRegister}>
@@ -329,11 +323,9 @@ function LoginContent() {
                   <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
                 </div>
                 <div className="flex items-center justify-between text-[13px] mt-1">
-                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
-                    已有账户？<span className="text-[#00b899]">去登录</span>
-                  </button>
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">{t('switchToLogin')}</button>
                 </div>
-                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>注册</button>
+                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('register')}</button>
               </form>
             )
           )}
@@ -344,7 +336,7 @@ function LoginContent() {
           <div className="mt-5 text-center">
             <button type="button" className="inline-flex items-center gap-2 text-gray-700 text-[14px]">
               <img src="/images/icons/微信.png" alt="wechat" className="w-4 h-4"/>
-              <span className="text-[12px]">微信登录</span>
+              <span className="text-[12px]">{locale==='en' ? 'WeChat Login' : '微信登录'}</span>
             </button>
           </div>
         </>

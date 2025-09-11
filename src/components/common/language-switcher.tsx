@@ -10,7 +10,9 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
+type LanguageSwitcherProps = { className?: string; hideIcon?: boolean }
+
+export function LanguageSwitcher({ className = '', hideIcon = false }: LanguageSwitcherProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -50,7 +52,7 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
         className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
         title={t('language')}
       >
-        <Globe className="w-4 h-4" />
+        {!hideIcon && <Globe className="w-4 h-4" />}
         <span className="flex items-center space-x-1">
           <span>{currentLangData?.flag}</span>
           <span>{currentLangData?.name}</span>
