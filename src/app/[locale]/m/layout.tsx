@@ -14,10 +14,10 @@ export default function MobileLayout({
   const pathname = usePathname()
   const tabs = useMemo(
     () => [
-      { key: 'home', labelZh: '首页', labelEn: 'Home', href: `/m/${locale}/home` },
-      { key: 'console', labelZh: '控制台', labelEn: 'Console', href: `/m/${locale}/console` },
-      { key: 'chat', labelZh: '对话', labelEn: 'Chat', href: `/m/${locale}/chat` },
-      { key: 'me', labelZh: '我的', labelEn: 'Me', href: `/m/${locale}/me` },
+      { key: 'home', labelZh: '首页', labelEn: 'Home', href: `/${locale}/m/home` },
+      { key: 'console', labelZh: '控制台', labelEn: 'Console', href: `/${locale}/m/console` },
+      { key: 'chat', labelZh: '对话', labelEn: 'Chat', href: `/${locale}/m/chat` },
+      { key: 'me', labelZh: '我的', labelEn: 'Me', href: `/${locale}/m/me` },
     ],
     [locale],
   )
@@ -45,4 +45,3 @@ export default function MobileLayout({
     </div>
   )
 }
-
