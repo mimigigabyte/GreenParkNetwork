@@ -85,7 +85,7 @@ export default function MobileLoginPage() {
     if (!code) { alert(locale==='en'?'Please enter verification code':'请输入验证码'); return }
     setLoading(true)
     try {
-      const r = await tencentSmsAuthApi.phoneCodeLogin({ phone, phoneCode: code, countryCode: '+86' })
+      const r = await tencentSmsAuthApi.phoneCodeLogin({ phone, code, countryCode: '+86' })
       if (r.success && r.data) {
         localStorage.setItem('access_token', r.data.token)
         if (r.data.refreshToken) localStorage.setItem('refresh_token', r.data.refreshToken)
@@ -159,4 +159,3 @@ export default function MobileLoginPage() {
     </section>
   )
 }
-
