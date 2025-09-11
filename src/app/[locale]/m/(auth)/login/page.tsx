@@ -271,7 +271,7 @@ function LoginContent() {
                 <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
                   {locale==='en' ? (<><span>Don't have an account? </span><span className="text-[#00b899]">Sign up</span></>) : (<><span>还没有账户？</span><span className="text-[#00b899]">立即注册</span></>)}
                 </button>
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">{locale==='en' ? 'Forgot Password?' : '忘记密码'}</button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/forgot`)} className="text-[#00b899]">{locale==='en' ? 'Forgot Password?' : '忘记密码'}</button>
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('login')}</button>
             </form>

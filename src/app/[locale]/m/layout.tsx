@@ -26,7 +26,7 @@ export default function MobileLayout({
   const isEn = locale === 'en'
   const { user } = useAuthContext()
   // Route groups like (auth) are not part of URL; detect auth pages explicitly
-  const isAuthPage = pathname?.startsWith(`/${locale}/m/login`) ?? false
+  const isAuthPage = !!(pathname && (pathname.startsWith(`/${locale}/m/login`) || pathname.startsWith(`/${locale}/m/forgot`)))
   // Only show bottom nav after login and not on auth pages
   const showNav = Boolean(user) && !isAuthPage
 
