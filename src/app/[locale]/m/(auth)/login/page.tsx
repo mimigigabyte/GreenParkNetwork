@@ -93,7 +93,10 @@ export default function MobileLoginPage() {
       if (r.success) {
         setCountdown(60)
         const timer = setInterval(() => setCountdown(p => { if (p <= 1) { clearInterval(timer); return 0 } return p - 1 }), 1000)
-      } else { alert(r.error || (locale==='en'?'Failed to send code':'发送验证码失败')) }
+      } else {
+        const errMsg = ('error' in r ? (r as any).error : ('message' in r ? (r as any).message : undefined)) as string | undefined
+        alert(errMsg || (locale==='en'?'Failed to send code':'发送验证码失败'))
+      }
     } finally { setSending(false) }
   }
 
@@ -108,7 +111,10 @@ export default function MobileLoginPage() {
         localStorage.setItem('access_token', r.data.token)
         if (r.data.refreshToken) localStorage.setItem('refresh_token', r.data.refreshToken)
         await checkUser(); alert(locale==='en'?'Login successful':'登录成功'); goAfterLogin()
-      } else { alert(r.error || (locale==='en'?'Login failed':'登录失败')) }
+      } else {
+        const errMsg = ('error' in r ? (r as any).error : ('message' in r ? (r as any).message : undefined)) as string | undefined
+        alert(errMsg || (locale==='en'?'Login failed':'登录失败'))
+      }
     } finally { setLoading(false) }
   }
 
@@ -144,7 +150,8 @@ export default function MobileLoginPage() {
           alert(locale==='en'?'Verification code sent':'验证码已发送')
         }
       } else {
-        alert(r.error || (locale==='en'?'Failed to send code':'发送验证码失败'))
+        const errMsg = ('error' in r ? (r as any).error : ('message' in r ? (r as any).message : undefined)) as string | undefined
+        alert(errMsg || (locale==='en'?'Failed to send code':'发送验证码失败'))
       }
     } finally {
       setRegSending(false)
