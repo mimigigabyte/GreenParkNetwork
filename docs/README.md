@@ -27,6 +27,15 @@
 ├── docs/                      # 项目文档
 ├── src/                       # 前端源代码
 │   ├── app/                   # Next.js App Router
+│   │   ├── m/                 # 移动端(H5)路由（与Web并存）
+│   │   │   └── [locale]/
+│   │   │       ├── (auth)/login/page.tsx   # 移动端登录
+│   │   │       ├── layout.tsx              # 移动端共享布局（底部Tab）
+│   │   │       ├── page.tsx                # 重定向到 /home
+│   │   │       ├── home/page.tsx           # 移动端首页
+│   │   │       ├── console/page.tsx        # 移动端控制台
+│   │   │       ├── chat/page.tsx           # 移动端对话
+│   │   │       └── me/page.tsx             # 移动端我的
 │   │   ├── globals.css       # 全局样式文件
 │   │   ├── layout.tsx        # 根布局组件
 │   │   ├── page.tsx          # 首页组件
