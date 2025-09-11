@@ -8,9 +8,10 @@ import { locales, type Locale } from '@/i18n/request';
 
 interface LanguageSwitcherProps {
   className?: string;
+  hideIcon?: boolean;
 }
 
-type LanguageSwitcherProps = { className?: string; hideIcon?: boolean }
+
 
 export function LanguageSwitcher({ className = '', hideIcon = false }: LanguageSwitcherProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -28,6 +28,8 @@ function LoginContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const t = useTranslations('auth')
+  const th = useTranslations('home')
+  const tf = useTranslations('footer')
   const { checkUser } = useAuthContext()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
@@ -240,19 +242,19 @@ function LoginContent() {
         <div className="mx-auto w-12 h-12 relative rounded-md overflow-hidden shadow-sm">
           <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
         </div>
-        <h1 className="mt-2 text-[15px] font-medium text-gray-900">国家级经开区绿色技术产品推广平台</h1>
+        <h1 className="mt-2 text-[15px] font-medium text-gray-900">{th('heroTitle')}</h1>
       </div>
 
       {/* 卡片容器（更靠下 + 毛玻璃效果） */}
       <div className="px-3 mt-4">
         <div className="mx-auto w-full max-w-[360px] rounded-[18px] bg-white/60 backdrop-blur-md p-4 shadow-sm border border-white/40">
-          {/* Tabs：根据模式切换标题 */}
+          {/* Tabs：根据模式切换标题（国际化） */}
           <div className="mb-3 grid grid-cols-2 bg-[#f5f6ff] rounded-full p-0.5">
             <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
               {isRegister ? (locale==='en' ? 'Email Register' : '邮箱注册') : t('loginWithPassword')}
             </button>
             <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
-              {isRegister ? (locale==='en' ? 'Phone Code Register' : '手机验证码注册') : t('loginWithVerification')}
+              {isRegister ? (locale==='en' ? 'SMS Register' : '手机验证码注册') : (locale==='en' ? 'Login with SMS' : t('loginWithVerification'))}
             </button>
           </div>
 
@@ -266,8 +268,10 @@ function LoginContent() {
               </div>
               {/* 辅助链接：注册 / 忘记密码 */}
               <div className="flex items-center justify-between text-[13px] mt-1">
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">{t('switchToRegister')}</button>
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">{t('forgotPassword')}</button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
+                  {locale==='en' ? (<><span>Don't have an account? </span><span className="text-[#00b899]">Sign up</span></>) : (<><span>还没有账户？</span><span className="text-[#00b899]">立即注册</span></>)}
+                </button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">{locale==='en' ? 'Forgot Password?' : '忘记密码'}</button>
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('login')}</button>
             </form>
@@ -277,11 +281,13 @@ function LoginContent() {
               {/* 内嵌按钮的验证码输入框 */}
               <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
                 <input type="text" value={code} onChange={(e)=>setCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
-                <button type="button" onClick={handleSendCode} disabled={sending||countdown>0||!isValidPhone(phone,'+86')} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${sending||countdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{countdown>0?`${countdown}s`:'发送验证码'}</button>
+                <button type="button" onClick={handleSendCode} disabled={sending||countdown>0||!isValidPhone(phone,'+86')} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${sending||countdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{countdown>0?`${countdown}s`:t('sendVerificationCode')}</button>
               </div>
               {/* 辅助链接（验证码登录不显示“忘记密码”） */}
               <div className="flex items-center justify-start text-[13px] mt-1 gap-3">
-                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">{t('switchToRegister')}</button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
+                  {locale==='en' ? (<><span>Don't have an account? </span><span className="text-[#00b899]">Sign up</span></>) : (<><span>还没有账户？</span><span className="text-[#00b899]">立即注册</span></>)}
+                </button>
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('login')}</button>
             </form>
@@ -292,7 +298,7 @@ function LoginContent() {
                 <input type="email" value={regEmail} onChange={(e)=>setRegEmail(e.target.value)} placeholder={locale==='en'?'Email address':'邮箱地址'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
                 <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
                   <input type="text" value={regCode} onChange={(e)=>setRegCode(e.target.value)} placeholder={locale==='en'?'Email code':'邮箱验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
-                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidEmail(regEmail)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:'发送验证码'}</button>
+                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidEmail(regEmail)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:t('sendVerificationCode')}</button>
                 </div>
                 <div className="relative">
                   <input type={regShowPassword?'text':'password'} value={regPassword} onChange={(e)=>setRegPassword(e.target.value)} placeholder={locale==='en'?'Set password':'设置密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
@@ -303,7 +309,9 @@ function LoginContent() {
                   <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
                 </div>
                 <div className="flex items-center justify-between text-[13px] mt-1">
-                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">{t('switchToLogin')}</button>
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
+                    {locale==='en' ? (<><span>Already have an account? </span><span className="text-[#00b899]">Sign in</span></>) : (<><span>已有账户？</span><span className="text-[#00b899]">立即登录</span></>)}
+                  </button>
                 </div>
                 <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('register')}</button>
               </form>
@@ -312,7 +320,7 @@ function LoginContent() {
                 <input type="tel" value={regPhone} onChange={(e)=>setRegPhone(e.target.value)} placeholder={locale==='en'?'Phone number':'输入手机号'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
                 <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
                   <input type="text" value={regCode} onChange={(e)=>setRegCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
-                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidPhone(regPhone,countryCode)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:'发送验证码'}</button>
+                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidPhone(regPhone,countryCode)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:t('sendVerificationCode')}</button>
                 </div>
                 <div className="relative">
                   <input type={regShowPassword?'text':'password'} value={regPassword} onChange={(e)=>setRegPassword(e.target.value)} placeholder={locale==='en'?'Set password':'设置密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
@@ -323,7 +331,19 @@ function LoginContent() {
                   <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
                 </div>
                 <div className="flex items-center justify-between text-[13px] mt-1">
-                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">{t('switchToLogin')}</button>
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
+                    {locale==='en' ? (
+                      <>
+                        <span>Already have an account? </span>
+                        <span className="text-[#00b899]">Sign in</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>已有账户？</span>
+                        <span className="text-[#00b899]">立即登录</span>
+                      </>
+                    )}
+                  </button>
                 </div>
                 <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>{t('register')}</button>
               </form>
@@ -350,9 +370,9 @@ function LoginContent() {
         <label className="inline-flex items-center gap-2 cursor-pointer">
           <input type="checkbox" defaultChecked className="accent-[#6b6ee2] w-3.5 h-3.5 rounded" />
           <span>
-            我已阅读并同意
-            <a href={`/${locale}/terms-of-service`} target="_blank" className="mx-1 text-[#6b6ee2] underline">《用户协议》</a>
-            <a href={`/${locale}/privacy-policy`} target="_blank" className="text-[#6b6ee2] underline">《隐私政策》</a>
+            {locale==='en' ? 'I have read and agree to the' : '我已阅读并同意'}
+            <a href={`/${locale}/terms-of-service`} target="_blank" className="mx-1 text-[#6b6ee2] underline">《{tf('termsOfService')}》</a>
+            <a href={`/${locale}/privacy-policy`} target="_blank" className="text-[#6b6ee2] underline">《{tf('privacyPolicy')}》</a>
           </span>
         </label>
       </div>
