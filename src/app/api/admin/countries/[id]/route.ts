@@ -34,6 +34,36 @@ async function getCountryFlag(countryName: string, countryCode: string): Promise
   }
 }
 
+function clip(v: any, max: number): string | null {
+  if (v == null) return null
+  const s = String(v)
+  return s.length <= max ? s : s.slice(0, max)
+}
+
+async function uploadDataUrlToStorage(dataUrl: string, code: string): Promise<string | null> {
+  try {
+    const m = dataUrl.match(/^data:(.+?);base64,(.*)$/)
+    if (!m) return null
+    const mime = m[1]
+    const b64 = m[2]
+    const buffer = Buffer.from(b64, 'base64')
+    const ext = mime.includes('png') ? 'png' : mime.includes('svg') ? 'svg' : mime.includes('webp') ? 'webp' : 'jpg'
+    const objectPath = `country-flags/${code.toLowerCase()}-${Date.now()}.${ext}`
+    const { error: upErr } = await supabase.storage
+      .from('images')
+      .upload(objectPath, buffer, { contentType: mime, upsert: true })
+    if (upErr) {
+      console.warn('上传国别图片到存储失败:', upErr.message)
+      return null
+    }
+    const { data } = supabase.storage.from('images').getPublicUrl(objectPath)
+    return data.publicUrl || null
+  } catch (e: any) {
+    console.warn('解析/上传 data URL 失败:', e?.message || e)
+    return null
+  }
+}
+
 // PUT - 更新国家
 export async function PUT(
   request: NextRequest,
@@ -64,17 +94,26 @@ export async function PUT(
       return NextResponse.json({ error: '国家代码已存在，请使用其他代码' }, { status: 400 })
     }
 
-    // 如果没有提供logo_url，自动获取国旗
+    // 如果没有提供logo_url，自动获取国旗；若提供的是 data: URL，上传到存储后改为可公开访问的 https 链接
     let finalLogoUrl = logo_url
+    if (finalLogoUrl && typeof finalLogoUrl === 'string' && finalLogoUrl.startsWith('data:')) {
+      const uploaded = await uploadDataUrlToStorage(finalLogoUrl, code)
+      if (uploaded) {
+        finalLogoUrl = uploaded
+      } else {
+        // 上传失败则清空，避免存入超长/无效 data URL
+        finalLogoUrl = ''
+      }
+    }
     if (!finalLogoUrl) {
       finalLogoUrl = await getCountryFlag(name_en, code)
     }
 
     // 先不包含 logo_url，等表结构修复后再添加
     const updateData: any = {
-      name_zh,
-      name_en,
-      code: code.toLowerCase(),
+      name_zh: clip(name_zh, 100) || '',
+      name_en: clip(name_en, 100) || '',
+      code: clip(code.toLowerCase(), 10) || '',
       sort_order: sort_order || 0,
       is_active: is_active ?? true,
       updated_at: new Date().toISOString()
@@ -82,7 +121,8 @@ export async function PUT(
 
     // 如果数据库支持 logo_url 列，则添加
     if (finalLogoUrl) {
-      updateData.logo_url = finalLogoUrl
+      // 最终只存 http(s) 链接，避免过长的 data: URL 触发数据库长度限制
+      updateData.logo_url = clip(finalLogoUrl, 500)
     }
 
     const { data, error } = await supabase

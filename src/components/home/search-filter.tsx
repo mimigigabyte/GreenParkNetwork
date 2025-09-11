@@ -145,6 +145,24 @@ export function SearchFilter({
     };
   }, []);
 
+  // 国家筛选搜索关键词
+  const [countrySearch, setCountrySearch] = useState('');
+
+  // 组装国家下拉数据：将中国置顶，其余按原序（或统一权重99处理后的排序）
+  const buildCountryOptions = () => {
+    const all = transformFilterDataForComponents(filterData, locale).countries;
+    // 将中国置顶；其余保持相对顺序
+    const china = all.find(c => c.value === 'china');
+    const others = all.filter(c => c.value !== 'china');
+    // 统一“权重99”的效果等价于把中国放最前，其余顺序不变
+    let list = china ? [china, ...others] : all.slice();
+    if (countrySearch.trim()) {
+      const kw = countrySearch.trim().toLowerCase();
+      list = list.filter(c => (c.label || '').toLowerCase().includes(kw) || (c.value || '').toLowerCase().includes(kw));
+    }
+    return list;
+  };
+
   const handleSearch = () => {
     onSearch(keyword);
   };
@@ -521,7 +539,7 @@ export function SearchFilter({
 
             {/* 国别 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">{t('countryLabel')}</label>
+              <label className="block text-sm font-medium text-gray-700">{locale === 'en' ? (t('countryLabel') || 'Country/Region') : '国家和地区'}</label>
               <Select 
                 value={filters.country || 'all'} 
                 onValueChange={(value) => handleFilterChange('country', value)}
@@ -530,26 +548,39 @@ export function SearchFilter({
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t('allCountries')} />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    <div className="flex items-center gap-2">{t('allCountries')}</div>
-                  </SelectItem>
-                  {transformFilterDataForComponents(filterData, locale).countries.map((country) => (
-                    <SelectItem key={country.value} value={country.value}>
-                      <div className="flex items-center gap-2">
-                        {country.logo_url && (
-                          <Image
-                            src={country.logo_url}
-                            alt={country.label}
-                            width={20}
-                            height={14}
-                            className="rounded-sm object-cover"
-                          />
-                        )}
-                        <span>{country.label}</span>
-                      </div>
+                <SelectContent className="min-w-[16rem]">
+                  {/* 顶部搜索框 */}
+                  <div className="sticky top-0 z-10 bg-white px-2 pt-2 pb-2 border-b">
+                    <input
+                      value={countrySearch}
+                      onChange={e => setCountrySearch(e.target.value)}
+                      placeholder={locale === 'en' ? 'Search country/region...' : '搜索国家/地区...'}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+
+                  {/* 列表区域可滚动 */}
+                  <div className="max-h-64 overflow-y-auto">
+                    <SelectItem value="all">
+                      <div className="flex items-center gap-2">{t('allCountries')}</div>
                     </SelectItem>
-                  ))}
+                    {buildCountryOptions().map((country) => (
+                      <SelectItem key={country.value} value={country.value}>
+                        <div className="flex items-center gap-2">
+                          {country.logo_url && (
+                            <Image
+                              src={country.logo_url}
+                              alt={country.label}
+                              width={20}
+                              height={14}
+                              className="rounded-sm object-cover"
+                            />
+                          )}
+                          <span>{country.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </div>
                 </SelectContent>
               </Select>
             </div>
