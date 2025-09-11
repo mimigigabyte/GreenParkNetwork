@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -15,6 +15,15 @@ import { supabase } from '@/lib/supabase'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 
 export default function MobileLoginPage() {
+  // Wrap searchParams consumer in Suspense to satisfy Next.js requirement
+  return (
+    <Suspense fallback={<section className="min-h-dvh" />}> 
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
