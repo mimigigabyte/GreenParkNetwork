@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
+import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
 import { getFilterOptions, searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
 // Local type matching /api/tech/filter-options response
@@ -107,9 +108,10 @@ export default function MobileHomePage() {
     try {
       const r = await searchTechProducts(params)
       if (r.success && r.data) {
-        setTotal(r.data.total)
+        const data = r.data as any
+        setTotal(data.total)
         setPage(nextPage)
-        setItems((prev) => (resetPage ? r.data.products : [...prev, ...r.data.products]))
+        setItems((prev) => (resetPage ? data.products : [...prev, ...data.products]))
       }
     } finally {
       setSearchLoading(false)
@@ -124,6 +126,16 @@ export default function MobileHomePage() {
 
   return (
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
+      {/* Top-right language switcher (iPhone safe area) */}
+      <div
+        className="fixed z-50"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          right: 'calc(env(safe-area-inset-right, 0px) + 8px)'
+        }}
+      >
+        <LanguageSwitcher className="text-[12px]" hideIcon />
+      </div>
       {/* Header: logo + title */}
       <div className="px-3 pt-4 flex items-center gap-2">
         <div className="relative w-8 h-8">
