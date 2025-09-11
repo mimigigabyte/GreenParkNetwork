@@ -24,9 +24,12 @@ export default function MobileLayout({
   const isActive = (href: string) => pathname?.startsWith(href)
   const isEn = locale === 'en'
 
+  const showNav = !(pathname && pathname.includes('/m/(auth)'))
+
   return (
     <div className="min-h-dvh bg-white flex flex-col">
-      <main className="flex-1 overflow-y-auto pb-16">{children}</main>
+      <main className={`flex-1 overflow-y-auto ${showNav ? 'pb-16' : ''}`}>{children}</main>
+      {showNav && (
       <nav className="fixed bottom-0 left-0 right-0 h-14 border-t bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
         <div className="mx-auto max-w-md h-full grid grid-cols-4">
           {tabs.map((t) => (
@@ -42,6 +45,7 @@ export default function MobileLayout({
           ))}
         </div>
       </nav>
+      )}
     </div>
   )
 }
