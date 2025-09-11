@@ -5,7 +5,16 @@ import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
-import { getFilterOptions, searchTechProducts, type FilterData, type SearchParams, type TechProduct } from '@/api/tech'
+import { getFilterOptions, searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
+// Local type matching /api/tech/filter-options response
+type H5FilterData = {
+  categories: {
+    value: string
+    label: string
+    labelEn: string
+    subcategories: { value: string; label: string; labelEn: string }[]
+  }[]
+}
 
 export default function MobileHomePage() {
   const pathname = usePathname()
@@ -19,7 +28,7 @@ export default function MobileHomePage() {
   const [loadingCarousel, setLoadingCarousel] = useState(true)
 
   // Filters & search
-  const [filters, setFilters] = useState<FilterData | null>(null)
+  const [filters, setFilters] = useState<H5FilterData | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('')
   const [q, setQ] = useState('')
@@ -63,9 +72,9 @@ export default function MobileHomePage() {
       const r = await getFilterOptions()
       if (!mounted) return
       if (r.success && r.data) {
-        setFilters(r.data)
-        // pick first category by default
-        const first = r.data.productCategories?.[0]?.id
+        setFilters(r.data as unknown as H5FilterData)
+        // pick first category by default (use slug value)
+        const first = (r.data as any).categories?.[0]?.value
         if (first) setSelectedCategory(first)
       }
     })()
@@ -74,7 +83,7 @@ export default function MobileHomePage() {
 
   const subcategories = useMemo(() => {
     if (!filters) return []
-    const cat = filters.productCategories?.find((c) => c.id === selectedCategory)
+    const cat = filters.categories.find((c) => c.value === selectedCategory)
     return cat?.subcategories || []
   }, [filters, selectedCategory])
 
@@ -177,13 +186,13 @@ export default function MobileHomePage() {
       <div className="px-3 mt-2">
         {/* Categories */}
         <div className="flex overflow-x-auto gap-2 pb-1">
-          {(filters?.productCategories || []).map((c) => (
+          {(filters?.categories || []).map((c) => (
             <button
-              key={c.id}
-              onClick={() => { setSelectedCategory(c.id); setSelectedSubcategory(''); }}
-              className={`whitespace-nowrap px-3 h-8 rounded-full border text-[12px] ${selectedCategory === c.id ? 'bg-[#e6fffa] border-[#00b899] text-[#007f66]' : 'bg-white border-gray-200 text-gray-600'}`}
+              key={c.value}
+              onClick={() => { setSelectedCategory(c.value); setSelectedSubcategory(''); }}
+              className={`whitespace-nowrap px-3 h-8 rounded-full border text-[12px] ${selectedCategory === c.value ? 'bg-[#e6fffa] border-[#00b899] text-[#007f66]' : 'bg-white border-gray-200 text-gray-600'}`}
             >
-              {locale === 'en' ? c.name_en : c.name_zh}
+              {locale === 'en' ? c.labelEn : c.label}
             </button>
           ))}
         </div>
@@ -192,11 +201,11 @@ export default function MobileHomePage() {
           <div className="flex overflow-x-auto gap-2 mt-2 pb-1">
             {subcategories.map((s) => (
               <button
-                key={s.id}
-                onClick={() => setSelectedSubcategory(s.id)}
-                className={`whitespace-nowrap px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory === s.id ? 'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]' : 'bg-white border-gray-200 text-gray-600'}`}
+                key={s.value}
+                onClick={() => setSelectedSubcategory(s.value)}
+                className={`whitespace-nowrap px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory === s.value ? 'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]' : 'bg-white border-gray-200 text-gray-600'}`}
               >
-                {locale === 'en' ? s.name_en : s.name_zh}
+                {locale === 'en' ? s.labelEn : s.label}
               </button>
             ))}
           </div>
