@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Eye, EyeOff } from 'lucide-react'
@@ -10,16 +10,21 @@ import { authApi } from '@/api/auth'
 import { customAuthApi } from '@/api/customAuth'
 import { tencentSmsAuthApi } from '@/api/tencentSmsAuth'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { emailVerificationApi } from '@/api/emailVerification'
+import { supabase } from '@/lib/supabase'
+import { LanguageSwitcher } from '@/components/common/language-switcher'
 
 export default function MobileLoginPage() {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const t = useTranslations('auth')
   const { checkUser } = useAuthContext()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
   // 0 = 验证码登录，1 = 密码登录
   const [tab, setTab] = useState<0 | 1>(0)
+  const isRegister = searchParams?.get('register') === '1'
   const [account, setAccount] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -29,7 +34,20 @@ export default function MobileLoginPage() {
   const [sending, setSending] = useState(false)
   const [countdown, setCountdown] = useState(0)
 
+  // 注册相关状态（沿用 Web 端逻辑，仅调整样式）
+  const [regEmail, setRegEmail] = useState('')
+  const [regPhone, setRegPhone] = useState('')
+  const [regCode, setRegCode] = useState('')
+  const [regPassword, setRegPassword] = useState('')
+  const [regConfirmPassword, setRegConfirmPassword] = useState('')
+  const [regShowPassword, setRegShowPassword] = useState(false)
+  const [regShowConfirmPassword, setRegShowConfirmPassword] = useState(false)
+  const [regSending, setRegSending] = useState(false)
+  const [regCountdown, setRegCountdown] = useState(0)
+  const [countryCode] = useState('+86')
+
   const goAfterLogin = () => router.replace(`/${locale}/m/console`)
+  const goAfterRegister = () => router.push(`/${locale}/company-profile`)
 
   async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -94,26 +112,136 @@ export default function MobileLoginPage() {
     } finally { setLoading(false) }
   }
 
+  // 发送注册验证码（tab 0: 邮箱验证码；tab 1: 手机验证码）
+  async function handleSendRegisterCode() {
+    const phoneMode = tab === 1
+    const target = phoneMode ? regPhone : regEmail
+    if (!target) {
+      alert(phoneMode ? (locale==='en'?'Please enter phone number':'请输入手机号') : (locale==='en'?'Please enter email address':'请输入邮箱地址'))
+      return
+    }
+    if (phoneMode) {
+      if (!isValidPhone(regPhone, countryCode)) { alert(phoneError(locale as any)); return }
+    } else {
+      if (!isValidEmail(regEmail)) { alert(emailError(locale as any)); return }
+    }
+
+    setRegSending(true)
+    try {
+      let r
+      if (phoneMode) {
+        r = await authApi.sendPhoneCode({ phone: regPhone, purpose: 'register', countryCode })
+      } else {
+        r = await emailVerificationApi.sendCode({ email: regEmail })
+      }
+      if (r.success) {
+        setRegCountdown(60)
+        const timer = setInterval(() => setRegCountdown(p => { if (p<=1) { clearInterval(timer); return 0 } return p-1 }), 1000)
+        const devCode = (r as any).data?.debugCode || (r as any).data?.devOTP
+        if (devCode) {
+          alert(locale==='en'?`Verification code sent! Dev: ${devCode}`:`验证码已发送！开发码：${devCode}`)
+        } else {
+          alert(locale==='en'?'Verification code sent':'验证码已发送')
+        }
+      } else {
+        alert(r.error || (locale==='en'?'Failed to send code':'发送验证码失败'))
+      }
+    } finally {
+      setRegSending(false)
+    }
+  }
+
+  // 提交注册（tab 0: 邮箱注册；tab 1: 手机注册）
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault()
+    const phoneMode = tab === 1
+    if (!regCode || !regPassword || !regConfirmPassword) {
+      alert(locale==='en'?'Please fill in all information':'请填写完整信息')
+      return
+    }
+    if (regPassword !== regConfirmPassword) {
+      alert(locale==='en'?'Passwords do not match':'两次输入的密码不一致')
+      return
+    }
+    if (regPassword.length < 6) {
+      alert(locale==='en'?'Password must be at least 6 characters':'密码长度至少6位')
+      return
+    }
+    try {
+      setLoading(true)
+      let result
+      if (phoneMode) {
+        if (!isValidPhone(regPhone, countryCode)) { alert(phoneError(locale as any)); return }
+        result = await customAuthApi.phoneRegister({
+          phone: regPhone,
+          phoneCode: regCode,
+          password: regPassword,
+          name: undefined,
+          countryCode,
+        })
+      } else {
+        if (!isValidEmail(regEmail)) { alert(emailError(locale as any)); return }
+        result = await emailVerificationApi.register({
+          email: regEmail,
+          code: regCode,
+          password: regPassword,
+        })
+        if (result.success && 'data' in result && (result as any).data?.token) {
+          try {
+            await supabase.auth.setSession({
+              access_token: (result as any).data.token,
+              refresh_token: (result as any).data.refreshToken || ''
+            })
+          } catch {}
+        }
+      }
+      if (result.success && 'data' in result && result.data) {
+        await checkUser()
+        alert(locale==='en'?'Registration successful!':'注册成功！')
+        setTimeout(() => goAfterRegister(), 200)
+      } else {
+        alert('error' in result ? (result as any).error : (locale==='en'?'Registration failed':'注册失败'))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <section className="min-h-dvh flex flex-col bg-[radial-gradient(120%_60%_at_50%_-10%,#e9e7ff_0%,#ffffff_60%)]">
+    <section className="min-h-dvh relative flex flex-col bg-[radial-gradient(120%_60%_at_50%_-10%,#e9e7ff_0%,#ffffff_60%)]">
+      {/* 顶部右侧语言切换（iPhone 安全区适配，固定视口） */}
+      <div
+        className="fixed z-50"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          right: 'calc(env(safe-area-inset-right, 0px) + 8px)'
+        }}
+      >
+        <LanguageSwitcher className="text-[12px]" />
+      </div>
       {/* 顶部 Logo 与标题（更紧凑） */}
-      <div className="px-4 pt-6 pb-4 text-center">
+      <div className="px-4 pt-10 pb-4 text-center">
         <div className="mx-auto w-12 h-12 relative rounded-md overflow-hidden shadow-sm">
           <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
         </div>
-        <h1 className="mt-2 text-[13px] font-medium text-gray-900">国家级经开区绿色技术产品推广平台</h1>
+        <h1 className="mt-2 text-[15px] font-medium text-gray-900">国家级经开区绿色技术产品推广平台</h1>
       </div>
 
       {/* 卡片容器（更靠下 + 毛玻璃效果） */}
-      <div className="px-3 mt-1">
+      <div className="px-3 mt-4">
         <div className="mx-auto w-full max-w-[360px] rounded-[18px] bg-white/60 backdrop-blur-md p-4 shadow-sm border border-white/40">
-          {/* Tabs：左 密码登录 右 验证码登录 */}
+          {/* Tabs：根据模式切换标题 */}
           <div className="mb-3 grid grid-cols-2 bg-[#f5f6ff] rounded-full p-0.5">
-            <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>密码登录</button>
-            <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>验证码登录</button>
+            <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
+              {isRegister ? '邮箱注册' : '密码登录'}
+            </button>
+            <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>
+              {isRegister ? '手机验证码注册' : '验证码登录'}
+            </button>
           </div>
 
-          {tab === 0 ? (
+          {!isRegister ? (
+            tab === 0 ? (
             <form className="space-y-3" onSubmit={handlePasswordLogin}>
               <input type="text" value={account} onChange={(e)=>setAccount(e.target.value)} placeholder={locale==='en'?'Phone / Email':'手机号 / 邮箱'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
               <div className="relative">
@@ -129,8 +257,8 @@ export default function MobileLoginPage() {
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
             </form>
-          ) : (
-            <form className="space-y-3" onSubmit={handleSmsLogin}>
+            ) : (
+              <form className="space-y-3" onSubmit={handleSmsLogin}>
               <input type="tel" value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder={locale==='en'?'Phone number':'输入手机号'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
               {/* 内嵌按钮的验证码输入框 */}
               <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
@@ -145,15 +273,66 @@ export default function MobileLoginPage() {
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
             </form>
+            )
+          ) : (
+            tab === 0 ? (
+              <form className="space-y-3" onSubmit={handleRegister}>
+                <input type="email" value={regEmail} onChange={(e)=>setRegEmail(e.target.value)} placeholder={locale==='en'?'Email address':'邮箱地址'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
+                  <input type="text" value={regCode} onChange={(e)=>setRegCode(e.target.value)} placeholder={locale==='en'?'Email code':'邮箱验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
+                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidEmail(regEmail)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:'发送验证码'}</button>
+                </div>
+                <div className="relative">
+                  <input type={regShowPassword?'text':'password'} value={regPassword} onChange={(e)=>setRegPassword(e.target.value)} placeholder={locale==='en'?'Set password':'设置密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                  <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowPassword(v=>!v)} aria-label="toggle password">{regShowPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
+                </div>
+                <div className="relative">
+                  <input type={regShowConfirmPassword?'text':'password'} value={regConfirmPassword} onChange={(e)=>setRegConfirmPassword(e.target.value)} placeholder={locale==='en'?'Confirm password':'确认密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                  <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
+                </div>
+                <div className="flex items-center justify-between text-[13px] mt-1">
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
+                    已有账户？<span className="text-[#00b899]">去登录</span>
+                  </button>
+                </div>
+                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>注册</button>
+              </form>
+            ) : (
+              <form className="space-y-3" onSubmit={handleRegister}>
+                <input type="tel" value={regPhone} onChange={(e)=>setRegPhone(e.target.value)} placeholder={locale==='en'?'Phone number':'输入手机号'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
+                  <input type="text" value={regCode} onChange={(e)=>setRegCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
+                  <button type="button" onClick={handleSendRegisterCode} disabled={regSending||regCountdown>0||!isValidPhone(regPhone,countryCode)} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${regSending||regCountdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{regCountdown>0?`${regCountdown}s`:'发送验证码'}</button>
+                </div>
+                <div className="relative">
+                  <input type={regShowPassword?'text':'password'} value={regPassword} onChange={(e)=>setRegPassword(e.target.value)} placeholder={locale==='en'?'Set password':'设置密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                  <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowPassword(v=>!v)} aria-label="toggle password">{regShowPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
+                </div>
+                <div className="relative">
+                  <input type={regShowConfirmPassword?'text':'password'} value={regConfirmPassword} onChange={(e)=>setRegConfirmPassword(e.target.value)} placeholder={locale==='en'?'Confirm password':'确认密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
+                  <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setRegShowConfirmPassword(v=>!v)} aria-label="toggle password">{regShowConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
+                </div>
+                <div className="flex items-center justify-between text-[13px] mt-1">
+                  <button type="button" onClick={() => router.replace(`/${locale}/m/login`)} className="text-gray-600">
+                    已有账户？<span className="text-[#00b899]">去登录</span>
+                  </button>
+                </div>
+                <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>注册</button>
+              </form>
+            )
           )}
 
-          {/* 微信登录 */}
+      {!isRegister && (
+        <>
+          {/* 微信登录（仅登录模式显示） */}
           <div className="mt-5 text-center">
             <button type="button" className="inline-flex items-center gap-2 text-gray-700 text-[14px]">
-              <img src="/images/icons/wechat-icon.png" alt="wechat" className="w-4 h-4"/>
-              <span>微信登录</span>
+              <img src="/images/icons/微信.png" alt="wechat" className="w-4 h-4"/>
+              <span className="text-[12px]">微信登录</span>
             </button>
           </div>
+        </>
+      )}
 
         </div>
       </div>
@@ -164,8 +343,8 @@ export default function MobileLoginPage() {
           <input type="checkbox" defaultChecked className="accent-[#6b6ee2] w-3.5 h-3.5 rounded" />
           <span>
             我已阅读并同意
-            <a href="/terms-of-service" target="_blank" className="mx-1 text-[#6b6ee2] underline">《用户协议》</a>
-            <a href="/privacy-policy" target="_blank" className="text-[#6b6ee2] underline">《隐私政策》</a>
+            <a href={`/${locale}/terms-of-service`} target="_blank" className="mx-1 text-[#6b6ee2] underline">《用户协议》</a>
+            <a href={`/${locale}/privacy-policy`} target="_blank" className="text-[#6b6ee2] underline">《隐私政策》</a>
           </span>
         </label>
       </div>

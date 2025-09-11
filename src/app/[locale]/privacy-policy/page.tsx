@@ -37,7 +37,7 @@ export default function PrivacyPolicyLocalePage({ params }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-md sm:max-w-4xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center">
             <a
               href={`/${params.locale}`}
@@ -55,7 +55,7 @@ export default function PrivacyPolicyLocalePage({ params }: PageProps) {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-md sm:max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-[13px] sm:text-[15px] leading-relaxed">
         <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="prose prose-gray max-w-none">
             <h2 className="text-xl font-bold text-gray-900 mb-6">
