@@ -104,30 +104,45 @@ export default function MobileLoginPage() {
         <h1 className="mt-2 text-[13px] font-medium text-gray-900">国家级经开区绿色技术产品推广平台</h1>
       </div>
 
-      {/* 卡片容器（375 视觉基线，紧凑尺寸） */}
-      <div className="px-3">
-        <div className="mx-auto w-full max-w-[360px] rounded-[18px] bg-white p-4 shadow-sm border">
-          {/* Tabs：左 验证码登录 右 密码登录 */}
+      {/* 卡片容器（更靠下 + 毛玻璃效果） */}
+      <div className="px-3 mt-1">
+        <div className="mx-auto w-full max-w-[360px] rounded-[18px] bg-white/60 backdrop-blur-md p-4 shadow-sm border border-white/40">
+          {/* Tabs：左 密码登录 右 验证码登录 */}
           <div className="mb-3 grid grid-cols-2 bg-[#f5f6ff] rounded-full p-0.5">
-            <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>验证码登录</button>
-            <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>密码登录</button>
+            <button onClick={() => setTab(0)} className={`h-9 rounded-full text-[13px] font-medium ${tab===0?'bg-white text-gray-900 shadow':'text-gray-500'}`}>密码登录</button>
+            <button onClick={() => setTab(1)} className={`h-9 rounded-full text-[13px] font-medium ${tab===1?'bg-white text-gray-900 shadow':'text-gray-500'}`}>验证码登录</button>
           </div>
 
-          {tab === 1 ? (
+          {tab === 0 ? (
             <form className="space-y-3" onSubmit={handlePasswordLogin}>
               <input type="text" value={account} onChange={(e)=>setAccount(e.target.value)} placeholder={locale==='en'?'Phone / Email':'手机号 / 邮箱'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
               <div className="relative">
                 <input type={showPassword?'text':'password'} value={password} onChange={(e)=>setPassword(e.target.value)} placeholder={locale==='en'?'Password':'密码'} className="w-full h-11 px-3 pr-9 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
                 <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onClick={()=>setShowPassword(v=>!v)} aria-label="toggle password">{showPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
               </div>
+              {/* 辅助链接：注册 / 忘记密码 */}
+              <div className="flex items-center justify-between text-[13px] mt-1">
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
+                  没有账户？<span className="text-[#00b899]">立即注册</span>
+                </button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">忘记密码</button>
+              </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
             </form>
           ) : (
             <form className="space-y-3" onSubmit={handleSmsLogin}>
               <input type="tel" value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder={locale==='en'?'Phone number':'输入手机号'} className="w-full h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
-              <div className="flex items-center gap-2">
-                <input type="text" value={code} onChange={(e)=>setCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-11 px-3 rounded-xl bg-gray-50 border border-transparent focus:border-[#00b899] outline-none text-[14px]" />
-                <button type="button" onClick={handleSendCode} disabled={sending||countdown>0||!isValidPhone(phone,'+86')} className={`h-11 px-3 rounded-xl border text-[13px] ${sending||countdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{countdown>0?`${countdown}s`:'发送验证码'}</button>
+              {/* 内嵌按钮的验证码输入框 */}
+              <div className="flex items-center h-11 rounded-xl bg-gray-50 border border-transparent focus-within:border-[#00b899]">
+                <input type="text" value={code} onChange={(e)=>setCode(e.target.value)} placeholder={locale==='en'?'6-digit code':'6位短信验证码'} className="flex-1 h-full px-3 bg-transparent outline-none text-[14px]" />
+                <button type="button" onClick={handleSendCode} disabled={sending||countdown>0||!isValidPhone(phone,'+86')} className={`mr-1 my-1 h-[38px] px-3 rounded-lg text-[13px] border ${sending||countdown>0?'text-gray-400 border-gray-200 bg-gray-100':'text-[#6b6ee2] border-[#d7d8fb] bg-[#eef0ff]'}`}>{countdown>0?`${countdown}s`:'发送验证码'}</button>
+              </div>
+              {/* 辅助链接 */}
+              <div className="flex items-center justify-between text-[13px] mt-1">
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?register=1`)} className="text-gray-600">
+                  没有账户？<span className="text-[#00b899]">立即注册</span>
+                </button>
+                <button type="button" onClick={() => router.push(`/${locale}/m/login?forgot=1`)} className="text-[#00b899]">忘记密码</button>
               </div>
               <button type="submit" disabled={loading} className={`w-full h-11 rounded-xl text-white font-medium text-[14px] ${loading?'bg-gray-400':'bg-[#00b899] hover:bg-[#009a7a] active:opacity-90'}`}>登录</button>
             </form>
@@ -141,21 +156,22 @@ export default function MobileLoginPage() {
             </button>
           </div>
 
-          {/* 协议 */}
-          <div className="mt-4 text-[12px] text-gray-500 text-center pb-[env(safe-area-inset-bottom)]">
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" defaultChecked className="accent-[#6b6ee2] w-3.5 h-3.5 rounded"/>
-              <span>
-                我已阅读并同意
-                <a href="/terms-of-service" target="_blank" className="mx-1 text-[#6b6ee2] underline">《用户协议》</a>
-                <a href="/privacy-policy" target="_blank" className="text-[#6b6ee2] underline">《隐私政策》</a>
-              </span>
-            </label>
-          </div>
         </div>
       </div>
 
-      <div className="mt-auto py-4 text-center text-[11px] text-gray-400">© {new Date().getFullYear()} — Green Tech Platform</div>
+      {/* 协议放到页面底部，字号更小 */}
+      <div className="px-3 mt-3 text-[11px] text-gray-500 text-center">
+        <label className="inline-flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" defaultChecked className="accent-[#6b6ee2] w-3.5 h-3.5 rounded" />
+          <span>
+            我已阅读并同意
+            <a href="/terms-of-service" target="_blank" className="mx-1 text-[#6b6ee2] underline">《用户协议》</a>
+            <a href="/privacy-policy" target="_blank" className="text-[#6b6ee2] underline">《隐私政策》</a>
+          </span>
+        </label>
+      </div>
+
+      <div className="mt-2 py-3 text-center text-[11px] text-gray-400">© {new Date().getFullYear()} — Green Tech Platform</div>
     </section>
   )
 }
