@@ -131,15 +131,15 @@ export default function MobileHomePage() {
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
       {/* Header: title aligned with language switcher; header is sticky at top */}
       <div
-        className="px-3 pt-4 pb-2 sticky z-50 bg-transparent"
+        className="px-3 pt-4 pb-2 sticky z-50 bg-white shadow-sm"
         style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="relative w-8 h-8">
+            <div className="relative w-7 h-7">
               <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
             </div>
-            <h1 className="text-[14px] font-semibold text-gray-900 truncate">{tHome('heroTitle')}</h1>
+            <h1 className="text-[18px] font-semibold text-gray-900 leading-snug line-clamp-2">{tHome('heroTitle')}</h1>
           </div>
           <LanguageSwitcher className="text-[12px]" hideIcon />
         </div>
@@ -164,9 +164,9 @@ export default function MobileHomePage() {
                 >
                   <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${c.image_url})` }} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-center">
                     {(locale === 'en' ? c.title_en : c.title_zh) && (
-                      <h3 className="text-[14px] font-semibold leading-snug line-clamp-1">
+                      <h3 className="text-[14px] font-semibold leading-snug">
                         {locale === 'en' ? c.title_en : c.title_zh}
                       </h3>
                     )}
@@ -191,7 +191,7 @@ export default function MobileHomePage() {
       </div>
 
       {/* Search bar (pill) with inline filter and divider */}
-      <div className="px-3 mt-3">
+      <div className="px-3 mt-5">
         <div className="h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center px-3">
           <Search className="w-5 h-5 text-gray-400 mr-2" />
           <input
