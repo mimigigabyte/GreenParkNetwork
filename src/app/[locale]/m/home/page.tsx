@@ -144,25 +144,6 @@ export default function MobileHomePage() {
         </div>
         <h1 className="text-[14px] font-semibold text-gray-900">{tHome('heroTitle')}</h1>
       </div>
-      {/* Search bar with filter button */}
-      <div className="px-3 mt-3">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-11 rounded-2xl bg-gray-50 border border-gray-200 flex items-center px-3">
-            <Search className="w-4 h-4 text-gray-400 mr-2" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e)=>{ if(e.key==='Enter') performSearch(true) }}
-              placeholder={tHome('searchPlaceholder')}
-              className="flex-1 bg-transparent outline-none text-[14px]"
-            />
-          </div>
-          <button onClick={()=>setShowFilter(true)} className="h-11 aspect-square rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center">
-            <SlidersHorizontal className="w-5 h-5 text-gray-600" />
-          </button>
-        </div>
-      </div>
-
       {/* Carousel (rounded) */}
       <div className="px-3 mt-3">
         <div className="relative w-full h-[180px] overflow-hidden rounded-2xl shadow-sm">
@@ -209,21 +190,24 @@ export default function MobileHomePage() {
         </div>
       </div>
 
-      {/* Search bar with filter button */}
+      {/* Search bar (pill) with inline filter and divider */}
       <div className="px-3 mt-3">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-11 rounded-2xl bg-gray-50 border border-gray-200 flex items-center px-3">
-            <Search className="w-4 h-4 text-gray-400 mr-2" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e)=>{ if(e.key==='Enter') performSearch(true) }}
-              placeholder={tHome('searchPlaceholder')}
-              className="flex-1 bg-transparent outline-none text-[14px]"
-            />
-          </div>
-          <button onClick={()=>setShowFilter(true)} className="h-11 aspect-square rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center">
-            <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+        <div className="h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center px-3">
+          <Search className="w-5 h-5 text-gray-400 mr-2" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e)=>{ if(e.key==='Enter') performSearch(true) }}
+            placeholder={tHome('searchPlaceholder')}
+            className="flex-1 bg-transparent outline-none text-[14px]"
+          />
+          <span className="mx-2 h-6 w-px bg-gray-200" />
+          <button
+            onClick={()=>setShowFilter(true)}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-50"
+            aria-label={locale==='en'?'Filter':'筛选'}
+          >
+            <SlidersHorizontal className="w-5 h-5" />
           </button>
         </div>
       </div>

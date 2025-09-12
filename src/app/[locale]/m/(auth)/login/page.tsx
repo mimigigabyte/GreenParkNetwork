@@ -11,7 +11,7 @@ import { customAuthApi } from '@/api/customAuth'
 import { tencentSmsAuthApi } from '@/api/tencentSmsAuth'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { emailVerificationApi } from '@/api/emailVerification'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 
 export default function MobileLoginPage() {
@@ -56,6 +56,18 @@ function LoginContent() {
   const [regSending, setRegSending] = useState(false)
   const [regCountdown, setRegCountdown] = useState(0)
   const [countryCode] = useState('+86')
+
+  // Create an H5-only Supabase client with a distinct storageKey to avoid
+  // the "Multiple GoTrueClient instances" warning under the same key.
+  const supabaseH5 = useMemo(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+    try {
+      return createClient(url, key, { auth: { storageKey: 'sb-h5-auth-token', persistSession: true } })
+    } catch {
+      return null
+    }
+  }, [])
 
   const goAfterLogin = () => router.replace(`/${locale}/m/console`)
   const goAfterRegister = () => router.push(`/${locale}/company-profile`)
@@ -204,9 +216,9 @@ function LoginContent() {
           code: regCode,
           password: regPassword,
         })
-        if (result.success && 'data' in result && (result as any).data?.token) {
+        if (result.success && 'data' in result && (result as any).data?.token && supabaseH5) {
           try {
-            await supabase.auth.setSession({
+            await supabaseH5.auth.setSession({
               access_token: (result as any).data.token,
               refresh_token: (result as any).data.refreshToken || ''
             })
