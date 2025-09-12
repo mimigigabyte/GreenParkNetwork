@@ -31,7 +31,7 @@ export default function MobileLayout({
   const showNav = !isAuthPage && !isTechDetail
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col">
+    <div className="min-h-dvh bg-[#edeef7] flex flex-col">
       <main className={`flex-1 overflow-y-auto ${showNav ? 'pb-16' : ''}`}>{children}</main>
       {showNav && (
       <nav className="fixed bottom-0 left-0 right-0 h-14 border-t bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70">
