@@ -104,6 +104,9 @@ export default function MobileHomePage() {
       keyword: q.trim() || undefined,
       category: selectedCategory || undefined,
       subCategory: selectedSubcategory || undefined,
+      country: selectedCountry || undefined,
+      province: selectedProvince || undefined,
+      developmentZone: selectedZone || undefined,
       sortBy: currentSort,
       page: nextPage,
       pageSize,
@@ -368,6 +371,7 @@ export default function MobileHomePage() {
               <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Category':'主分类'}</div>
               <div className="relative">
                 <div className={`flex flex-wrap gap-2 ${expandCategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                  <button key="all" onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
                   {(transformed.mainCategories||[]).map(c => (
                     <button key={c.id} onClick={()=>{ setSelectedCategory(c.id); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===c.id?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{c.name}</button>
                   ))}
@@ -393,6 +397,7 @@ export default function MobileHomePage() {
                 <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Subcategory':'子分类'}</div>
                 <div className="relative">
                   <div className={`flex flex-wrap gap-2 ${expandSubcategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                    <button key="all-sub" onClick={()=>setSelectedSubcategory('')} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===''?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
                     {subcategories.map((s: any) => (
                       <button key={s.id} onClick={()=>setSelectedSubcategory(s.id)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===s.id?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{s.name}</button>
                     ))}
@@ -425,6 +430,7 @@ export default function MobileHomePage() {
               ) : (
                 <div className="relative">
                   <div className={`flex flex-wrap gap-2 ${expandCountry ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                    <button key="all-country" onClick={()=>{ setSelectedCountry(''); setSelectedProvince(''); setSelectedZone(''); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
                     {transformed.countries.map(c => (
                       <button key={c.value} onClick={async()=>{ setSelectedCountry(c.value); setSelectedProvince(''); setSelectedZone(''); const id = (fd.countries||[]).find(x=>x.code===c.value)?.id; if (id) await loadProvinces(id); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===c.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>
                         <span className="inline-flex items-center gap-1">
@@ -463,6 +469,7 @@ export default function MobileHomePage() {
                 ) : (
                   <div className="relative">
                     <div className={`flex flex-wrap gap-2 ${expandProvince ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                      <button key="all-province" onClick={()=>{ setSelectedProvince(''); setSelectedZone(''); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedProvince===''?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
                       {transformed.provinces.map(p => (
                         <button key={p.value} onClick={async()=>{ setSelectedProvince(p.value); setSelectedZone(''); const id = (fd.provinces||[]).find(x=>x.code===p.value)?.id; if (id) await loadDevelopmentZones(id); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedProvince===p.value?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{p.label}</button>
                       ))}
@@ -497,6 +504,7 @@ export default function MobileHomePage() {
                 ) : (
                   <div className="relative">
                     <div className={`flex flex-wrap gap-2 ${expandZone ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                      <button key="all-zone" onClick={()=> setSelectedZone('')} className={`px-3 h-8 rounded-full border text-[12px] ${selectedZone===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
                       {transformed.developmentZones.map(z => (
                         <button key={z.value} onClick={()=> setSelectedZone(z.value)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedZone===z.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{z.label}</button>
                       ))}

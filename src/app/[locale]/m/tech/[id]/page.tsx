@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { getTechnologyById } from '@/api/tech'
-import { Share2, Heart, Phone } from 'lucide-react'
+import { Share2, Heart, Phone, ArrowLeft } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 
 export default function MobileTechDetailPage({ params: { id } }: { params: { id: string } }) {
@@ -174,19 +174,24 @@ export default function MobileTechDetailPage({ params: { id } }: { params: { id:
       {/* Bottom action bar */}
       <div className="fixed left-0 right-0 bottom-0 z-50 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-t">
         <div className="mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)', paddingTop: 8 }}>
-          <div className="grid grid-cols-3 gap-2">
-            <button onClick={()=>setFav(v=>!v)} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
-              <Heart className={`w-4 h-4 ${fav? 'fill-[#ef4444] stroke-[#ef4444]':'stroke-current'}`} />
-              <span>{locale==='en'?'Favorite':'收藏'}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/home`)} className="h-10 w-10 rounded-full bg-white border border-gray-200 text-gray-800 inline-flex items-center justify-center">
+              <ArrowLeft className="w-5 h-5" />
             </button>
-            <button onClick={async()=>{ if (navigator.share) { try { await navigator.share({ title, text: title, url: typeof window!=='undefined'?window.location.href:'' }) } catch {} } }} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
-              <Share2 className="w-4 h-4" />
-              <span>{locale==='en'?'Share':'分享'}</span>
-            </button>
-            <button onClick={()=>setContactOpen(true)} className="h-10 rounded-xl bg-[#00b899] text-white text-[13px] inline-flex items-center justify-center gap-1.5">
-              <Phone className="w-4 h-4" />
-              <span>{locale==='en'?'Contact':'联系咨询'}</span>
-            </button>
+            <div className="grid grid-cols-3 gap-2 flex-1">
+              <button onClick={()=>setFav(v=>!v)} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
+                <Heart className={`w-4 h-4 ${fav? 'fill-[#ef4444] stroke-[#ef4444]':'stroke-current'}`} />
+                <span>{locale==='en'?'Favorite':'收藏'}</span>
+              </button>
+              <button onClick={async()=>{ if (navigator.share) { try { await navigator.share({ title, text: title, url: typeof window!=='undefined'?window.location.href:'' }) } catch {} } }} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
+                <Share2 className="w-4 h-4" />
+                <span>{locale==='en'?'Share':'分享'}</span>
+              </button>
+              <button onClick={()=>setContactOpen(true)} className="h-10 rounded-xl bg-[#00b899] text-white text-[13px] inline-flex items-center justify-center gap-1.5">
+                <Phone className="w-4 h-4" />
+                <span>{locale==='en'?'Contact':'联系咨询'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
