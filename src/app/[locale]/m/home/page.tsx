@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { Search, SlidersHorizontal, Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
 import type { AdminCarouselImage } from '@/lib/types/admin'
-import { searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
+import { searchTechProducts, type SearchParams, type TechProduct, type SortType } from '@/api/tech'
 import { useFilterData, transformFilterDataForComponents } from '@/hooks/admin/use-filter-data'
 // Local type matching /api/tech/filter-options response
 type H5FilterData = {
@@ -48,6 +48,9 @@ export default function MobileHomePage() {
   const [total, setTotal] = useState(0)
   const pageSize = 10
   const [searchLoading, setSearchLoading] = useState(false)
+  const [companyCount, setCompanyCount] = useState<number>(0)
+  const [currentSort, setCurrentSort] = useState<SortType>('updateTime')
+  const [sortOpen, setSortOpen] = useState(false)
   // UI state
   const [showFilter, setShowFilter] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
@@ -99,9 +102,9 @@ export default function MobileHomePage() {
       keyword: q.trim() || undefined,
       category: selectedCategory || undefined,
       subCategory: selectedSubcategory || undefined,
+      sortBy: currentSort,
       page: nextPage,
       pageSize,
-      sortBy: 'updateTime',
     }
     setSearchLoading(true)
     try {
@@ -109,6 +112,7 @@ export default function MobileHomePage() {
       if (r.success && r.data) {
         const data = r.data as any
         setTotal(data.total)
+        if (data.stats?.companyCount != null) setCompanyCount(data.stats.companyCount)
         setPage(nextPage)
         setItems((prev) => (resetPage ? data.products : [...prev, ...data.products]))
       }
@@ -125,22 +129,20 @@ export default function MobileHomePage() {
 
   const pageContent = (
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
-      {/* Top-right language switcher (iPhone safe area) */}
+      {/* Header: title aligned with language switcher; header is sticky at top */}
       <div
-        className="fixed z-50"
-        style={{
-          top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-          right: 'calc(env(safe-area-inset-right, 0px) + 8px)'
-        }}
+        className="px-3 pt-4 pb-2 sticky z-50 bg-transparent"
+        style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
-        <LanguageSwitcher className="text-[12px]" hideIcon />
-      </div>
-      {/* Header: logo + title */}
-      <div className="px-3 pt-4 flex items-center gap-2">
-        <div className="relative w-8 h-8">
-          <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="relative w-8 h-8">
+              <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
+            </div>
+            <h1 className="text-[14px] font-semibold text-gray-900 truncate">{tHome('heroTitle')}</h1>
+          </div>
+          <LanguageSwitcher className="text-[12px]" hideIcon />
         </div>
-        <h1 className="text-[14px] font-semibold text-gray-900">{tHome('heroTitle')}</h1>
       </div>
       {/* Carousel (rounded) */}
       <div className="px-3 mt-3">
@@ -217,6 +219,52 @@ export default function MobileHomePage() {
 
       {/* Categories section removed for H5 — filtering only via search bar button */}
 
+      {/* Results header: count + sort */}
+      <div className="px-3 mt-3">
+        <div className="flex items-center justify-between">
+          <div className="text-[12px] text-gray-700">
+            {locale==='en' ? (
+              <>
+                Results: <span className="text-blue-600 font-semibold">{companyCount}</span> companies, <span className="text-blue-600 font-semibold">{total}</span> technologies
+              </>
+            ) : (
+              <>
+                相关结果：来自 <span className="text-blue-600 font-semibold">{companyCount}</span> 家企业的 <span className="text-blue-600 font-semibold">{total}</span> 项技术
+              </>
+            )}
+          </div>
+          <div className="relative">
+            <button
+              className="h-8 rounded-xl px-3 border border-gray-200 bg-white text-[12px] text-gray-800 inline-flex items-center gap-1 shadow-sm"
+              onClick={()=>setSortOpen(v=>!v)}
+            >
+              <Clock className="w-4 h-4" />
+              <span>{locale==='en' ? 'Sort' : '排序方式'}：</span>
+              <span className="font-semibold">
+                {currentSort==='updateTime' ? (locale==='en'?'Updated':'更新时间') : currentSort==='nameAsc' ? (locale==='en'?'Name A-Z':'名称升序') : (locale==='en'?'Name Z-A':'名称降序')}
+              </span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            {sortOpen && (
+              <>
+                <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+                  <button onClick={()=>{ setCurrentSort('updateTime'); setSortOpen(false); performSearch(true) }} className={`w-full px-3 h-9 text-left text-[12px] hover:bg-gray-50 inline-flex items-center gap-2 ${currentSort==='updateTime'?'text-[#00b899] font-semibold':''}`}>
+                    <Clock className="w-4 h-4" />{locale==='en'?'Updated':'更新时间'}
+                  </button>
+                  <button onClick={()=>{ setCurrentSort('nameAsc'); setSortOpen(false); performSearch(true) }} className={`w-full px-3 h-9 text-left text-[12px] hover:bg-gray-50 inline-flex items-center gap-2 ${currentSort==='nameAsc'?'text-[#00b899] font-semibold':''}`}>
+                    <ArrowUpAZ className="w-4 h-4" />{locale==='en'?'Name A-Z':'名称升序'}
+                  </button>
+                  <button onClick={()=>{ setCurrentSort('nameDesc'); setSortOpen(false); performSearch(true) }} className={`w-full px-3 h-9 text-left text-[12px] hover:bg-gray-50 inline-flex items-center gap-2 ${currentSort==='nameDesc'?'text-[#00b899] font-semibold':''}`}>
+                    <ArrowDownAZ className="w-4 h-4" />{locale==='en'?'Name Z-A':'名称降序'}
+                  </button>
+                </div>
+                <div className="fixed inset-0 z-40" onClick={()=>setSortOpen(false)} />
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Results list */}
       <div className="px-3 mt-3 pb-20">
         {items.length === 0 && !searchLoading && (
@@ -236,7 +284,7 @@ export default function MobileHomePage() {
             return (
               <article key={it.id} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
                 {/* Title row */}
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
                     {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
                   </h3>
