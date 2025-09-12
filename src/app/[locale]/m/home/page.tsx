@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { Search, SlidersHorizontal, Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown } from 'lucide-react'
+import { Search, SlidersHorizontal, Clock, ArrowDownAZ, ArrowUpAZ, ArrowUpDown } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
@@ -224,32 +224,24 @@ export default function MobileHomePage() {
         <div className="flex items-center justify-between">
           <div className="text-[12px] text-gray-700">
             {locale==='en' ? (
-              <>
-                Results: <span className="text-blue-600 font-semibold">{companyCount}</span> companies, <span className="text-blue-600 font-semibold">{total}</span> technologies
-              </>
+              <>Found <span className="text-blue-600 font-semibold">{total}</span> technologies</>
             ) : (
-              <>
-                相关结果：来自 <span className="text-blue-600 font-semibold">{companyCount}</span> 家企业的 <span className="text-blue-600 font-semibold">{total}</span> 项技术
-              </>
+              <>搜索到<span className="text-blue-600 font-semibold">{total}</span>项技术结果</>
             )}
           </div>
           <div className="relative">
             <button
-              className="h-8 rounded-xl px-3 border border-gray-200 bg-white text-[12px] text-gray-800 inline-flex items-center gap-1 shadow-sm"
+              className="w-9 h-9 rounded-full inline-flex items-center justify-center text-gray-700 hover:bg-gray-50"
+              aria-label={locale==='en'?'Sort':'排序方式'}
               onClick={()=>setSortOpen(v=>!v)}
             >
-              <Clock className="w-4 h-4" />
-              <span>{locale==='en' ? 'Sort' : '排序方式'}：</span>
-              <span className="font-semibold">
-                {currentSort==='updateTime' ? (locale==='en'?'Updated':'更新时间') : currentSort==='nameAsc' ? (locale==='en'?'Name A-Z':'名称升序') : (locale==='en'?'Name Z-A':'名称降序')}
-              </span>
-              <ChevronDown className="w-4 h-4" />
+              <ArrowUpDown className="w-5 h-5" />
             </button>
             {sortOpen && (
               <>
                 <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
                   <button onClick={()=>{ setCurrentSort('updateTime'); setSortOpen(false); performSearch(true) }} className={`w-full px-3 h-9 text-left text-[12px] hover:bg-gray-50 inline-flex items-center gap-2 ${currentSort==='updateTime'?'text-[#00b899] font-semibold':''}`}>
-                    <Clock className="w-4 h-4" />{locale==='en'?'Updated':'更新时间'}
+                  <Clock className="w-4 h-4" />{locale==='en'?'Updated':'更新时间'}
                   </button>
                   <button onClick={()=>{ setCurrentSort('nameAsc'); setSortOpen(false); performSearch(true) }} className={`w-full px-3 h-9 text-left text-[12px] hover:bg-gray-50 inline-flex items-center gap-2 ${currentSort==='nameAsc'?'text-[#00b899] font-semibold':''}`}>
                     <ArrowUpAZ className="w-4 h-4" />{locale==='en'?'Name A-Z':'名称升序'}
