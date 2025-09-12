@@ -69,7 +69,7 @@ function LoginContent() {
     }
   }, [])
 
-  const goAfterLogin = () => router.replace(`/${locale}/m/console`)
+  const goAfterLogin = () => router.replace(`/${locale}/m/home`)
   const goAfterRegister = () => router.push(`/${locale}/company-profile`)
 
   async function handlePasswordLogin(e: React.FormEvent) {

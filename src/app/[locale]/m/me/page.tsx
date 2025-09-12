@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuthContext } from '@/components/auth/auth-provider'
-import { User, Shield, Heart, MessageSquare, LogOut, ChevronRight, Crown } from 'lucide-react'
+import { User, Shield, Heart, MessageSquare, LogOut, ChevronRight, Crown, Building } from 'lucide-react'
 
 export default function MobileMePage() {
   const pathname = usePathname()
@@ -23,11 +23,13 @@ export default function MobileMePage() {
               {initial}
             </div>
             <div className="min-w-0 text-white">
-              <div className="text-[18px] font-semibold truncate">{displayName}</div>
-              <div className="text-[12px] opacity-90 truncate">{user?.phone || user?.email || (locale==='en'?'Not bound':'未绑定')}</div>
-              <div className="mt-1 inline-flex items-center gap-1 text-[12px] opacity-95">
-                <span className="inline-flex items-center gap-1 px-2 h-6 rounded-full bg-white/20">{locale==='en'?'Elite Customer':'尊享用户'} <Crown className="w-3.5 h-3.5" /></span>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="text-[18px] font-semibold truncate">{displayName}</div>
+                <span className="inline-flex items-center gap-1 px-2 h-6 rounded-full bg-white/20 text-[12px]">
+                  {locale==='en'?'Regular User':'普通用户'} <Crown className="w-3.5 h-3.5" />
+                </span>
               </div>
+              <div className="text-[12px] opacity-90 truncate">{user?.phone || user?.email || (locale==='en'?'Not bound':'未绑定')}</div>
             </div>
           </div>
         </div>
@@ -36,6 +38,7 @@ export default function MobileMePage() {
         <div className="mt-7 space-y-3">
           <OptionTile icon={<User className="w-5 h-5" />} label={locale==='en'?'Basic Info':'基本信息'} onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/me/basic`)} />
           <OptionTile icon={<Shield className="w-5 h-5" />} label={locale==='en'?'Account Security':'账户安全'} onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/me/security`)} />
+          <OptionTile icon={<Building className="w-5 h-5" />} label={locale==='en'?'Company Info':'企业信息'} onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/me/company`)} />
           <OptionTile icon={<Heart className="w-5 h-5" />} label={locale==='en'?'My Favorites':'我的收藏'} onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/me/favorites`)} />
           <OptionTile icon={<MessageSquare className="w-5 h-5" />} label={locale==='en'?'Feedback':'问题反馈'} onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/me/feedback`)} />
           <OptionTile icon={<LogOut className="w-5 h-5" />} label={locale==='en'?'Sign Out':'退出登录'} danger onClick={async()=>{ try { await logout(); router.push(`${locale==='en'?'/en':'/zh'}/m/login`) } catch { router.push(`${locale==='en'?'/en':'/zh'}/m/login`) } }} />
