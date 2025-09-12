@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch related lookups in parallel
-    const [cat, sub, country, zone] = await Promise.all([
+    const [cat, sub, country, zone, province] = await Promise.all([
       tech.category_id
         ? supabaseAdmin.from('admin_categories').select('id,name_zh,name_en').eq('id', tech.category_id).single()
         : Promise.resolve({ data: null }),
@@ -41,6 +41,9 @@ export async function GET(req: NextRequest) {
         : Promise.resolve({ data: null }),
       tech.company_development_zone_id
         ? supabaseAdmin.from('admin_development_zones').select('id,name_zh,name_en,code').eq('id', tech.company_development_zone_id).single()
+        : Promise.resolve({ data: null }),
+      tech.company_province_id
+        ? supabaseAdmin.from('admin_provinces').select('id,name_zh,name_en,code').eq('id', tech.company_province_id).single()
         : Promise.resolve({ data: null })
     ])
 
@@ -73,7 +76,9 @@ export async function GET(req: NextRequest) {
       developmentZoneName: zone.data?.name_zh || '',
       developmentZoneNameEn: zone.data?.name_en || '',
       country: country.data?.code || '',
-      province: tech.company_province_id || '',
+      province: province.data?.code || '',
+      provinceName: province.data?.name_zh || '',
+      provinceNameEn: province.data?.name_en || '',
       developmentZone: zone.data?.code || '',
       custom_label: tech.custom_label || '',
       updateTime: tech.updated_at || tech.created_at,
@@ -86,4 +91,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Internal Error' }, { status: 500 })
   }
 }
-
