@@ -135,13 +135,13 @@ export default function MobileHomePage() {
         style={{ top: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="relative w-7 h-7">
+          <div className="flex items-center gap-1 min-w-0">
+            <div className="relative w-6 h-6">
               <Image src="/images/logo/绿盟logo.png" alt="logo" fill className="object-contain" />
             </div>
-            <h1 className="text-[18px] font-semibold text-gray-900 leading-snug line-clamp-2">{tHome('heroTitle')}</h1>
+            <h1 className="text-[15px] font-semibold tracking-tight text-gray-900 truncate">{tHome('heroTitle')}</h1>
           </div>
-          <LanguageSwitcher className="text-[12px]" hideIcon />
+          <LanguageSwitcher className="text-[11px]" hideIcon />
         </div>
       </div>
       {/* Carousel (rounded) */}
