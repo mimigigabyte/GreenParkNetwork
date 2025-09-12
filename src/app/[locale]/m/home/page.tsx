@@ -231,11 +231,11 @@ export default function MobileHomePage() {
           </div>
           <div className="relative">
             <button
-              className="h-9 rounded-full px-3 border border-gray-200 bg-white text-[12px] text-gray-800 inline-flex items-center gap-1 shadow-sm"
+              className="h-7 rounded-full px-2 border border-gray-200 bg-white text-[11px] text-gray-800 inline-flex items-center gap-1 shadow-sm"
               aria-label={locale==='en'?'Change sort':'切换排序'}
               onClick={()=>setSortOpen(v=>!v)}
             >
-              <ArrowUpDown className="w-5 h-5" />
+              <ArrowUpDown className="w-3 h-3" />
               <span>{locale==='en'?'Sort':'切换排序'}</span>
             </button>
             {sortOpen && (
