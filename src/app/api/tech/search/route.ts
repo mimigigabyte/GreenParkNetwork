@@ -254,7 +254,9 @@ export async function GET(request: NextRequest) {
     console.log('🎯 开始执行联合查询，应用的筛选条件总数:', Object.values(filterConditions).filter(Boolean).length);
     
     const { data: technologies, error, count } = await query
+      // Primary order by selected field, then tie-break by id for stable pagination
       .order(orderField, { ascending: orderAscending })
+      .order('id', { ascending: true })
       .range(from, to);
 
     if (error) {

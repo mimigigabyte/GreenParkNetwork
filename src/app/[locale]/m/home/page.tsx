@@ -97,6 +97,8 @@ export default function MobileHomePage() {
   }, [transformed.mainCategories, selectedCategory])
 
   const performSearch = async (resetPage = true) => {
+    // Prevent overlapping requests that can duplicate results
+    if (searchLoading) return
     const nextPage = resetPage ? 1 : page + 1
     const params: SearchParams = {
       keyword: q.trim() || undefined,
@@ -114,7 +116,18 @@ export default function MobileHomePage() {
         setTotal(data.total)
         if (data.stats?.companyCount != null) setCompanyCount(data.stats.companyCount)
         setPage(nextPage)
-        setItems((prev) => (resetPage ? data.products : [...prev, ...data.products]))
+        setItems((prev) => {
+          const merged = resetPage ? data.products : [...prev, ...data.products]
+          const seen = new Set<string>()
+          const deduped: TechProduct[] = []
+          for (const it of merged) {
+            if (it && typeof it.id === 'string' && !seen.has(it.id)) {
+              seen.add(it.id)
+              deduped.push(it)
+            }
+          }
+          return deduped
+        })
       }
     } finally {
       setSearchLoading(false)
