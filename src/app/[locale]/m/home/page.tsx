@@ -224,18 +224,19 @@ export default function MobileHomePage() {
         <div className="flex items-center justify-between">
           <div className="text-[12px] text-gray-700">
             {locale==='en' ? (
-              <>Found <span className="text-blue-600 font-semibold">{total}</span> technologies</>
+              <>Found{' '}<span className="text-blue-600 font-semibold">{total}</span>{' '}technologies</>
             ) : (
-              <>搜索到<span className="text-blue-600 font-semibold">{total}</span>项技术结果</>
+              <>搜索到{' '}<span className="text-blue-600 font-semibold">{total}</span>{' '}项技术结果</>
             )}
           </div>
           <div className="relative">
             <button
-              className="w-9 h-9 rounded-full inline-flex items-center justify-center text-gray-700 hover:bg-gray-50"
-              aria-label={locale==='en'?'Sort':'排序方式'}
+              className="h-9 rounded-full px-3 border border-gray-200 bg-white text-[12px] text-gray-800 inline-flex items-center gap-1 shadow-sm"
+              aria-label={locale==='en'?'Change sort':'切换排序'}
               onClick={()=>setSortOpen(v=>!v)}
             >
               <ArrowUpDown className="w-5 h-5" />
+              <span>{locale==='en'?'Sort':'切换排序'}</span>
             </button>
             {sortOpen && (
               <>
