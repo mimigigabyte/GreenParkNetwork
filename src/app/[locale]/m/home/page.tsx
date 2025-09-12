@@ -251,44 +251,48 @@ export default function MobileHomePage() {
           <div className="text-center text-gray-500 text-[13px] py-10">{locale === 'en' ? 'No results' : '暂无相关技术'}</div>
         )}
         <div className="grid grid-cols-1 gap-3">
-          {items.map((it) => (
-            <article key={it.id} className="rounded-xl border border-gray-100 bg-white p-3 flex gap-3 shadow-sm">
-              {/* Left square image */}
-              <div className="w-[84px] h-[84px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${it.solutionThumbnail || it.solutionImage})` }} />
-              </div>
-              {/* Right content */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-[14px] font-semibold text-[#00b899] line-clamp-2">
-                  {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
-                </h3>
-                {/* Tags: category + subcategory */}
-                <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  {(it.categoryName || it.categoryNameEn || it.category) && (
-                    <span className="px-2 h-6 inline-flex items-center rounded-full bg-[#ecfdf5] text-[#007f66] border border-[#a7f3d0] text-[11px]">
-                      {locale === 'en' ? (it.categoryNameEn || it.category) : (it.categoryName || it.category)}
-                    </span>
-                  )}
-                  {(it.subCategoryName || it.subCategoryNameEn || it.subCategory) && (
-                    <span className="px-2 h-6 inline-flex items-center rounded-full bg-[#eef2ff] text-[#4b50d4] border border-[#c7d2fe] text-[11px]">
-                      {locale === 'en' ? (it.subCategoryNameEn || it.subCategory) : (it.subCategoryName || it.subCategory)}
-                    </span>
-                  )}
+          {items.map((it) => {
+            const tags = [
+              locale === 'en' ? (it.categoryNameEn || it.category) : (it.categoryName || it.category),
+              locale === 'en' ? (it.subCategoryNameEn || it.subCategory) : (it.subCategoryName || it.subCategory),
+              locale === 'en' ? (it.countryNameEn || it.country) : (it.countryName || it.country),
+              locale === 'en' ? (it.developmentZoneNameEn || '') : (it.developmentZoneName || '')
+            ].filter(Boolean) as string[]
+            return (
+              <article key={it.id} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+                {/* Title row */}
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-[#00b899] leading-snug line-clamp-2">
+                    {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
+                  </h3>
+                  <button className="shrink-0 px-3 h-8 rounded-full bg-[#00b899] text-white text-[12px]">
+                    {locale==='en' ? 'Details' : '查看详情'}
+                  </button>
                 </div>
-                <p className="mt-1 text-[12px] text-gray-900 line-clamp-2">
-                  {locale === 'en' ? (it.shortDescriptionEn || it.solutionDescriptionEn || '') : (it.shortDescription || it.solutionDescription || '')}
-                </p>
-                <div className="mt-1 flex items-center justify-between">
-                  <button onClick={()=>{
-                    // simple expand: navigate to desktop detail if exists or keep placeholder
-                    // For now toggle to search page with keyword
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }} className="text-[12px] text-[#00b899]">{locale==='en'?'Read more':'展开更多'}</button>
-                  <button onClick={()=>{ setContactTech({ id: it.id, name: locale==='en'?(it.solutionTitleEn||it.solutionTitle):it.solutionTitle, company: locale==='en'?(it.companyNameEn||it.companyName):it.companyName }); setContactOpen(true) }} className="px-3 h-8 rounded-full bg-[#00b899] text-white text-[12px]">{locale==='en'?'Contact':'联系我们'}</button>
+                {/* Content row */}
+                <div className="mt-2 flex gap-3">
+                  <div className="w-[96px] h-[96px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${it.solutionThumbnail || it.solutionImage})` }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] text-gray-900 leading-relaxed line-clamp-4">
+                      {locale === 'en' ? (it.solutionDescriptionEn || it.shortDescriptionEn || '') : (it.solutionDescription || it.shortDescription || '')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+                {/* Tags row */}
+                {tags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {tags.map((tag, i) => (
+                      <span key={i} className="px-2.5 h-7 inline-flex items-center rounded-md border border-[#bfdbfe] text-[#2f6fde] bg-white text-[11px]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </article>
+            )
+          })}
         </div>
 
         {items.length < total && (
