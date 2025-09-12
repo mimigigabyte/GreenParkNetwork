@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useMemo } from 'react'
-import { useAuthContext } from '@/components/auth/auth-provider'
 
 export default function MobileLayout({
   children,
@@ -24,11 +23,10 @@ export default function MobileLayout({
   )
   const isActive = (href: string) => pathname?.startsWith(href)
   const isEn = locale === 'en'
-  const { user } = useAuthContext()
   // Route groups like (auth) are not part of URL; detect auth pages explicitly
   const isAuthPage = !!(pathname && (pathname.startsWith(`/${locale}/m/login`) || pathname.startsWith(`/${locale}/m/forgot`)))
-  // Only show bottom nav after login and not on auth pages
-  const showNav = Boolean(user) && !isAuthPage
+  // Show bottom nav on all non-auth pages
+  const showNav = !isAuthPage
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">
