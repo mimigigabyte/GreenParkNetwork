@@ -252,20 +252,23 @@ export default function MobileHomePage() {
         )}
         <div className="grid grid-cols-1 gap-3">
           {items.map((it) => {
-            const tags = [
-              locale === 'en' ? (it.categoryNameEn || it.category) : (it.categoryName || it.category),
-              locale === 'en' ? (it.subCategoryNameEn || it.subCategory) : (it.subCategoryName || it.subCategory),
-              locale === 'en' ? (it.countryNameEn || it.country) : (it.countryName || it.country),
-              locale === 'en' ? (it.developmentZoneNameEn || '') : (it.developmentZoneName || '')
-            ].filter(Boolean) as string[]
+            const tagItems: { text: string; kind?: 'country' | 'default'; flag?: string }[] = []
+            const cat = locale === 'en' ? (it.categoryNameEn || it.category) : (it.categoryName || it.category)
+            const sub = locale === 'en' ? (it.subCategoryNameEn || it.subCategory) : (it.subCategoryName || it.subCategory)
+            const country = locale === 'en' ? (it.countryNameEn || it.country) : (it.countryName || it.country)
+            const zone = locale === 'en' ? (it.developmentZoneNameEn || '') : (it.developmentZoneName || '')
+            if (cat) tagItems.push({ text: cat })
+            if (sub) tagItems.push({ text: sub })
+            if (country) tagItems.push({ text: country, kind: 'country', flag: it.countryFlagUrl })
+            if (zone) tagItems.push({ text: zone })
             return (
               <article key={it.id} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-[#00b899] leading-snug line-clamp-2">
+                  <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
                     {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
                   </h3>
-                  <button className="shrink-0 px-3 h-8 rounded-full bg-[#00b899] text-white text-[12px]">
+                  <button className="shrink-0 px-2.5 h-6 rounded-full bg-[#00b899] text-white text-[11px] leading-none flex items-center">
                     {locale==='en' ? 'Details' : '查看详情'}
                   </button>
                 </div>
@@ -275,17 +278,21 @@ export default function MobileHomePage() {
                     <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${it.solutionThumbnail || it.solutionImage})` }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] text-gray-900 leading-relaxed line-clamp-4">
+                    <p className="text-[12px] text-gray-900 leading-relaxed line-clamp-5">
                       {locale === 'en' ? (it.solutionDescriptionEn || it.shortDescriptionEn || '') : (it.solutionDescription || it.shortDescription || '')}
                     </p>
                   </div>
                 </div>
                 {/* Tags row */}
-                {tags.length > 0 && (
+                {tagItems.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {tags.map((tag, i) => (
-                      <span key={i} className="px-2.5 h-7 inline-flex items-center rounded-md border border-[#bfdbfe] text-[#2f6fde] bg-white text-[11px]">
-                        {tag}
+                    {tagItems.map((tg, i) => (
+                      <span key={i} className="px-2.5 h-7 inline-flex items-center gap-1.5 rounded-md border border-[#bfdbfe] text-[#2f6fde] bg-white text-[11px]">
+                        {tg.kind==='country' && tg.flag && (
+                          // flag icon (square or round small image)
+                          <img src={tg.flag} alt="flag" className="w-3.5 h-3.5 rounded-sm object-cover" />
+                        )}
+                        <span className="truncate max-w-[140px]">{tg.text}</span>
                       </span>
                     ))}
                   </div>
