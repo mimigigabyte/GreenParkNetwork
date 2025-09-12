@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useMemo } from 'react'
+import { Home, Upload, MessageSquare, User } from 'lucide-react'
 
 export default function MobileLayout({
   children,
@@ -14,10 +15,10 @@ export default function MobileLayout({
   const pathname = usePathname()
   const tabs = useMemo(
     () => [
-      { key: 'home', labelZh: '首页', labelEn: 'Home', href: `/${locale}/m/home` },
-      { key: 'console', labelZh: '控制台', labelEn: 'Console', href: `/${locale}/m/console` },
-      { key: 'chat', labelZh: '对话', labelEn: 'Chat', href: `/${locale}/m/chat` },
-      { key: 'me', labelZh: '我的', labelEn: 'Me', href: `/${locale}/m/me` },
+      { key: 'home', labelZh: '首页', labelEn: 'Home', href: `/${locale}/m/home`, Icon: Home },
+      { key: 'publish', labelZh: '技术发布', labelEn: 'Publish', href: `/${locale}/m/console`, Icon: Upload },
+      { key: 'messages', labelZh: '消息', labelEn: 'Messages', href: `/${locale}/m/chat`, Icon: MessageSquare },
+      { key: 'me', labelZh: '我的', labelEn: 'Me', href: `/${locale}/m/me`, Icon: User },
     ],
     [locale],
   )
@@ -32,17 +33,20 @@ export default function MobileLayout({
     <div className="min-h-dvh bg-white flex flex-col">
       <main className={`flex-1 overflow-y-auto ${showNav ? 'pb-16' : ''}`}>{children}</main>
       {showNav && (
-      <nav className="fixed bottom-0 left-0 right-0 h-14 border-t bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+      <nav className="fixed bottom-0 left-0 right-0 h-14 border-t bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70">
         <div className="mx-auto max-w-md h-full grid grid-cols-4">
           {tabs.map((t) => (
             <Link
               key={t.key}
               href={t.href}
-              className={`flex items-center justify-center text-sm ${
-                isActive(t.href) ? 'text-green-700 font-medium' : 'text-gray-600'
+              className={`flex flex-col items-center justify-center text-[11px] ${
+                isActive(t.href) ? 'text-[#6366F1] font-medium' : 'text-gray-700'
               }`}
             >
-              {isEn ? t.labelEn : t.labelZh}
+              {/* icon */}
+              <t.Icon className={`mb-0.5 ${isActive(t.href) ? 'stroke-[#6366F1]' : 'stroke-current'} w-[18px] h-[18px]`} />
+              {/* label */}
+              <span>{isEn ? t.labelEn : t.labelZh}</span>
             </Link>
           ))}
         </div>
