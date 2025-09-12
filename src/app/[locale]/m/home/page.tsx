@@ -8,6 +8,7 @@ import { Search, SlidersHorizontal } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
+import type { AdminCarouselImage } from '@/lib/types/admin'
 import { getFilterOptions, searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
 // Local type matching /api/tech/filter-options response
 type H5FilterData = {
@@ -26,7 +27,7 @@ export default function MobileHomePage() {
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
   // Carousel
-  const [carousel, setCarousel] = useState<Array<{ id: string; image_url: string; title_zh?: string; title_en?: string; link_url?: string }>>([])
+  const [carousel, setCarousel] = useState<AdminCarouselImage[]>([])
   const [current, setCurrent] = useState(0)
   const [loadingCarousel, setLoadingCarousel] = useState(true)
 
@@ -54,7 +55,7 @@ export default function MobileHomePage() {
       try {
         const list = await getPublicCarouselApi()
         if (!mounted) return
-        if (list && list.length) setCarousel(list as any)
+        if (list && list.length) setCarousel(list as AdminCarouselImage[])
         else setCarousel([])
       } catch {
         setCarousel([])
