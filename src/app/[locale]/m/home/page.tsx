@@ -9,7 +9,8 @@ import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
 import type { AdminCarouselImage } from '@/lib/types/admin'
-import { getFilterOptions, searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
+import { searchTechProducts, type SearchParams, type TechProduct } from '@/api/tech'
+import { useFilterData, transformFilterDataForComponents } from '@/hooks/admin/use-filter-data'
 // Local type matching /api/tech/filter-options response
 type H5FilterData = {
   categories: {
@@ -25,6 +26,7 @@ export default function MobileHomePage() {
   const router = useRouter()
   const tHome = useTranslations('home')
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
+  const modalLocale: 'en' | 'zh' = locale === 'en' ? 'en' : 'zh'
 
   // Carousel
   const [carousel, setCarousel] = useState<AdminCarouselImage[]>([])
@@ -32,9 +34,12 @@ export default function MobileHomePage() {
   const [loadingCarousel, setLoadingCarousel] = useState(true)
 
   // Filters & search
-  const [filters, setFilters] = useState<H5FilterData | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('')
+  // H5 filter extras aligned with Web: country / province / national development zone
+  const [selectedCountry, setSelectedCountry] = useState<string>('')
+  const [selectedProvince, setSelectedProvince] = useState<string>('')
+  const [selectedZone, setSelectedZone] = useState<string>('')
   const [q, setQ] = useState('')
 
   // Results
@@ -47,6 +52,16 @@ export default function MobileHomePage() {
   const [showFilter, setShowFilter] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
   const [contactTech, setContactTech] = useState<{ id: string; name: string; company?: string } | null>(null)
+  // Filter list expand toggles (limit to 2 lines by default)
+  const [expandCategory, setExpandCategory] = useState(false)
+  const [expandSubcategory, setExpandSubcategory] = useState(false)
+  const [expandCountry, setExpandCountry] = useState(false)
+  const [expandProvince, setExpandProvince] = useState(false)
+  const [expandZone, setExpandZone] = useState(false)
+
+  // Shared Web filter data (categories/countries/provinces/zones)
+  const { data: fd, isLoading: fdLoading, loadProvinces, loadDevelopmentZones } = useFilterData()
+  const transformed = useMemo(() => transformFilterDataForComponents(fd, locale), [fd, locale])
 
   // Load carousel
   useEffect(() => {
@@ -73,27 +88,10 @@ export default function MobileHomePage() {
     return () => clearInterval(timer)
   }, [carousel.length])
 
-  // Load filter options
-  useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      const r = await getFilterOptions()
-      if (!mounted) return
-      if (r.success && r.data) {
-        setFilters(r.data as unknown as H5FilterData)
-        // pick first category by default (use slug value)
-        const first = (r.data as any).categories?.[0]?.value
-        if (first) setSelectedCategory(first)
-      }
-    })()
-    return () => { mounted = false }
-  }, [])
-
   const subcategories = useMemo(() => {
-    if (!filters) return []
-    const cat = filters.categories.find((c) => c.value === selectedCategory)
-    return cat?.subcategories || []
-  }, [filters, selectedCategory])
+    const cat = (transformed.mainCategories || []).find((c) => c.id === selectedCategory)
+    return cat?.subCategories || []
+  }, [transformed.mainCategories, selectedCategory])
 
   const performSearch = async (resetPage = true) => {
     const nextPage = resetPage ? 1 : page + 1
@@ -120,12 +118,12 @@ export default function MobileHomePage() {
   }
 
   useEffect(() => {
-    // initial search when filters prepared
-    if (filters) performSearch(true)
+    // initial search when shared filter data is ready
+    if (!fdLoading) performSearch(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, selectedCategory, selectedSubcategory])
+  }, [fdLoading])
 
-  return (
+  const pageContent = (
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
       {/* Top-right language switcher (iPhone safe area) */}
       <div
@@ -204,46 +202,20 @@ export default function MobileHomePage() {
           <span className="mx-2 h-6 w-px bg-gray-200" />
           <button
             onClick={()=>setShowFilter(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-50"
+            className="relative w-9 h-9 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-50"
             aria-label={locale==='en'?'Filter':'筛选'}
           >
             <SlidersHorizontal className="w-5 h-5" />
+            {((selectedCategory?1:0)+(selectedSubcategory?1:0)+(selectedCountry?1:0)+(selectedProvince?1:0)+(selectedZone?1:0))>0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#00b899] text-white text-[10px] flex items-center justify-center">
+                {(selectedCategory?1:0)+(selectedSubcategory?1:0)+(selectedCountry?1:0)+(selectedProvince?1:0)+(selectedZone?1:0)}
+              </span>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Categories section */}
-      <div className="px-3 mt-2">
-        <div className="flex items-center justify-between px-0.5 mb-2">
-          <h2 className="text-[15px] font-semibold text-gray-900">{locale==='en'?'Categories':'绿色低碳技术产品目录'}</h2>
-          <button className="text-[12px] text-gray-500" onClick={()=>setShowFilter(true)}>{locale==='en'?'Filter':'筛选'}</button>
-        </div>
-        <div className="flex overflow-x-auto gap-3 pb-1">
-          {(filters?.categories || []).map((c) => (
-            <button
-              key={c.value}
-              onClick={() => { setSelectedCategory(c.value); setSelectedSubcategory(''); }}
-              className={`shrink-0 w-16 h-16 rounded-full border flex items-center justify-center ${selectedCategory === c.value ? 'bg-[#e6fffa] border-[#00b899] text-[#007f66]' : 'bg-white border-gray-200 text-gray-600'}`}
-            >
-              <span className="text-[11px] leading-tight text-center px-1">{locale === 'en' ? c.labelEn : c.label}</span>
-            </button>
-          ))}
-        </div>
-        {/* Subcategories */}
-        {subcategories.length > 0 && (
-          <div className="flex overflow-x-auto gap-2 mt-2 pb-1">
-            {subcategories.map((s) => (
-              <button
-                key={s.value}
-                onClick={() => setSelectedSubcategory(s.value)}
-                className={`whitespace-nowrap px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory === s.value ? 'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]' : 'bg-white border-gray-200 text-gray-600'}`}
-              >
-                {locale === 'en' ? s.labelEn : s.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Categories section removed for H5 — filtering only via search bar button */}
 
       {/* Results list */}
       <div className="px-3 mt-3 pb-20">
@@ -320,29 +292,177 @@ export default function MobileHomePage() {
           <div className="absolute inset-0 bg-black/30" onClick={()=>setShowFilter(false)} />
           <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[15px] font-semibold">{locale==='en'?'Filters':'技术筛选'}</h3>
-              <button onClick={()=>setShowFilter(false)} className="text-[12px] text-gray-500">{locale==='en'?'Close':'关闭'}</button>
+              <h3 className="text-[15px] font-semibold">{locale==='en'?'Filters':'技术筛选'}{((selectedCategory?1:0)+(selectedSubcategory?1:0)+(selectedCountry?1:0)+(selectedProvince?1:0)+(selectedZone?1:0))>0 && <span className="ml-1 text-[12px] text-gray-500">({(selectedCategory?1:0)+(selectedSubcategory?1:0)+(selectedCountry?1:0)+(selectedProvince?1:0)+(selectedZone?1:0)})</span>}</h3>
+              <button onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory(''); setSelectedCountry(''); setSelectedProvince(''); setSelectedZone(''); }} className="text-[12px] text-gray-500">{locale==='en'?'Reset':'重置'}</button>
             </div>
+            {fdLoading ? (
+              <div className="py-6">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 w-24 bg-gray-200 rounded" />
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="h-8 w-20 bg-gray-200 rounded-full" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div className="mb-3">
               <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Category':'主分类'}</div>
-              <div className="flex flex-wrap gap-2">
-                {(filters?.categories||[]).map(c => (
-                  <button key={c.value} onClick={()=>{ setSelectedCategory(c.value); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===c.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?c.labelEn:c.label}</button>
-                ))}
+              <div className="relative">
+                <div className={`flex flex-wrap gap-2 ${expandCategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                  {(transformed.mainCategories||[]).map(c => (
+                    <button key={c.id} onClick={()=>{ setSelectedCategory(c.id); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===c.id?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{c.name}</button>
+                  ))}
+                </div>
+                {!expandCategory && (transformed.mainCategories||[]).length > 10 && (
+                  <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />
+                )}
               </div>
+              {(transformed.mainCategories||[]).length > 10 && (
+                <div className="mt-2">
+                  <button
+                    onClick={()=>setExpandCategory(v=>!v)}
+                    className="h-8 px-0 text-[12px] text-[#60A5FA] hover:underline"
+                  >
+                    {locale==='en' ? (expandCategory ? 'Show less' : 'Show all') : (expandCategory ? '收起' : '显示全部')}
+                  </button>
+                </div>
+              )}
             </div>
+            )}
             {subcategories.length>0 && (
               <div className="mb-3">
                 <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Subcategory':'子分类'}</div>
+                <div className="relative">
+                  <div className={`flex flex-wrap gap-2 ${expandSubcategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                    {subcategories.map((s: any) => (
+                      <button key={s.id} onClick={()=>setSelectedSubcategory(s.id)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===s.id?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{s.name}</button>
+                    ))}
+                  </div>
+                  {!expandSubcategory && subcategories.length > 10 && (
+                    <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />
+                  )}
+                </div>
+                {subcategories.length > 10 && (
+                  <div className="mt-2">
+                    <button
+                      onClick={()=>setExpandSubcategory(v=>!v)}
+                      className="h-8 px-0 text-[12px] text-[#60A5FA] hover:underline"
+                    >
+                      {locale==='en' ? (expandSubcategory ? 'Show less' : 'Show all') : (expandSubcategory ? '收起' : '显示全部')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Country */}
+            <div className="mb-3">
+              <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Country / Region':'国家与地区'}</div>
+              {fdLoading ? (
                 <div className="flex flex-wrap gap-2">
-                  {subcategories.map(s => (
-                    <button key={s.value} onClick={()=>setSelectedSubcategory(s.value)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===s.value?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?s.labelEn:s.label}</button>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-8 w-24 bg-gray-200 rounded-full" />
                   ))}
                 </div>
+              ) : (
+                <div className="relative">
+                  <div className={`flex flex-wrap gap-2 ${expandCountry ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                    {transformed.countries.map(c => (
+                      <button key={c.value} onClick={async()=>{ setSelectedCountry(c.value); setSelectedProvince(''); setSelectedZone(''); const id = (fd.countries||[]).find(x=>x.code===c.value)?.id; if (id) await loadProvinces(id); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===c.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>
+                        <span className="inline-flex items-center gap-1">
+                          {c.logo_url && <img src={c.logo_url} alt="flag" className="w-3.5 h-3.5 rounded-sm" />}
+                          {c.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  {!expandCountry && transformed.countries.length > 12 && (
+                    <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />
+                  )}
+                  {transformed.countries.length > 12 && (
+                    <div className="mt-2">
+                      <button
+                        onClick={()=>setExpandCountry(v=>!v)}
+                        className="h-8 px-0 text-[12px] text-[#60A5FA] hover:underline"
+                      >
+                        {locale==='en' ? (expandCountry ? 'Show less' : 'Show all') : (expandCountry ? '收起' : '显示全部')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* Province */}
+            {selectedCountry && (
+              <div className="mb-3">
+                <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Province / State':'省份'}</div>
+                {fdLoading ? (
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-8 w-24 bg-gray-200 rounded-full" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className={`flex flex-wrap gap-2 ${expandProvince ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                      {transformed.provinces.map(p => (
+                        <button key={p.value} onClick={async()=>{ setSelectedProvince(p.value); setSelectedZone(''); const id = (fd.provinces||[]).find(x=>x.code===p.value)?.id; if (id) await loadDevelopmentZones(id); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedProvince===p.value?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{p.label}</button>
+                      ))}
+                    </div>
+                    {!expandProvince && transformed.provinces.length > 12 && (
+                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />
+                    )}
+                    {transformed.provinces.length > 12 && (
+                      <div className="mt-2">
+                        <button
+                          onClick={()=>setExpandProvince(v=>!v)}
+                          className="h-8 px-0 text-[12px] text-[#60A5FA] hover:underline"
+                        >
+                          {locale==='en' ? (expandProvince ? 'Show less' : 'Show all') : (expandProvince ? '收起' : '显示全部')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Development Zone */}
+            {selectedProvince && (
+              <div className="mb-2">
+                <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'National Development Zone':'国家级经开区'}</div>
+                {fdLoading ? (
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-8 w-28 bg-gray-200 rounded-full" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className={`flex flex-wrap gap-2 ${expandZone ? '' : 'max-h-[72px] overflow-hidden'}`}>
+                      {transformed.developmentZones.map(z => (
+                        <button key={z.value} onClick={()=> setSelectedZone(z.value)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedZone===z.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{z.label}</button>
+                      ))}
+                    </div>
+                    {!expandZone && transformed.developmentZones.length > 12 && (
+                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />
+                    )}
+                    {transformed.developmentZones.length > 12 && (
+                      <div className="mt-2">
+                        <button
+                          onClick={()=>setExpandZone(v=>!v)}
+                          className="h-8 px-0 text-[12px] text-[#60A5FA] hover:underline"
+                        >
+                          {locale==='en' ? (expandZone ? 'Show less' : 'Show all') : (expandZone ? '收起' : '显示全部')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             <div className="flex items-center gap-2 mt-2">
-              <button onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory(''); }} className="flex-1 h-10 rounded-xl border border-gray-200 text-[14px]">{locale==='en'?'Reset':'重置'}</button>
+              <button onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory(''); setSelectedCountry(''); setSelectedProvince(''); setSelectedZone(''); setExpandCategory(false); setExpandSubcategory(false); setExpandCountry(false); setExpandProvince(false); setExpandZone(false); }} className="flex-1 h-10 rounded-xl border border-gray-200 text-[14px]">{locale==='en'?'Reset':'重置'}</button>
               <button onClick={()=>{ setShowFilter(false); performSearch(true) }} className="flex-1 h-10 rounded-xl bg-[#00b899] text-white text-[14px]">{locale==='en'?'Apply':'确定'}</button>
             </div>
           </div>
@@ -350,8 +470,9 @@ export default function MobileHomePage() {
       )}
 
       {/* Contact modal */}
-      <ContactUsModal isOpen={contactOpen} onClose={()=>setContactOpen(false)} technologyId={contactTech?.id||''} technologyName={contactTech?.name||''} companyName={contactTech?.company||''} locale={locale as any} />
-
+      <ContactUsModal isOpen={contactOpen} onClose={()=>setContactOpen(false)} technologyId={contactTech?.id||''} technologyName={contactTech?.name||''} companyName={contactTech?.company||''} locale={modalLocale} />
     </section>
   )
+
+  return pageContent
 }
