@@ -294,7 +294,10 @@ export default function MobileHomePage() {
                   <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
                     {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
                   </h3>
-                  <button className="shrink-0 px-2.5 h-6 rounded-full bg-[#00b899] text-white text-[11px] leading-none flex items-center">
+                  <button
+                    onClick={()=> router.push(`${locale==='en'?'/en':'/zh'}/m/tech/${it.id}`)}
+                    className="shrink-0 px-2.5 h-6 rounded-full bg-[#00b899] text-white text-[11px] leading-none flex items-center"
+                  >
                     {locale==='en' ? 'Details' : '查看详情'}
                   </button>
                 </div>

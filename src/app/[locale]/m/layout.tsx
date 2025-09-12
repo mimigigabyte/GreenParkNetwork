@@ -40,11 +40,11 @@ export default function MobileLayout({
               key={t.key}
               href={t.href}
               className={`flex flex-col items-center justify-center text-[11px] ${
-                isActive(t.href) ? 'text-[#6366F1] font-medium' : 'text-gray-700'
+                isActive(t.href) ? 'text-[#00b899] font-medium' : 'text-gray-700'
               }`}
             >
               {/* icon */}
-              <t.Icon className={`mb-0.5 ${isActive(t.href) ? 'stroke-[#6366F1]' : 'stroke-current'} w-[18px] h-[18px]`} />
+              <t.Icon className={`mb-0.5 ${isActive(t.href) ? 'stroke-[#00b899]' : 'stroke-current'} w-[18px] h-[18px]`} />
               {/* label */}
               <span>{isEn ? t.labelEn : t.labelZh}</span>
             </Link>

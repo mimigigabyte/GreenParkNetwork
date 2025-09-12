@@ -200,6 +200,20 @@ export const getSearchStats = async (params: SearchParams): Promise<ApiResponse<
   }
 };
 
+// 按ID获取单个技术详情（移动端复用）
+export const getTechnologyById = async (id: string): Promise<ApiResponse<TechProduct>> => {
+  try {
+    const { safeGet, handleApiResponse } = await import('@/lib/safe-fetch');
+    const resp = await safeGet(`/api/tech/detail?id=${encodeURIComponent(id)}`)
+    const result = await handleApiResponse(resp)
+    if (!result.success) throw new Error(result.error || 'Failed to fetch technology')
+    return { success: true, data: result.data, error: undefined }
+  } catch (error) {
+    console.error('Error fetching technology detail:', error)
+    return { success: false, data: undefined as any, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
 // 获取筛选选项
 interface FilterData {
   categories: unknown[]
