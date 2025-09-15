@@ -153,7 +153,7 @@ export default function MobileCompanyInfoPage() {
       {/* 地址信息 */}
       <div className="mt-3 rounded-2xl bg-white p-3 border border-gray-100">
         <h2 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Address':'地址信息'}</h2>
-        <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-4">
           <Field label={locale==='en'?'Country/Region':'国家/地区'}>
             <select value={form.country} onChange={e=>onCountryChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white">
               <option value="">{locale==='en'?'Select':'选择'}</option>
@@ -195,7 +195,7 @@ export default function MobileCompanyInfoPage() {
             ))}
           </select>
         </Field>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-4">
           <Field label={locale==='en'?'Industry Code':'行业代码'}>
             <input value={form.industryCode} onChange={e=>onChange('industryCode', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
           </Field>
@@ -208,7 +208,7 @@ export default function MobileCompanyInfoPage() {
       {/* 联系人信息 */}
       <div className="mt-3 rounded-2xl bg-white p-3 border border-gray-100">
         <h2 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Contact':'联系人信息'}</h2>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-4">
           <Field label={locale==='en'?'Contact Person':'联系人'}>
             <input value={form.contactPerson} onChange={e=>onChange('contactPerson', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
           </Field>
@@ -233,8 +233,8 @@ export default function MobileCompanyInfoPage() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block">
-      <div className="mb-1 text-[12px] text-gray-600">{label}</div>
+    <label className="block mb-3">
+      <div className="mb-1.5 text-[12px] text-gray-600">{label}</div>
       {children}
     </label>
   )
