@@ -144,7 +144,7 @@ export function CompanySearch({
   };
 
   const handleInputFocus = () => {
-    if (customMode) return;
+    if (customMode || isSelected) return; // 自定义模式或已选择企业时不显示下拉框
     if (suggestions.length > 0 || allowCustom) {
       setShowDropdown(true);
     }

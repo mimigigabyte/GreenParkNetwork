@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { getUserCompanyInfo, submitCompanyProfile, type CompanyProfileData } from '@/api/company'
 import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators'
@@ -20,6 +20,9 @@ export default function MobileCompanyInfoPage() {
   const [saving, setSaving] = useState(false)
   const { data: fd, isLoading: fdLoading, loadProvinces, loadDevelopmentZones, refetch } = useFilterData()
   const transformed = useMemo(() => transformFilterDataForComponents(fd, locale), [fd, locale])
+
+  // 使用ref跟踪是否已经预加载过数据
+  const preloadedRef = useRef({ provinces: false, zones: false })
 
   const [form, setForm] = useState<CompanyProfileData>({
     companyName: '',
@@ -45,6 +48,11 @@ export default function MobileCompanyInfoPage() {
         if (!mounted) return
         if (info.success && info.data) {
           const d = info.data
+          console.log('📋 企业信息数据:', {
+            country: d.country,
+            province: d.province,
+            economicZone: d.development_zone
+          })
           setForm(prev => ({
             ...prev,
             companyName: d.name_zh || '',
@@ -76,7 +84,10 @@ export default function MobileCompanyInfoPage() {
     onChange('country', code)
     onChange('province','')
     onChange('economicZone','')
-    if (code) {
+    // 重置预加载标记，允许重新加载
+    preloadedRef.current.provinces = false
+    preloadedRef.current.zones = false
+    if (code === 'china') {
       const countryId = (fd.countries || []).find(c=>c.code===code)?.id
       if (countryId) await loadProvinces(countryId)
     }
@@ -85,26 +96,48 @@ export default function MobileCompanyInfoPage() {
   const onProvinceChange = async (code: string) => {
     onChange('province', code)
     onChange('economicZone','')
+    // 重置经开区预加载标记，允许重新加载
+    preloadedRef.current.zones = false
     if (code) {
       const provinceId = (fd.provinces || []).find(p=>p.code===code)?.id
       if (provinceId) await loadDevelopmentZones(provinceId)
     }
   }
 
-  // Preload provinces/zones with IDs once fd is ready and form has codes
+  // Preload provinces once when form.country is set
   useEffect(() => {
     (async () => {
-      if (fdLoading) return
-      if (form.country) {
-        const countryId = (fd.countries || []).find(c=>c.code===form.country)?.id
-        if (countryId) await loadProvinces(countryId)
-      }
-      if (form.province) {
-        const provinceId = (fd.provinces || []).find(p=>p.code===form.province)?.id
-        if (provinceId) await loadDevelopmentZones(provinceId)
+      if (fdLoading || loading || preloadedRef.current.provinces) return
+      if (form.country === 'china') {
+        const countryId = (fd.countries || []).find(c=>c.code==='china')?.id
+        if (countryId) {
+          console.log('🔄 加载省份数据，国家: china，国家ID:', countryId)
+          await loadProvinces(countryId)
+          preloadedRef.current.provinces = true
+        }
       }
     })()
-  }, [fdLoading])
+  }, [fdLoading, loading, form.country])
+
+  // Preload development zones with a slight delay to ensure provinces are loaded
+  // 注意：依赖 fd.provinces，确保在省份数据异步就绪后能再次尝试加载经开区
+  useEffect(() => {
+    if (fdLoading || loading || preloadedRef.current.zones || !form.province) return
+
+    const timer = setTimeout(async () => {
+      if (preloadedRef.current.zones) return // 双重检查
+      const provinceId = (fd.provinces || []).find(p=>p.code===form.province)?.id
+      if (provinceId) {
+        console.log('🔄 加载经开区数据，省份:', form.province, '省份ID:', provinceId)
+        await loadDevelopmentZones(provinceId)
+        preloadedRef.current.zones = true
+      } else {
+        console.log('⚠️ 未找到省份ID，省份代码:', form.province, '可用省份数量:', fd.provinces?.length)
+      }
+    }, 100) // 100ms延迟确保省份数据已加载
+
+    return () => clearTimeout(timer)
+  }, [fdLoading, loading, form.province, fd.provinces])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -169,7 +202,7 @@ export default function MobileCompanyInfoPage() {
             </select>
           </Field>
           <Field label={locale==='en'?'Province/State':'省份'}>
-            <select value={form.province} onChange={e=>onProvinceChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.country}>
+            <select value={form.province} onChange={e=>onProvinceChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={form.country !== 'china'}>
               <option value="">{locale==='en'?'Select':'选择'}</option>
               {(transformed.provinces||[]).map(p=> (
                 <option key={p.value} value={p.value}>{p.label}</option>
@@ -178,12 +211,16 @@ export default function MobileCompanyInfoPage() {
           </Field>
         </div>
             <Field label={locale==='en'?'National Development Zone':'国家级经开区'}>
-              <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province}>
+              <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province || form.country !== 'china'}>
                 <option value="">{locale==='en'?'Select':'选择'}</option>
                 <option value="none">{locale==='en'?'Not in national development zone':'不在国家级经开区内'}</option>
                 {(transformed.developmentZones||[]).map(z=> (
                   <option key={z.value} value={z.value}>{z.label}</option>
                 ))}
+                {/* 调试信息 */}
+                {transformed.developmentZones?.length === 0 && form.province && (
+                  <option disabled>调试: 省份={form.province}, 经开区数量=0</option>
+                )}
               </select>
             </Field>
         <Field label={locale==='en'?'Address':'详细地址'}>

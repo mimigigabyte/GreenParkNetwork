@@ -154,8 +154,8 @@ export default function MobileCompanyProfilePage() {
       const res = await submitCompanyProfile(submitData)
       if (res.success) {
         localStorage.setItem('company_name', formData.companyName)
-        alert(locale==='en' ? 'Company profile saved successfully' : '保存企业信息成功')
-        setTimeout(()=> router.replace(`/${locale}/m/home`), 400)
+        // 直接跳转，不显示alert避免在返回时出现提示
+        router.replace(`/${locale}/m/home`)
       } else {
         alert(res.error || (locale==='en'?'Submit failed':'提交失败'))
       }
