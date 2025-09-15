@@ -26,6 +26,7 @@ export default function MobileCompanyProfilePage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitLoading, setSubmitLoading] = useState(false)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [qccDataFetched, setQccDataFetched] = useState(false) // 是否获取了企查查数据
 
   const [formData, setFormData] = useState({
     requirement: '',
@@ -99,7 +100,12 @@ export default function MobileCompanyProfilePage() {
     }))
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }))
 
-    if (field === 'companyName' && value && !formData.logoFile) generateLogoPreview(value)
+    // 如果是手动修改企业名称，清除企查查数据获取状态
+    if (field === 'companyName') {
+      setQccDataFetched(false)
+      if (value && !formData.logoFile) generateLogoPreview(value)
+    }
+
     if (field === 'country') {
       const china = (fd.countries || []).find(c => c.code === 'china')
       if (value === 'china' && china) loadProvinces(china.id)
@@ -206,13 +212,19 @@ export default function MobileCompanyProfilePage() {
                     contactPerson: c.legalRepresentative || prev.contactPerson,
                     address: c.address || prev.address,
                   }))
+                  setQccDataFetched(true) // 标记已获取企查查数据
                   if (!formData.logoFile && c.name) generateLogoPreview(c.name)
                 }}
-                placeholder={locale==='en'?'Search company (QCC)':'查询企业（企查查）'}
+                placeholder={locale==='en'?'Enter company name keywords for auto search':'输入企业名称关键词自动搜索匹配'}
                 className="mt-0"
                 allowCustom
                 customLabel={locale==='en' ? 'Custom company name' : '自定义输入企业名称'}
               />
+              {qccDataFetched && (
+                <div className="mt-1 text-[12px] text-green-600">
+                  ✓ {locale==='en'?'Business registration data automatically retrieved':'已自动获取企业工商信息'}
+                </div>
+              )}
             </Field>
             {/* 按 Web 端规范：仅保留企业名称单一输入，无企查查搜索框 */}
 

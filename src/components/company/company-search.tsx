@@ -41,21 +41,8 @@ export function CompanySearch({
   const inputRef = useRef<HTMLInputElement>(null);
   const [customMode, setCustomMode] = useState(false);
   const [notFound, setNotFound] = useState(false); // API 201: 未找到匹配
+  const [isSelected, setIsSelected] = useState(false); // 是否已选择企业，阻止自动搜索
 
-  // 防抖搜索
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (value && value.length >= 2) {
-        searchCompanies(value);
-      } else {
-        setSuggestions([]);
-        setShowDropdown(false);
-        setSearchError('');
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [value]);
 
   // 点击外部关闭下拉框
   useEffect(() => {
@@ -109,21 +96,17 @@ export function CompanySearch({
     }
   };
 
-  // 防抖搜索（加入自定义模式控制）
+  // 防抖搜索
   useEffect(() => {
+    if (customMode || isSelected) return; // 如果在自定义模式或已选择企业，不执行搜索
+
     const timeoutId = setTimeout(() => {
       const trimmed = (value || '').trim()
       if (!trimmed) {
         setSuggestions([])
         setShowDropdown(false)
         setSearchError('')
-        return
-      }
-      if (customMode) {
-        // 自定义模式：不再自动弹出/搜索
-        setSuggestions([])
-        setShowDropdown(false)
-        setSearchError('')
+        setNotFound(false)
         return
       }
       if (trimmed.length >= 2) {
@@ -132,23 +115,32 @@ export function CompanySearch({
         setSuggestions([])
         setShowDropdown(!!allowCustom)
         setSearchError('')
+        setNotFound(false)
       }
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [value, customMode, allowCustom])
+  }, [value, customMode, allowCustom, isSelected])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSelected(false); // 用户手动输入时，重置选择状态，允许搜索
     onChange(e.target.value);
   };
 
   const handleSelectCompany = (company: CompanySearchResult) => {
+    setIsSelected(true); // 标记已选择企业，阻止自动搜索
     onChange(company.name);
     onSelect(company);
     setShowDropdown(false);
     setSuggestions([]);
-    // 选择了正式结果，退出自定义模式
+    setSearchError('');
+    setNotFound(false);
     setCustomMode(false);
+
+    // 移除输入框焦点
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
   };
 
   const handleInputFocus = () => {
@@ -172,7 +164,7 @@ export function CompanySearch({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
+          className="w-full h-10 rounded-xl border border-gray-200 px-3 pl-10 bg-white text-[14px] focus:ring-2 focus:ring-[#00b899] focus:border-transparent outline-none transition-all"
         />
         {isLoading && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
