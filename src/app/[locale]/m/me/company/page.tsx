@@ -1,20 +1,25 @@
 "use client"
 
 import { useEffect, useMemo, useState } from 'react'
-import { usePathname } from 'next/navigation'
-import { getUserCompanyInfo, submitCompanyProfile, type CompanyProfileData, getCountries, getProvinces, getEconomicZones } from '@/api/company'
+import { usePathname, useRouter } from 'next/navigation'
+import { getUserCompanyInfo, submitCompanyProfile, type CompanyProfileData } from '@/api/company'
+import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators'
+import { I18nCompactImageUpload } from '@/components/ui/i18n-compact-image-upload'
+import { ArrowLeft } from 'lucide-react'
+import { useFilterData, transformFilterDataForComponents } from '@/hooks/admin/use-filter-data'
+import { COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
 
 type Option = { value: string; label: string; logo_url?: string }
 
 export default function MobileCompanyInfoPage() {
   const pathname = usePathname()
+  const router = useRouter()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [countries, setCountries] = useState<Option[]>([])
-  const [provinces, setProvinces] = useState<Option[]>([])
-  const [zones, setZones] = useState<Option[]>([])
+  const { data: fd, isLoading: fdLoading, loadProvinces, loadDevelopmentZones, refetch } = useFilterData()
+  const transformed = useMemo(() => transformFilterDataForComponents(fd, locale), [fd, locale])
 
   const [form, setForm] = useState<CompanyProfileData>({
     companyName: '',
@@ -36,11 +41,8 @@ export default function MobileCompanyInfoPage() {
     let mounted = true
     ;(async () => {
       try {
-        const [cRes, info] = await Promise.all([getCountries(), getUserCompanyInfo()])
+        const info = await getUserCompanyInfo()
         if (!mounted) return
-        if (cRes.success && Array.isArray(cRes.data)) {
-          setCountries(cRes.data.map((c: any)=>({ value: c.code, label: locale==='en'?(c.name_en||c.name_zh):c.name_zh, logo_url: c.logo_url })))
-        }
         if (info.success && info.data) {
           const d = info.data
           setForm(prev => ({
@@ -59,15 +61,7 @@ export default function MobileCompanyInfoPage() {
             contactEmail: d.contact_email || '',
             creditCode: d.credit_code || ''
           }))
-          // preload province/zone options when possible
-          if (d.country?.code) {
-            const pRes = await getProvinces(d.country.code)
-            if (pRes.success) setProvinces(pRes.data.map((p:any)=>({ value:p.code, label: locale==='en'?(p.name_en||p.name_zh):p.name_zh })))
-          }
-          if (d.province?.code) {
-            const zRes = await getEconomicZones(d.province.code)
-            if (zRes.success) setZones(zRes.data.map((z:any)=>({ value:z.code, label: locale==='en'?(z.name_en||z.name_zh):z.name_zh })))
-          }
+          // provinces/zones will be preloaded in next effect when fd is ready
         }
       } finally {
         if (mounted) setLoading(false)
@@ -82,26 +76,44 @@ export default function MobileCompanyInfoPage() {
     onChange('country', code)
     onChange('province','')
     onChange('economicZone','')
-    setProvinces([]); setZones([])
     if (code) {
-      const res = await getProvinces(code)
-      if (res.success) setProvinces(res.data.map((p:any)=>({ value:p.code, label: locale==='en'?(p.name_en||p.name_zh):p.name_zh })))
+      const countryId = (fd.countries || []).find(c=>c.code===code)?.id
+      if (countryId) await loadProvinces(countryId)
     }
   }
 
   const onProvinceChange = async (code: string) => {
     onChange('province', code)
     onChange('economicZone','')
-    setZones([])
     if (code) {
-      const res = await getEconomicZones(code)
-      if (res.success) setZones(res.data.map((z:any)=>({ value:z.code, label: locale==='en'?(z.name_en||z.name_zh):z.name_zh })))
+      const provinceId = (fd.provinces || []).find(p=>p.code===code)?.id
+      if (provinceId) await loadDevelopmentZones(provinceId)
     }
   }
+
+  // Preload provinces/zones with IDs once fd is ready and form has codes
+  useEffect(() => {
+    (async () => {
+      if (fdLoading) return
+      if (form.country) {
+        const countryId = (fd.countries || []).find(c=>c.code===form.country)?.id
+        if (countryId) await loadProvinces(countryId)
+      }
+      if (form.province) {
+        const provinceId = (fd.provinces || []).find(p=>p.code===form.province)?.id
+        if (provinceId) await loadDevelopmentZones(provinceId)
+      }
+    })()
+  }, [fdLoading])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.companyName.trim()) { alert(locale==='en'?'Please enter company name':'请输入企业名称'); return }
+    // 校验：国家为中国时必须选择省份
+    if (form.country === 'china' && !form.province) { alert(locale==='en'?'Please select a province':'请选择省份'); return }
+    // 校验：邮箱/电话格式
+    if (form.contactEmail && !isValidEmail(form.contactEmail)) { alert(emailError(locale as any)); return }
+    if (form.contactPhone && !isValidPhone(form.contactPhone, '+86')) { alert(phoneError(locale as any)); return }
     setSaving(true)
     try {
       const res = await submitCompanyProfile(form)
@@ -112,79 +124,108 @@ export default function MobileCompanyInfoPage() {
 
   return (
     <div className="px-3 py-3 pb-24" style={{ backgroundColor: '#edeef7' }}>
+      <h1 className="sr-only">{locale==='en'?'Company Information':'企业信息'}</h1>
+      {/* 企业基本信息 */}
       <div className="rounded-2xl bg-white p-3 border border-gray-100">
-        <h1 className="text-[16px] font-semibold text-gray-900 mb-3">{locale==='en'?'Company Information':'企业信息'}</h1>
+        <div className="mb-2 flex items-center gap-2">
+          <button onClick={()=>router.back()} aria-label={locale==='en'?'Back':'返回'} className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 inline-flex items-center justify-center active:scale-95">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <h2 className="text-[16px] font-semibold text-gray-900">{locale==='en'?'Basic Info':'企业基本信息'}</h2>
+        </div>
         {loading ? (
           <div className="space-y-2">
             <div className="h-10 bg-gray-100 rounded-xl" />
             <div className="h-10 bg-gray-100 rounded-xl" />
-            <div className="h-10 bg-gray-100 rounded-xl" />
           </div>
         ) : (
-          <form onSubmit={onSubmit} className="space-y-3">
+          <>
             <Field label={locale==='en'?'Company Name':'企业名称'}>
               <input value={form.companyName} onChange={e=>onChange('companyName', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
             </Field>
-            <Field label={locale==='en'?'Company Type':'企业类型'}>
-              <input value={form.companyType} onChange={e=>onChange('companyType', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" placeholder={locale==='en'?'e.g. Private Enterprise':'例如：民营企业'} />
+            <Field label={locale==='en'?'Company Logo':'企业Logo'}>
+              <I18nCompactImageUpload value={form.logoUrl} onChange={(url)=>onChange('logoUrl', url)} locale={locale as any} bucket="images" folder="company-logos" />
             </Field>
-            <div className="grid grid-cols-2 gap-2">
-              <Field label={locale==='en'?'Country/Region':'国家/地区'}>
-                <select value={form.country} onChange={e=>onCountryChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white">
-                  <option value="">{locale==='en'?'Select':'选择'}</option>
-                  {countries.map(c=> (
-                    <option key={c.value} value={c.value}>{c.label}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label={locale==='en'?'Province/State':'省份'}>
-                <select value={form.province} onChange={e=>onProvinceChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.country}>
-                  <option value="">{locale==='en'?'Select':'选择'}</option>
-                  {provinces.map(p=> (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-            <Field label={locale==='en'?'National Development Zone':'国家级经开区'}>
-              <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province}>
-                <option value="">{locale==='en'?'Select':'选择'}</option>
-                {zones.map(z=> (
-                  <option key={z.value} value={z.value}>{z.label}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label={locale==='en'?'Address':'详细地址'}>
-              <input value={form.address} onChange={e=>onChange('address', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-            </Field>
-            <div className="grid grid-cols-2 gap-2">
-              <Field label={locale==='en'?'Industry Code':'行业代码'}>
-                <input value={form.industryCode} onChange={e=>onChange('industryCode', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-              </Field>
-              <Field label={locale==='en'?'Annual Output (100M CNY)':'年产值（亿元）'}>
-                <input value={form.annualOutput} onChange={e=>onChange('annualOutput', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-              </Field>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Field label={locale==='en'?'Contact Person':'联系人'}>
-                <input value={form.contactPerson} onChange={e=>onChange('contactPerson', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-              </Field>
-              <Field label={locale==='en'?'Phone':'联系电话'}>
-                <input value={form.contactPhone} onChange={e=>onChange('contactPhone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-              </Field>
-            </div>
-            <Field label={locale==='en'?'Email':'联系邮箱'}>
-              <input value={form.contactEmail} onChange={e=>onChange('contactEmail', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-            </Field>
-            <Field label={locale==='en'?'Unified Social Credit Code':'统一社会信用代码'}>
-              <input value={form.creditCode} onChange={e=>onChange('creditCode', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
-            </Field>
-
-            <button disabled={saving} className={`w-full h-10 rounded-xl ${saving?'bg-gray-300':'bg-[#00b899] hover:opacity-95'} text-white text-[14px]`}>
-              {saving ? (locale==='en'?'Saving...':'保存中...') : (locale==='en'?'Save':'保存')}
-            </button>
-          </form>
+          </>
         )}
+      </div>
+
+      {/* 地址信息 */}
+      <div className="mt-3 rounded-2xl bg-white p-3 border border-gray-100">
+        <h2 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Address':'地址信息'}</h2>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label={locale==='en'?'Country/Region':'国家/地区'}>
+            <select value={form.country} onChange={e=>onCountryChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white">
+              <option value="">{locale==='en'?'Select':'选择'}</option>
+              {(transformed.countries||[]).map(c=> (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label={locale==='en'?'Province/State':'省份'}>
+            <select value={form.province} onChange={e=>onProvinceChange(e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.country}>
+              <option value="">{locale==='en'?'Select':'选择'}</option>
+              {(transformed.provinces||[]).map(p=> (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <Field label={locale==='en'?'National Development Zone':'国家级经开区'}>
+          <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province}>
+            <option value="">{locale==='en'?'Select':'选择'}</option>
+            {(transformed.developmentZones||[]).map(z=> (
+              <option key={z.value} value={z.value}>{z.label}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label={locale==='en'?'Address':'详细地址'}>
+          <input value={form.address} onChange={e=>onChange('address', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+        </Field>
+      </div>
+
+      {/* 企业详情 */}
+      <div className="mt-3 rounded-2xl bg-white p-3 border border-gray-100">
+        <h2 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Company Details':'企业详情'}</h2>
+        <Field label={locale==='en'?'Company Nature':'企业性质'}>
+          <select value={form.companyType} onChange={e=>onChange('companyType', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white">
+            <option value="">{locale==='en'?'Select':'选择'}</option>
+            {COMPANY_TYPE_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{locale==='en'? opt.label_en : opt.label_zh}</option>
+            ))}
+          </select>
+        </Field>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label={locale==='en'?'Industry Code':'行业代码'}>
+            <input value={form.industryCode} onChange={e=>onChange('industryCode', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+          </Field>
+          <Field label={locale==='en'?'Annual Output (100M CNY)':'工业总产值（亿元）'}>
+            <input value={form.annualOutput} onChange={e=>onChange('annualOutput', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+          </Field>
+        </div>
+      </div>
+
+      {/* 联系人信息 */}
+      <div className="mt-3 rounded-2xl bg-white p-3 border border-gray-100">
+        <h2 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Contact':'联系人信息'}</h2>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label={locale==='en'?'Contact Person':'联系人'}>
+            <input value={form.contactPerson} onChange={e=>onChange('contactPerson', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+          </Field>
+          <Field label={locale==='en'?'Phone':'联系电话'}>
+            <input value={form.contactPhone} onChange={e=>onChange('contactPhone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+          </Field>
+        </div>
+        <Field label={locale==='en'?'Email':'联系邮箱'}>
+          <input value={form.contactEmail} onChange={e=>onChange('contactEmail', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
+        </Field>
+      </div>
+
+      {/* 提交按钮 */}
+      <div className="mt-3">
+        <button disabled={saving} className={`w-full h-10 rounded-xl ${saving?'bg-gray-300':'bg-[#00b899] hover:opacity-95'} text-white text-[14px]`}>
+          {saving ? (locale==='en'?'Saving...':'保存中...') : (locale==='en'?'Save':'保存')}
+        </button>
       </div>
     </div>
   )
@@ -198,4 +239,3 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   )
 }
-
