@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { createContactMessage } from '@/lib/supabase/contact-messages'
+import { ArrowLeft } from 'lucide-react'
 
 export default function MobileFeedbackPage() {
   const pathname = usePathname()
+  const router = useRouter()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
   const { user } = useAuthContext()
 
@@ -38,7 +40,12 @@ export default function MobileFeedbackPage() {
   return (
     <div className="px-3 py-3 pb-20" style={{ backgroundColor: '#edeef7' }}>
       <div className="rounded-2xl bg-white p-3 border border-gray-100">
-        <h1 className="text-[16px] font-semibold text-gray-900 mb-2">{locale==='en'?'Feedback':'问题反馈'}</h1>
+        <div className="mb-2 flex items-center gap-2">
+          <button onClick={()=>router.back()} aria-label={locale==='en'?'Back':'返回'} className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 inline-flex items-center justify-center active:scale-95">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <h2 className="text-[16px] font-semibold text-gray-900">{locale==='en'?'Feedback':'问题反馈'}</h2>
+        </div>
         <form onSubmit={onSubmit} className="space-y-3">
           <Field label={locale==='en'?'Name(optional)':'姓名（可选）'}>
             <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
@@ -71,4 +78,3 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   )
 }
-

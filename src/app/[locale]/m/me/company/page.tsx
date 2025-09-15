@@ -125,6 +125,7 @@ export default function MobileCompanyInfoPage() {
   return (
     <div className="px-3 py-3 pb-24" style={{ backgroundColor: '#edeef7' }}>
       <h1 className="sr-only">{locale==='en'?'Company Information':'企业信息'}</h1>
+      <form onSubmit={onSubmit} className="space-y-3">
       {/* 企业基本信息 */}
       <div className="rounded-2xl bg-white p-3 border border-gray-100">
         <div className="mb-2 flex items-center gap-2">
@@ -223,10 +224,11 @@ export default function MobileCompanyInfoPage() {
 
       {/* 提交按钮 */}
       <div className="mt-3">
-        <button disabled={saving} className={`w-full h-10 rounded-xl ${saving?'bg-gray-300':'bg-[#00b899] hover:opacity-95'} text-white text-[14px]`}>
+        <button type="submit" disabled={saving} className={`w-full h-10 rounded-xl ${saving?'bg-gray-300':'bg-[#00b899] hover:opacity-95'} text-white text-[14px]`}>
           {saving ? (locale==='en'?'Saving...':'保存中...') : (locale==='en'?'Save':'保存')}
         </button>
       </div>
+      </form>
     </div>
   )
 }
