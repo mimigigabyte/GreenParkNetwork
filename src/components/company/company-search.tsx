@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, Building2, MapPin, User } from 'lucide-react';
+import { Search, Building2, MapPin, User, Pencil } from 'lucide-react';
 
 export interface CompanySearchResult {
   id: string;
@@ -20,6 +20,8 @@ interface CompanySearchProps {
   onSelect: (company: CompanySearchResult) => void;
   placeholder?: string;
   className?: string;
+  allowCustom?: boolean; // 允许顶部自定义选项
+  customLabel?: string;  // 自定义选项文案
 }
 
 export function CompanySearch({ 
@@ -27,7 +29,9 @@ export function CompanySearch({
   onChange, 
   onSelect, 
   placeholder = "请输入企业名称", 
-  className = "" 
+  className = "",
+  allowCustom = false,
+  customLabel = "自定义输入企业名称"
 }: CompanySearchProps) {
   const [suggestions, setSuggestions] = useState<CompanySearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +39,8 @@ export function CompanySearch({
   const [searchError, setSearchError] = useState<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [customMode, setCustomMode] = useState(false);
+  const [notFound, setNotFound] = useState(false); // API 201: 未找到匹配
 
   // 防抖搜索
   useEffect(() => {
@@ -71,10 +77,19 @@ export function CompanySearch({
   const searchCompanies = async (searchKey: string) => {
     setIsLoading(true);
     setSearchError('');
+    setNotFound(false);
 
     try {
       const response = await fetch(`/api/company/search?q=${encodeURIComponent(searchKey)}`);
       const result = await response.json();
+
+      // 特殊处理：201 表示未找到匹配企业
+      if (response.status === 201) {
+        setSuggestions([]);
+        setNotFound(true);
+        setShowDropdown(true);
+        return;
+      }
 
       if (result.success) {
         setSuggestions(result.data || []);
@@ -94,6 +109,35 @@ export function CompanySearch({
     }
   };
 
+  // 防抖搜索（加入自定义模式控制）
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const trimmed = (value || '').trim()
+      if (!trimmed) {
+        setSuggestions([])
+        setShowDropdown(false)
+        setSearchError('')
+        return
+      }
+      if (customMode) {
+        // 自定义模式：不再自动弹出/搜索
+        setSuggestions([])
+        setShowDropdown(false)
+        setSearchError('')
+        return
+      }
+      if (trimmed.length >= 2) {
+        searchCompanies(trimmed)
+      } else {
+        setSuggestions([])
+        setShowDropdown(!!allowCustom)
+        setSearchError('')
+      }
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [value, customMode, allowCustom])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
@@ -103,10 +147,13 @@ export function CompanySearch({
     onSelect(company);
     setShowDropdown(false);
     setSuggestions([]);
+    // 选择了正式结果，退出自定义模式
+    setCustomMode(false);
   };
 
   const handleInputFocus = () => {
-    if (suggestions.length > 0) {
+    if (customMode) return;
+    if (suggestions.length > 0 || allowCustom) {
       setShowDropdown(true);
     }
   };
@@ -135,20 +182,58 @@ export function CompanySearch({
       </div>
 
       {/* 搜索提示下拉框 */}
-      {(showDropdown || searchError) && (
+      {(showDropdown || searchError || notFound) && (
         <div 
           ref={dropdownRef}
           className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto"
         >
-          {searchError ? (
+          {notFound ? (
+            <div
+              className="p-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-50"
+              onMouseDown={(e)=>{
+                e.preventDefault();
+                setShowDropdown(false);
+                setNotFound(false); // 重置 notFound 状态
+                setCustomMode(true);
+                setSuggestions([]);
+                setSearchError('');
+                setTimeout(()=>inputRef.current?.focus(),0);
+              }}
+            >
+              未找到匹配的企业，手动输入
+            </div>
+          ) : searchError ? (
             <div className="p-4 text-red-500 text-sm text-center">
               <div className="flex items-center justify-center space-x-2">
                 <span>⚠️</span>
                 <span>{searchError}</span>
               </div>
             </div>
-          ) : suggestions.length > 0 ? (
+          ) : suggestions.length > 0 || allowCustom ? (
             <div className="py-2">
+              {allowCustom && (
+                <div
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                  onMouseDown={(e) => {
+                    // 用 onMouseDown 提前触发，避免后续 focus 再次展开
+                    e.preventDefault();
+                    setCustomMode(true);
+                    setShowDropdown(false);
+                    setSuggestions([]);
+                    setSearchError('');
+                    // 下一帧聚焦输入框，避免事件竞争
+                    setTimeout(() => inputRef.current?.focus(), 0);
+                  }}
+                >
+                  <div className="flex items-start space-x-3">
+                    <Pencil className="h-5 w-5 text-[#00b899] mt-0.5 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-medium text-gray-900">{customLabel || '关闭自动匹配企业信息'}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">自定义输入企业名称</div>
+                    </div>
+                  </div>
+                </div>
+              )}
               {suggestions.map((company) => (
                 <div
                   key={company.id}

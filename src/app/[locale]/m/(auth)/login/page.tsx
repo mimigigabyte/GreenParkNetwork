@@ -11,7 +11,7 @@ import { customAuthApi } from '@/api/customAuth'
 import { tencentSmsAuthApi } from '@/api/tencentSmsAuth'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { emailVerificationApi } from '@/api/emailVerification'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 
 export default function MobileLoginPage() {
@@ -57,17 +57,7 @@ function LoginContent() {
   const [regCountdown, setRegCountdown] = useState(0)
   const [countryCode] = useState('+86')
 
-  // Create an H5-only Supabase client with a distinct storageKey to avoid
-  // the "Multiple GoTrueClient instances" warning under the same key.
-  const supabaseH5 = useMemo(() => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-    try {
-      return createClient(url, key, { auth: { storageKey: 'sb-h5-auth-token', persistSession: true } })
-    } catch {
-      return null
-    }
-  }, [])
+  // 使用全局 Supabase 客户端，确保会话能被全局 AuthProvider 识别
 
   const goAfterLogin = () => router.replace(`/${locale}/m/home`)
   const goAfterRegister = () => router.push(`/${locale}/company-profile`)
@@ -216,19 +206,23 @@ function LoginContent() {
           code: regCode,
           password: regPassword,
         })
-        if (result.success && 'data' in result && (result as any).data?.token && supabaseH5) {
-          try {
-            await supabaseH5.auth.setSession({
-              access_token: (result as any).data.token,
-              refresh_token: (result as any).data.refreshToken || ''
-            })
-          } catch {}
+        // 邮箱注册：若返回 token，同步设置全局 Supabase 会话
+        if (result.success && 'data' in result && (result as any).data?.token) {
+          const data: any = (result as any).data
+          try { localStorage.setItem('access_token', data.token); if (data.refreshToken) localStorage.setItem('refresh_token', data.refreshToken) } catch {}
+          try { await supabase.auth.setSession({ access_token: data.token, refresh_token: data.refreshToken || '' }) } catch {}
         }
       }
       if (result.success && 'data' in result && result.data) {
+        // 手机注册：如果带 token，一并持久化，保证后续页面立即识别为登录态
+        const data: any = (result as any).data
+        if (data?.token) {
+          try { localStorage.setItem('access_token', data.token); if (data.refreshToken) localStorage.setItem('refresh_token', data.refreshToken) } catch {}
+        }
         await checkUser()
         alert(locale==='en'?'Registration successful!':'注册成功！')
-        setTimeout(() => goAfterRegister(), 200)
+        // 直接跳转完善企业信息页（已改为移动端路由）
+        router.replace(`/${locale}/m/company-profile`)
       } else {
         alert('error' in result ? (result as any).error : (locale==='en'?'Registration failed':'注册失败'))
       }

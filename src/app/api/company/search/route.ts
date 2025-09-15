@@ -33,10 +33,20 @@ export async function GET(request: NextRequest) {
     const result = await searchCompanies(searchKey);
 
     if (!result.success) {
+      const errMsg = result.error || ''
+      // 业务约定：当企查查返回状态码201（未找到匹配企业）时，转发为HTTP 201
+      // 供前端触发“手动输入企业名称”的交互
+      if (/未找到匹配|状态码\s*:\s*201/.test(errMsg)) {
+        return NextResponse.json(
+          { success: false, error: '未找到匹配的企业信息' },
+          { status: 201 }
+        )
+      }
+
       return NextResponse.json(
         { 
           success: false, 
-          error: result.error || '企业搜索失败' 
+          error: errMsg || '企业搜索失败' 
         },
         { status: 500 }
       );

@@ -116,7 +116,12 @@ export default function MobileCompanyInfoPage() {
     if (form.contactPhone && !isValidPhone(form.contactPhone, '+86')) { alert(phoneError(locale as any)); return }
     setSaving(true)
     try {
-      const res = await submitCompanyProfile(form)
+      const payload: CompanyProfileData = {
+        ...form,
+        province: form.province || undefined,
+        economicZone: form.economicZone && form.economicZone !== 'none' ? form.economicZone : undefined
+      }
+      const res = await submitCompanyProfile(payload)
       if (res.success) alert(locale==='en'?'Saved successfully':'保存成功')
       else alert(res.error || (locale==='en'?'Save failed':'保存失败'))
     } finally { setSaving(false) }
@@ -172,14 +177,15 @@ export default function MobileCompanyInfoPage() {
             </select>
           </Field>
         </div>
-        <Field label={locale==='en'?'National Development Zone':'国家级经开区'}>
-          <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province}>
-            <option value="">{locale==='en'?'Select':'选择'}</option>
-            {(transformed.developmentZones||[]).map(z=> (
-              <option key={z.value} value={z.value}>{z.label}</option>
-            ))}
-          </select>
-        </Field>
+            <Field label={locale==='en'?'National Development Zone':'国家级经开区'}>
+              <select value={form.economicZone} onChange={e=>onChange('economicZone', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" disabled={!form.province}>
+                <option value="">{locale==='en'?'Select':'选择'}</option>
+                <option value="none">{locale==='en'?'Not in national development zone':'不在国家级经开区内'}</option>
+                {(transformed.developmentZones||[]).map(z=> (
+                  <option key={z.value} value={z.value}>{z.label}</option>
+                ))}
+              </select>
+            </Field>
         <Field label={locale==='en'?'Address':'详细地址'}>
           <input value={form.address} onChange={e=>onChange('address', e.target.value)} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
         </Field>
