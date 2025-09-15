@@ -16,7 +16,7 @@ export default function MobileLayout({
   const tabs = useMemo(
     () => [
       { key: 'home', labelZh: '首页', labelEn: 'Home', href: `/${locale}/m/home`, Icon: Home },
-      { key: 'publish', labelZh: '技术发布', labelEn: 'Publish', href: `/${locale}/m/console`, Icon: Upload },
+      { key: 'publish', labelZh: '技术发布', labelEn: 'Publish', href: `/${locale}/m/me/technologies`, Icon: Upload },
       { key: 'messages', labelZh: '消息', labelEn: 'Messages', href: `/${locale}/m/chat`, Icon: MessageSquare },
       { key: 'me', labelZh: '我的', labelEn: 'Me', href: `/${locale}/m/me`, Icon: User },
     ],

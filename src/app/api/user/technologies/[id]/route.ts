@@ -2,6 +2,37 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
 
+// GET - 获取单个用户技术详情（含分类/子分类、附件等）
+export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const { id } = params
+
+    const { data, error } = await db
+      .from('admin_technologies')
+      .select(`
+        *,
+        category:category_id(*),
+        subcategory:subcategory_id(*)
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      console.error('获取用户技术详情失败:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: '技术不存在' }, { status: 404 })
+    }
+
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('用户技术详情API错误:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 // PUT - 用户更新技术
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {

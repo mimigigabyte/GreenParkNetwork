@@ -32,9 +32,13 @@
 │   │   │   ├── layout.tsx              # 移动端共享布局（底部Tab）
 │   │   │   ├── page.tsx                # 重定向到 /home
 │   │   │   ├── home/page.tsx           # 移动端首页
-│   │   │   ├── console/page.tsx        # 移动端控制台
 │   │   │   ├── chat/page.tsx           # 移动端对话
-│   │   │   └── me/page.tsx             # 移动端我的
+│   │   │   ├── company-profile/page.tsx # 移动端企业信息完善（与Web逻辑一致，含Logo上传）
+│   │   │   ├── me/page.tsx             # 移动端我的
+│   │   │   └── me/company/page.tsx     # 移动端我的-企业信息（Logo可上传与展示）
+│   │   │   └── me/technologies/page.tsx # 移动端我的-技术发布列表/搜索/发布
+│   │   │   └── me/technologies/[id]/page.tsx # 移动端我的-技术详情
+│   │   │   └── me/technologies/page.tsx # 移动端我的-技术发布（搜索、发布、列表、加载更多）
 │   │   ├── globals.css       # 全局样式文件
 │   │   ├── layout.tsx        # 根布局组件
 │   │   ├── page.tsx          # 首页组件

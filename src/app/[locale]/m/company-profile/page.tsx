@@ -10,6 +10,7 @@ import { COMPANY_TYPE_OPTIONS } from '@/lib/types/admin'
 import { CompanySearch, type CompanySearchResult } from '@/components/company/company-search'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { generateCompanyLogo } from '@/lib/logoGenerator'
+import { I18nCompactImageUpload } from '@/components/ui/i18n-compact-image-upload'
 import { isValidEmail, isValidPhone, emailError, phoneError } from '@/lib/validators'
 
 export default function MobileCompanyProfilePage() {
@@ -32,6 +33,7 @@ export default function MobileCompanyProfilePage() {
     requirement: '',
     companyName: '',
     logoFile: null as File | null,
+    logoUrl: '' as string,
     country: '',
     province: '',
     economicZone: '',
@@ -135,8 +137,9 @@ export default function MobileCompanyProfilePage() {
     if (!user) { alert(locale==='en'?'Please login first':'请先登录'); return }
     setSubmitLoading(true)
     try {
-      let logoUrl = ''
-      if (!formData.logoFile && formData.companyName) {
+      // 优先采用用户上传的URL；若无，再按企业名自动生成
+      let logoUrl = formData.logoUrl || ''
+      if (!logoUrl && !formData.logoFile && formData.companyName) {
         try {
           const resp = await fetch('/api/generate-logo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ companyName: formData.companyName, size:256 }) })
           const data = await resp.json().catch(()=>({}))
@@ -183,10 +186,17 @@ export default function MobileCompanyProfilePage() {
   return (
     <section className="px-3 py-3 pb-24" style={{ backgroundColor: '#edeef7' }}>
       <form onSubmit={handleSubmit} className="space-y-3">
-        {/* Step indicator (simple) */}
-        <div className="rounded-2xl bg-white p-3 border border-gray-100">
-          <div className="text-[12px] text-gray-600">{locale==='en'?'Step':'步骤'} {step}/2</div>
-          <h1 className="mt-1 text-[16px] font-semibold text-gray-900">{t('title')}</h1>
+        {/* Header section matching web design */}
+        <div className="rounded-2xl bg-white p-4 border border-gray-100">
+          <h1 className="text-[18px] font-semibold text-gray-900 mb-2">
+            {locale==='en'?'Complete Company Information':'企业信息完善'}
+          </h1>
+          <div className="text-[12px] text-gray-500">
+            {locale==='en'
+              ?`Complete information to start your green low-carbon journey (Step ${step}/2)`
+              :`完善信息，即刻开启绿色低碳之旅 (第 ${step}/2 步)`
+            }
+          </div>
         </div>
 
         {step === 1 ? (
@@ -251,21 +261,27 @@ export default function MobileCompanyProfilePage() {
               </select>
             </Field>
 
-            {/* Logo 上传 or 预览 */}
+            {/* Logo 上传：与“我的-企业信息”统一，直接上传到 Supabase，获得可持久化URL */}
             <Field label={t('step1.logo')}>
-              {logoPreview ? (
-                <div className="flex items-start gap-3">
-                  <img src={logoPreview} alt="logo" className="w-12 h-12 rounded border flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-[12px] text-gray-600 mb-2">
-                      {locale==='en'?'System will auto-generate logo based on company name. You can also upload custom logo.':'系统将根据企业名称自动生成logo，您也可以上传自定义logo'}
-                    </p>
-                    <button type="button" onClick={()=>setLogoPreview(null)} className="text-[12px] text-[#00b899]">{locale==='en'?'Upload Image':'上传图片'}</button>
+              <div className="space-y-2">
+                <I18nCompactImageUpload
+                  value={formData.logoUrl}
+                  onChange={(url)=>{ setFormData(prev=>({ ...prev, logoUrl: url, logoFile: null })); if (url) setLogoPreview(null) }}
+                  bucket="images"
+                  folder="company-logos"
+                  locale={locale}
+                />
+                {logoPreview && !formData.logoUrl && (
+                  <div className="flex items-start gap-3">
+                    <img src={logoPreview} alt="logo" className="w-12 h-12 rounded border flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-[12px] text-gray-600 mb-2">
+                        {locale==='en'?'If no image is uploaded, a logo will be generated automatically on submit.':'若未上传图片，提交时将根据企业名称自动生成Logo'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px] bg-white" />
-              )}
+                )}
+              </div>
             </Field>
 
             <button type="button" onClick={handleNextStep} className="w-full h-10 rounded-xl bg-[#00b899] text-white text-[14px] mt-1">{tCommon('nextStep')}</button>
