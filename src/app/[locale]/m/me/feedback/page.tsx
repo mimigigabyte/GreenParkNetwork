@@ -25,7 +25,8 @@ export default function MobileFeedbackPage() {
         contact_name: form.name || (user.name || 'User'),
         contact_phone: form.phone || (user.phone || ''),
         contact_email: form.email || (user.email || ''),
-        message: form.message
+        message: form.message,
+        category: '用户反馈' // 明确标记为用户反馈
       })
       alert(locale==='en'?'Submitted successfully':'提交成功')
       setForm({ name: '', phone: '', email: '', message: '' })

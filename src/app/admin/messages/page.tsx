@@ -224,8 +224,11 @@ export default function AdminMessagesPage() {
   // 打开回复对话框
   const handleOpenReply = (message: ContactMessage) => {
     setSelectedMessage(message);
+    const isFeedback = message.category === '用户反馈';
     setReplyContent({
-      title: `关于您的咨询：${message.technology_name || '技术咨询'}`,
+      title: isFeedback
+        ? `关于您的反馈：问题处理回复`
+        : `关于您的咨询：${message.technology_name || '技术咨询'}`,
       content: ''
     });
     setReplyModalOpen(true);
@@ -249,7 +252,7 @@ export default function AdminMessagesPage() {
         contact_message_id: selectedMessage.id,
         title: replyContent.title,
         content: replyContent.content,
-        category: '技术对接'
+        category: selectedMessage.category || '技术对接'
       });
 
       // 同时将消息状态更新为已处理
@@ -294,6 +297,25 @@ export default function AdminMessagesPage() {
         已处理
       </Badge>
     );
+  };
+
+  // 获取类别徽章
+  const getCategoryBadge = (category?: string) => {
+    if (category === '用户反馈') {
+      return (
+        <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50">
+          <MessageSquare className="w-3 h-3 mr-1" />
+          用户反馈
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+          <Building2 className="w-3 h-3 mr-1" />
+          技术对接
+        </Badge>
+      );
+    }
   };
 
   return (
@@ -495,6 +517,7 @@ export default function AdminMessagesPage() {
                           </span>
                         </div>
                       )}
+                      {getCategoryBadge(message.category)}
                       {getStatusBadge(message.status)}
                     </div>
 

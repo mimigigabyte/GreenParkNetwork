@@ -12,6 +12,7 @@ export interface ContactMessage {
   contact_email: string;
   message: string;
   status: 'pending' | 'processed';
+  category?: '技术对接' | '用户反馈'; // 新增分类字段
   admin_reply?: string;
   admin_id?: string;
   replied_at?: string;
@@ -28,6 +29,7 @@ export interface CreateContactMessageData {
   contact_phone: string;
   contact_email: string;
   message: string;
+  category?: '技术对接' | '用户反馈'; // 新增分类字段
 }
 
 // 站内信数据类型定义
@@ -68,6 +70,7 @@ export async function createContactMessage(data: CreateContactMessageData): Prom
   const messageData = {
     user_id: user.id,
     ...data,
+    category: data.category || '技术对接', // 默认为技术对接
     status: 'pending' as const
   };
 
@@ -512,25 +515,31 @@ async function notifyAdminNewContactMessage(contactMessage: ContactMessage): Pro
     }
   }
   
+  // 根据消息类型创建不同的通知内容
+  const isFeedback = contactMessage.category === '用户反馈';
+  const titlePrefix = isFeedback ? '新的用户反馈' : '新的联系咨询';
+  const titleSuffix = isFeedback ? '问题反馈' : (contactMessage.technology_name || '技术咨询');
+  const category = isFeedback ? '用户反馈' : '技术对接';
+  
   // 为每个管理员创建站内信
   const notifications = admins.map(admin => ({
     from_user_id: contactMessage.user_id,
     to_user_id: admin.id,
     contact_message_id: contactMessage.id,
-    title: `新的联系咨询：${contactMessage.technology_name || '技术咨询'}`,
-    content: `您收到了一条新的联系消息：
+    title: `${titlePrefix}：${titleSuffix}`,
+    content: `您收到了一条新的${isFeedback ? '用户反馈' : '联系消息'}：
 
 联系人：${contactMessage.contact_name}
 联系电话：${contactMessage.contact_phone}
 联系邮箱：${contactMessage.contact_email}
-咨询技术：${contactMessage.technology_name || '无'}
-所属公司：${contactMessage.company_name || '无'}
+${isFeedback ? '' : `咨询技术：${contactMessage.technology_name || '无'}
+所属公司：${contactMessage.company_name || '无'}`}
 
-留言内容：
+${isFeedback ? '反馈' : '留言'}内容：
 ${contactMessage.message}
 
 请前往管理后台查看并处理此消息。`,
-    category: '技术对接'
+    category: category
   }));
   
   console.log('准备发送的通知数量:', notifications.length);
