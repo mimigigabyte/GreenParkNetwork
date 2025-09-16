@@ -309,9 +309,9 @@ export default function MobileChatPage() {
                     <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
                       <div className="w-full text-left">
                         {/* Two-column: left prefix, right content to align title/content/date */}
-                        <div className="flex items-start gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
                           {/* left prefix */}
-                          <div className="flex items-center gap-2 pt-0.5">
+                          <div className="flex items-center gap-2">
                             <input
                               type="checkbox"
                               className="w-4 h-4 rounded border-gray-300"
@@ -320,25 +320,28 @@ export default function MobileChatPage() {
                               onClick={(e) => e.stopPropagation()}
                             />
                             <div className={`w-2 h-2 rounded-full ${unread ? 'bg-blue-500' : 'bg-transparent'}`} />
-                            <div className="w-7 h-7 rounded-full bg-[#1d4ed8] flex items-center justify-center">
-                              <Mail className="w-4 h-4 text-white" />
-                            </div>
+                            
                           </div>
                           {/* right content column */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
-                              <button
-                                className={`text-left text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}
-                                onClick={() => markAsReadOne(m)}
-                              >
-                                {m.title}
-                              </button>
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="w-6 h-6 rounded-full bg-[#1d4ed8] flex items-center justify-center relative top-[1px]">
+                                  <Mail className="w-4 h-4 text-white" />
+                                </div>
+                                <button
+                                  className={`flex-1 text-left text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}
+                                  onClick={() => markAsReadOne(m)}
+                                >
+                                  {m.title}
+                                </button>
+                              </div>
                               <Badge className="shrink-0 whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-100 border border-gray-200 text-[10px] font-medium rounded-full px-2 py-0.5">
                                 {displayCategory}
                               </Badge>
                             </div>
-                            <div className="mt-0.5 text-[12px] text-gray-500 truncate">{m.content}</div>
-                            <div className="mt-1 text-[12px] text-gray-500">{formatDate(m.created_at)}</div>
+                            <div className="mt-1.5 pl-8 text-[12px] text-gray-500 truncate">{m.content}</div>
+                            <div className="mt-1.5 pl-8 text-[12px] text-gray-700">{formatDate(m.created_at)}</div>
                           </div>
                         </div>
                       </div>
