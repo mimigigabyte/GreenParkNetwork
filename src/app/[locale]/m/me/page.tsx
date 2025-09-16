@@ -10,8 +10,8 @@ export default function MobileMePage() {
   const { user, logout } = useAuthContext()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
 
-  const displayName = user?.name || user?.email || user?.phone || (locale==='en'?'Guest':'访客')
-  const initial = displayName?.charAt(0)?.toUpperCase() || 'U'
+  const displayName = user ? (user?.name || user?.email || user?.phone || (locale==='en'?'Guest':'访客')) : (locale==='en'?'Not logged in':'未登录')
+  const initial = user ? (displayName?.charAt(0)?.toUpperCase() || 'U') : null
 
   return (
     <div className="pb-20" style={{ backgroundColor: '#edeef7' }}>
@@ -20,16 +20,28 @@ export default function MobileMePage() {
         <div className="rounded-3xl bg-gradient-to-br from-[#10b981] to-[#059669] px-4 py-4 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center text-[18px] font-semibold text-[#007f66] shadow">
-              {initial}
+              {user ? initial : <User className="w-7 h-7" />}
             </div>
-            <div className="min-w-0 text-white">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="text-[18px] font-semibold truncate">{displayName}</div>
-                <span className="inline-flex items-center gap-1 px-2 h-6 rounded-full bg-white/20 text-[12px]">
-                  {locale==='en'?'Regular User':'普通用户'} <Crown className="w-3.5 h-3.5" />
-                </span>
+            <div className="min-w-0 text-white flex-1">
+              <div className="flex items-center justify-between min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="text-[18px] font-semibold truncate">{displayName}</div>
+                  {user && (
+                    <span className="inline-flex items-center gap-1 px-2 h-6 rounded-full bg-white/20 text-[12px]">
+                      {locale==='en'?'Regular User':'普通用户'} <Crown className="w-3.5 h-3.5" />
+                    </span>
+                  )}
+                </div>
+                {!user && (
+                  <button
+                    onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/login`)}
+                    className="h-8 px-3 rounded-lg bg-white/20 text-white text-[12px] font-medium border border-white/30 hover:bg-white/30 transition-colors"
+                  >
+                    {locale==='en'?'Go to Login':'去登录'}
+                  </button>
+                )}
               </div>
-              <div className="text-[12px] opacity-90 truncate">{user?.phone || user?.email || (locale==='en'?'Not bound':'未绑定')}</div>
+              <div className="text-[12px] opacity-90 truncate">{user?.phone || user?.email || (locale==='en'?'Please log in to access features':'请登录以使用功能')}</div>
             </div>
           </div>
         </div>

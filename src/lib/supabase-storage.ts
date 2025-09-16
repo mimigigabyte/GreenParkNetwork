@@ -39,22 +39,40 @@ export async function uploadFileToSupabase(
     // 准备请求头
     const headers: Record<string, string> = {};
     
-    // 如果不是管理员页面，需要添加用户认证token
+    // 如果不是管理员页面，需要添加用户认证token（为 getSession 增加超时，并回退到本地token）
     if (!isAdminPage) {
-      // 从 Supabase 获取当前用户的访问token
-      const token = await supabase.auth.getSession().then(({ data: { session } }) => 
-        session?.access_token
-      );
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      let token: string | null = null
+      try {
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timeout')), 3000))
+        ]) as { data: { session?: any } }
+        token = sessionResult?.data?.session?.access_token || null
+      } catch {}
+      if (!token) {
+        try { token = localStorage.getItem('custom_auth_token') } catch {}
       }
+      if (!token) {
+        try { token = localStorage.getItem('access_token') } catch {}
+      }
+      if (token) headers['Authorization'] = `Bearer ${token}`
     }
 
-    const response = await fetch(uploadUrl, {
+    // 增加请求超时，避免前端长时间等待
+    const controller = new AbortController()
+    const pending = fetch(uploadUrl, {
       method: 'POST',
       headers,
       body: formData,
-    });
+      signal: controller.signal,
+    })
+    const timeout = setTimeout(() => controller.abort('timeout'), 30000)
+    let response: Response
+    try {
+      response = await pending
+    } finally {
+      clearTimeout(timeout)
+    }
 
     if (!response.ok) {
       let errorMessage = `上传失败: HTTP ${response.status}`;
@@ -150,87 +168,61 @@ export async function uploadFileWithInfo(
   bucket: string = 'images',
   folder: string = 'uploads'
 ): Promise<FileAttachment> {
-  console.log(`开始上传文件到存储桶 '${bucket}', 文件夹 '${folder}'`);
-  console.log(`文件信息: ${file.name}, 大小: ${file.size}字节, 类型: ${file.type}`);
-
-  // 使用管理员客户端避免RLS权限问题
-  const client = supabaseAdmin || supabase;
-  if (!client) {
-    throw new Error('Supabase 客户端未初始化');
-  }
-
-  // 生成唯一文件名
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-  
-  console.log(`生成的文件名: ${fileName}`);
+  console.log(`开始上传文件到存储桶 '${bucket}', 文件夹 '${folder}'`)
+  console.log(`文件信息: ${file.name}, 大小: ${file.size}字节, 类型: ${file.type}`)
 
   try {
-    // 添加上传超时控制
-    const uploadPromise = client.storage
-      .from(bucket)
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('bucket', bucket)
+    formData.append('folder', folder)
 
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('上传超时，请检查网络连接或文件大小')), 30000)
-    );
+    // 非管理员统一走 /api/upload，带认证；为 getSession 加超时并回退本地 token
+    const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+    const uploadUrl = isAdminPage ? '/api/admin/upload' : '/api/upload'
+    const headers: Record<string, string> = {}
 
-    const result = await Promise.race([uploadPromise, timeoutPromise]);
-    const { data, error } = result as { data: any; error: any };
-
-    if (error) {
-      console.error('Supabase上传错误:', error);
-      
-      // 提供更友好的错误信息
-      if (error.message.includes('Bucket not found') || error.message.includes('bucket')) {
-        throw new Error(`存储桶 '${bucket}' 不存在。请检查存储配置。`);
-      }
-      if (error.message.includes('The resource already exists')) {
-        throw new Error(`文件已存在，请重试或重命名文件。`);
-      }
-      if (error.message.includes('413') || error.message.includes('too large')) {
-        throw new Error(`文件太大，请选择小于10MB的文件。`);
-      }
-      
-      throw new Error(`上传失败: ${error.message}`);
+    if (!isAdminPage) {
+      let token: string | null = null
+      try {
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timeout')), 3000))
+        ]) as { data: { session?: any } }
+        token = sessionResult?.data?.session?.access_token || null
+      } catch {}
+      if (!token) { try { token = localStorage.getItem('custom_auth_token') || null } catch {} }
+      if (!token) { try { token = localStorage.getItem('access_token') || null } catch {} }
+      if (token) headers['Authorization'] = `Bearer ${token}`
     }
 
-    if (!data || !data.path) {
-      throw new Error('上传成功但未返回文件路径');
+    const controller = new AbortController()
+    const pending = fetch(uploadUrl, { method: 'POST', headers, body: formData, signal: controller.signal })
+    const timeout = setTimeout(() => controller.abort('timeout'), 30000)
+    let resp: Response
+    try {
+      resp = await pending
+    } finally {
+      clearTimeout(timeout)
     }
 
-    console.log('文件上传成功到Supabase:', data);
-
-    // 获取公共URL
-    const { data: publicData } = client.storage
-      .from(bucket)
-      .getPublicUrl(fileName);
-
-    if (!publicData || !publicData.publicUrl) {
-      throw new Error('无法生成文件访问URL');
+    if (!resp.ok) {
+      let errorMessage = `上传失败: HTTP ${resp.status}`
+      try { const e = await resp.json(); errorMessage = e.error || errorMessage } catch { /* ignore */ }
+      throw new Error(errorMessage)
     }
 
-    console.log('生成的公共URL:', publicData.publicUrl);
-    
-    // 返回完整的附件信息
+    const result = await resp.json()
     return {
-      url: publicData.publicUrl,
-      filename: file.name, // 保存原始文件名
-      size: file.size,
-      type: file.type
-    };
-  } catch (error) {
-    console.error('上传过程中发生错误:', error);
-    
-    // 重新抛出更友好的错误信息
-    if (error instanceof Error) {
-      throw error;
-    } else {
-      throw new Error('上传失败，请重试');
+      url: result.url as string,
+      filename: result.filename || file.name,
+      size: result.size || file.size,
+      type: result.type || file.type
     }
+  } catch (error) {
+    console.error('上传过程中发生错误:', error)
+    if (error instanceof Error) throw error
+    throw new Error('上传失败，请重试')
   }
 }
 

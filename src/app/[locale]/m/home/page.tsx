@@ -143,6 +143,17 @@ export default function MobileHomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fdLoading])
 
+  // Fallback: trigger an initial search on mount even if filter data is slow or fails
+  useEffect(() => {
+    let timer: any = setTimeout(() => {
+      if (!searchLoading && items.length === 0) {
+        performSearch(true)
+      }
+    }, 1200)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const pageContent = (
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
       {/* Header: title aligned with language switcher; header is sticky at top */}

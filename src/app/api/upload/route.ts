@@ -42,9 +42,26 @@ export async function POST(request: NextRequest) {
       folder
     })
 
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: '只支持图片文件' }, { status: 400 })
+    // 验证文件类型（统一支持图片与常见文档）
+    const allowedTypes = new Set([
+      // images
+      'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp',
+      // pdf
+      'application/pdf',
+      // office docs
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      // text
+      'text/plain'
+    ])
+    if (file.type && (file.type.startsWith('image/') || allowedTypes.has(file.type))) {
+      // ok
+    } else {
+      return NextResponse.json({ error: '不支持的文件类型' }, { status: 400 })
     }
 
     // 验证文件大小 (10MB)
