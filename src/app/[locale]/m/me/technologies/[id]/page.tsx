@@ -2,18 +2,23 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { getUserTechnologyByIdApi } from '@/lib/api/user-technologies'
+import { getUserTechnologyByIdApi, deleteUserTechnologyApi } from '@/lib/api/user-technologies'
 import type { AdminTechnology, TechReviewStatus } from '@/lib/types/admin'
 import { TECH_REVIEW_STATUS_OPTIONS, TECH_SOURCE_OPTIONS } from '@/lib/types/admin'
-import { ArrowLeft, Image as ImageIcon, Tag, Link as LinkIcon, FileText } from 'lucide-react'
+import { ArrowLeft, Image as ImageIcon, Tag, Link as LinkIcon, FileText, Trash2, Edit as EditIcon } from 'lucide-react'
+import { useAuthContext } from '@/components/auth/auth-provider'
+import { UserTechnologyForm } from '@/app/[locale]/user/technologies/components/user-technology-form'
 
 export default function MobileMyTechDetailPage({ params: { id } }: { params: { id: string } }) {
   const pathname = usePathname()
   const router = useRouter()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
+  const { user } = useAuthContext()
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<AdminTechnology | null>(null)
+  const [showEdit, setShowEdit] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -84,15 +89,26 @@ export default function MobileMyTechDetailPage({ params: { id } }: { params: { i
 
   // attachments is computed above to ensure consistent hooks order
 
+  const baseLocale = locale === 'en' ? '/en' : '/zh'
+
+  const handleDelete = async () => {
+    if (!user?.id || !data?.id || deleting) return
+    const ok = confirm(locale==='en' ? 'Are you sure to delete this technology?' : '确定要删除该技术吗？')
+    if (!ok) return
+    setDeleting(true)
+    try {
+      await deleteUserTechnologyApi(data.id, user.id)
+      alert(locale==='en' ? 'Deleted successfully' : '删除成功')
+      router.replace(`${baseLocale}/m/me/technologies`)
+    } catch (e:any) {
+      alert((locale==='en' ? 'Delete failed: ' : '删除失败：') + (e?.message || ''))
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="pb-20" style={{ backgroundColor: '#edeef7' }}>
-      <div className="px-3 pt-4 flex items-center gap-2">
-        <button onClick={()=>router.back()} aria-label={locale==='en'?'Back':'返回'} className="w-9 h-9 rounded-full bg-white border border-gray-200 inline-flex items-center justify-center">
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
-        </button>
-        <h1 className="text-[16px] font-semibold text-gray-900 truncate">{name}</h1>
-      </div>
-
       <div className="px-3 mt-3">
         {/* Card 1: Image */}
         <div className="rounded-2xl bg-white border border-gray-100 overflow-hidden">
@@ -189,6 +205,36 @@ export default function MobileMyTechDetailPage({ params: { id } }: { params: { i
           <div className="mt-3 text-[12px] text-gray-500">{locale==='en'?'Uploaded at':'上传时间'}：{createdAt}</div>
         )}
       </div>
+
+      {/* Bottom action bar: back / delete / edit */}
+      <div className="fixed left-0 right-0 bottom-0 z-50 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-t">
+        <div className="mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)', paddingTop: 8 }}>
+          <div className="flex items-center gap-2">
+            <button onClick={()=>router.back()} aria-label={locale==='en'?'Back':'返回'} className="h-10 w-10 rounded-full bg-white border border-gray-200 text-gray-800 inline-flex items-center justify-center">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="grid grid-cols-2 gap-2 flex-1">
+              <button onClick={handleDelete} disabled={deleting} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
+                <Trash2 className="w-4 h-4" />
+                <span>{locale==='en'?'Delete':'删除'}</span>
+              </button>
+              <button onClick={()=>setShowEdit(true)} className="h-10 rounded-xl bg-[#00b899] text-white text-[13px] inline-flex items-center justify-center gap-1.5">
+                <EditIcon className="w-4 h-4" />
+                <span>{locale==='en'?'Edit':'编辑'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit overlay reuse Web form */}
+      {showEdit && data && (
+        <UserTechnologyForm
+          technology={data}
+          onSuccess={async()=>{ setShowEdit(false); try { const res = await getUserTechnologyByIdApi(data.id!); setData(res) } catch {} }}
+          onCancel={()=>setShowEdit(false)}
+        />
+      )}
     </div>
   )
 }
