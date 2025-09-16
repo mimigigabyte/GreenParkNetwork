@@ -22,12 +22,20 @@ export default function MobileLayout({
     ],
     [locale],
   )
-  const isActive = (href: string) => pathname?.startsWith(href)
+  // Derive active tab with precedence to longer, more specific paths
+  const activeKey = useMemo(() => {
+    if (!pathname) return ''
+    if (pathname.startsWith(`/${locale}/m/me/technologies`)) return 'publish'
+    if (pathname.startsWith(`/${locale}/m/home`)) return 'home'
+    if (pathname.startsWith(`/${locale}/m/chat`)) return 'messages'
+    if (pathname.startsWith(`/${locale}/m/me`)) return 'me'
+    return ''
+  }, [pathname, locale])
   const isEn = locale === 'en'
   // Route groups like (auth) are not part of URL; detect auth pages explicitly
   const isAuthPage = !!(pathname && (pathname.startsWith(`/${locale}/m/login`) || pathname.startsWith(`/${locale}/m/forgot`)))
   // Show bottom nav on all non-auth pages, except detail pages where a local action bar exists
-  const isTechDetail = !!(pathname && pathname.startsWith(`/${locale}/m/tech/`))
+  const isTechDetail = !!(pathname && (pathname.startsWith(`/${locale}/m/tech/`) || pathname.startsWith(`/${locale}/m/me/technologies/`)))
   const showNav = !isAuthPage && !isTechDetail
 
   return (
@@ -41,11 +49,11 @@ export default function MobileLayout({
               key={t.key}
               href={t.href}
               className={`flex flex-col items-center justify-center text-[11px] ${
-                isActive(t.href) ? 'text-[#00b899] font-medium' : 'text-gray-700'
+                activeKey === t.key ? 'text-[#00b899] font-medium' : 'text-gray-700'
               }`}
             >
               {/* icon */}
-              <t.Icon className={`mb-0.5 ${isActive(t.href) ? 'stroke-[#00b899]' : 'stroke-current'} w-[18px] h-[18px]`} />
+              <t.Icon className={`mb-0.5 ${activeKey === t.key ? 'stroke-[#00b899]' : 'stroke-current'} w-[18px] h-[18px]`} />
               {/* label */}
               <span>{isEn ? t.labelEn : t.labelZh}</span>
             </Link>

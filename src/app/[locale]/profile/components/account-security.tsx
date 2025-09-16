@@ -197,7 +197,7 @@ export default function AccountSecurity({ locale }: AccountSecurityProps) {
         <Button 
           type="submit" 
           disabled={isLoading || !password.currentPassword || !password.newPassword || !password.confirmPassword}
-          className="w-full"
+          className="w-full bg-[#00b899] hover:bg-[#009a7a] text-white"
         >
           {isLoading 
             ? (locale === 'en' ? 'Changing...' : '修改中...')

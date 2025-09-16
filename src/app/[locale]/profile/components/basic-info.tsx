@@ -192,7 +192,7 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
         </Avatar>
         <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button size="sm" className="bg-[#00b899] hover:bg-[#009a7a] text-white">
               {locale === 'en' ? 'Change Avatar' : '更换头像'}
             </Button>
           </DialogTrigger>
@@ -273,10 +273,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
                         className="flex-1"
                       />
                       <Button 
-                        variant="outline" 
                         size="sm"
                         onClick={sendEmailCode}
                         disabled={!newEmail || emailCountdown > 0}
+                        className="bg-[#00b899] hover:bg-[#009a7a] text-white disabled:opacity-50"
                       >
                         {emailCountdown > 0 ? `${emailCountdown}s` : (locale === 'en' ? 'Send Code' : '发送验证码')}
                       </Button>
@@ -286,7 +286,7 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
                     <Button variant="outline" onClick={() => setIsEmailDialogOpen(false)}>
                       {locale === 'en' ? 'Cancel' : '取消'}
                     </Button>
-                    <Button onClick={handleConfirmEmailChange} disabled={!newEmail || !emailCode}>
+                    <Button onClick={handleConfirmEmailChange} disabled={!newEmail || !emailCode} className="bg-[#00b899] hover:bg-[#009a7a] text-white">
                       {locale === 'en' ? 'Confirm Change' : '确认修改'}
                     </Button>
                   </div>
@@ -303,7 +303,7 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
             <Input id="phone" type="tel" value={user.phone || ''} disabled className="flex-1" />
             <Dialog open={isPhoneDialogOpen} onOpenChange={setIsPhoneDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button size="sm" className="bg-[#00b899] hover:bg-[#009a7a] text-white">
                   {locale === 'en' ? 'Modify' : '修改'}
                 </Button>
               </DialogTrigger>
@@ -339,10 +339,10 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
                         className="flex-1"
                       />
                       <Button 
-                        variant="outline" 
                         size="sm"
                         onClick={sendPhoneCode}
                         disabled={!newPhone || phoneCountdown > 0}
+                        className="bg-[#00b899] hover:bg-[#009a7a] text-white disabled:opacity-50"
                       >
                         {phoneCountdown > 0 ? `${phoneCountdown}s` : (locale === 'en' ? 'Send Code' : '发送验证码')}
                       </Button>
@@ -352,7 +352,7 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
                     <Button variant="outline" onClick={() => setIsPhoneDialogOpen(false)}>
                       {locale === 'en' ? 'Cancel' : '取消'}
                     </Button>
-                    <Button onClick={handleConfirmPhoneChange} disabled={!newPhone || !phoneCode}>
+                    <Button onClick={handleConfirmPhoneChange} disabled={!newPhone || !phoneCode} className="bg-[#00b899] hover:bg-[#009a7a] text-white">
                       {locale === 'en' ? 'Confirm Change' : '确认修改'}
                     </Button>
                   </div>

@@ -125,7 +125,7 @@ export default function MobileMyTechDetailPage({ params: { id } }: { params: { i
         <div className="mt-3 rounded-2xl bg-white border border-gray-100 p-3">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="text-[15px] font-semibold text-gray-900 leading-snug">{name}</div>
+              <div className="text-[17px] font-semibold text-gray-900 leading-snug">{name}</div>
               {nameEn && nameEn !== name && (
                 <div className="text-[12px] text-gray-500 mt-0.5 break-all">{nameEn}</div>
               )}
@@ -207,18 +207,18 @@ export default function MobileMyTechDetailPage({ params: { id } }: { params: { i
       </div>
 
       {/* Bottom action bar: back / delete / edit */}
-      <div className="fixed left-0 right-0 bottom-0 z-50 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-t">
+      <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t">
         <div className="mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)', paddingTop: 8 }}>
           <div className="flex items-center gap-2">
             <button onClick={()=>router.back()} aria-label={locale==='en'?'Back':'返回'} className="h-10 w-10 rounded-full bg-white border border-gray-200 text-gray-800 inline-flex items-center justify-center">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="grid grid-cols-2 gap-2 flex-1">
-              <button onClick={handleDelete} disabled={deleting} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5">
+              <button onClick={handleDelete} disabled={deleting} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5 transition-none">
                 <Trash2 className="w-4 h-4" />
                 <span>{locale==='en'?'Delete':'删除'}</span>
               </button>
-              <button onClick={()=>setShowEdit(true)} className="h-10 rounded-xl bg-[#00b899] text-white text-[13px] inline-flex items-center justify-center gap-1.5">
+              <button onClick={()=>setShowEdit(true)} className="h-10 rounded-xl bg-[#00b899] hover:bg-[#009a7a] text-white text-[13px] inline-flex items-center justify-center gap-1.5 transition-colors">
                 <EditIcon className="w-4 h-4" />
                 <span>{locale==='en'?'Edit':'编辑'}</span>
               </button>
