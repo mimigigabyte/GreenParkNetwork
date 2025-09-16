@@ -3,11 +3,12 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useMemo, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Bell, Mail } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { useUnreadMessage } from '@/components/message/unread-message-context'
 import {
   type InternalMessage,
   getReceivedInternalMessages,
@@ -28,9 +29,11 @@ interface MessageFilters {
 
 export default function MobileChatPage() {
   const pathname = usePathname()
+  const router = useRouter()
   const locale: 'en' | 'zh' = pathname.startsWith('/en') ? 'en' : 'zh'
   const { user } = useAuthContext()
   const { toast } = useToast()
+  const { refreshUnreadCount, decrementUnreadCount, setUnreadCount: setGlobalUnreadCount } = useUnreadMessage()
 
   const [messages, setMessages] = useState<InternalMessage[]>([])
   const [filtered, setFiltered] = useState<InternalMessage[]>([])
@@ -135,6 +138,7 @@ export default function MobileChatPage() {
       await markInternalMessageAsRead(m.id)
       setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, is_read: true, read_at: new Date().toISOString() } : x)))
       setUnreadCount((c) => Math.max(0, c - 1))
+      decrementUnreadCount(1) // 更新全局未读数量
     } catch (e) {
       console.error('标记已读失败', e)
     }
@@ -152,6 +156,7 @@ export default function MobileChatPage() {
       setMessages((prev) => prev.map((m) => (selectedIds.has(m.id) ? { ...m, is_read: true, read_at: new Date().toISOString() } : m)))
       const dec = messages.filter((m) => selectedIds.has(m.id) && !m.is_read).length
       setUnreadCount((c) => Math.max(0, c - dec))
+      decrementUnreadCount(dec) // 更新全局未读数量
       setSelectedIds(new Set())
       setIsAllSelected(false)
       toast({ title: locale === 'en' ? 'Success' : '操作成功', description: locale === 'en' ? 'Marked as read' : '已标记为已读' })
@@ -175,6 +180,7 @@ export default function MobileChatPage() {
       const dec = messages.filter((m) => selectedIds.has(m.id) && !m.is_read).length
       setMessages((prev) => prev.filter((m) => !selectedIds.has(m.id)))
       setUnreadCount((c) => Math.max(0, c - dec))
+      decrementUnreadCount(dec) // 更新全局未读数量
       setSelectedIds(new Set())
       setIsAllSelected(false)
       toast({ title: locale === 'en' ? 'Success' : '操作成功', description: locale === 'en' ? 'Deleted messages' : '已删除所选消息' })
@@ -192,6 +198,7 @@ export default function MobileChatPage() {
       await markAllInternalMessagesAsRead()
       setMessages((prev) => prev.map((m) => ({ ...m, is_read: true, read_at: new Date().toISOString() })))
       setUnreadCount(0)
+      setGlobalUnreadCount(0) // 更新全局未读数量为0
       toast({ title: locale === 'en' ? 'Success' : '操作成功', description: locale === 'en' ? 'All read' : '全部已读' })
     } catch (e) {
       console.error('全部已读失败', e)
@@ -305,40 +312,38 @@ export default function MobileChatPage() {
               const displayCategory = m.category || (locale === 'en' ? 'Technical Connection' : '技术对接')
               return (
                 <li key={m.id}>
-                  <label className="block">
-                    <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
-                      <div className="w-full text-left">
-                        {/* Single-row aligned: checkbox, dot, icon, title, status */}
-                        <div className="grid grid-cols-[72px_1fr_auto] items-center gap-2 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 rounded border-gray-300"
-                              checked={selectedIds.has(m.id)}
-                              onChange={(e) => toggleSelectOne(m.id, e.target.checked)}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <div className={`w-2 h-2 rounded-full ${unread ? 'bg-blue-500' : 'bg-transparent'}`} />
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#2563eb] to-[#1e40af] flex items-center justify-center shadow-sm ring-1 ring-white/40">
-                              <Mail className="w-4 h-4 text-white" strokeWidth={2.2} />
-                            </div>
+                  <div
+                    className="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => router.push(`${pathname}/${m.id}`)}
+                  >
+                    <div className="w-full text-left">
+                      {/* Single-row aligned: checkbox, dot, icon, title, status */}
+                      <div className="grid grid-cols-[72px_1fr_auto] items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 rounded border-gray-300"
+                            checked={selectedIds.has(m.id)}
+                            onChange={(e) => toggleSelectOne(m.id, e.target.checked)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div className={`w-2 h-2 rounded-full ${unread ? 'bg-blue-500' : 'bg-transparent'}`} />
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#2563eb] to-[#1e40af] flex items-center justify-center shadow-sm ring-1 ring-white/40">
+                            <Mail className="w-4 h-4 text-white" strokeWidth={2.2} />
                           </div>
-                          <button
-                            className={`text-left text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}
-                            onClick={() => markAsReadOne(m)}
-                          >
-                            {m.title}
-                          </button>
-                          <Badge className="shrink-0 whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-100 border border-gray-200 text-[10px] font-medium rounded-full px-2 py-0.5">
-                            {displayCategory}
-                          </Badge>
                         </div>
-                        {/* content and date aligned with title (second column start) */}
-                        <div className="mt-1.5 pl-[80px] text-[12px] text-gray-500 truncate">{m.content}</div>
-                        <div className="mt-1.5 pl-[80px] text-[12px] text-gray-700">{formatDate(m.created_at)}</div>
+                        <div className={`text-left text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                          {m.title}
+                        </div>
+                        <Badge className="shrink-0 whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-100 border border-gray-200 text-[10px] font-medium rounded-full px-2 py-0.5">
+                          {displayCategory}
+                        </Badge>
                       </div>
+                      {/* content and date aligned with title (second column start) */}
+                      <div className="mt-1.5 pl-[80px] text-[12px] text-gray-500 truncate">{m.content}</div>
+                      <div className="mt-1.5 pl-[80px] text-[12px] text-gray-700">{formatDate(m.created_at)}</div>
                     </div>
-                  </label>
+                  </div>
                 </li>
               )
             })}

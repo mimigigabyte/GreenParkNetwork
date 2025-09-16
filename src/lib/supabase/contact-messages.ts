@@ -273,7 +273,7 @@ export async function sendInternalMessage(data: SendInternalMessageData): Promis
  */
 export async function getReceivedInternalMessages(): Promise<InternalMessage[]> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
+
   if (authError || !user) {
     throw new Error('用户未登录');
   }
@@ -290,6 +290,35 @@ export async function getReceivedInternalMessages(): Promise<InternalMessage[]> 
   }
 
   return data || [];
+}
+
+/**
+ * 根据ID获取单条站内信
+ */
+export async function getInternalMessageById(messageId: string): Promise<InternalMessage> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error('用户未登录');
+  }
+
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .select('*')
+    .eq('id', messageId)
+    .eq('to_user_id', user.id) // 确保只能查看发给自己的消息
+    .single();
+
+  if (error) {
+    console.error('获取站内信详情失败:', error);
+    throw new Error(error.message || '获取站内信详情失败');
+  }
+
+  if (!data) {
+    throw new Error('消息不存在');
+  }
+
+  return data;
 }
 
 /**
