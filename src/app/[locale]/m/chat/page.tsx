@@ -244,8 +244,11 @@ export default function MobileChatPage() {
 
   return (
     <section className="min-h-dvh" style={{ backgroundColor: '#edeef7' }}>
-      {/* Header with tabs */}
+      {/* Header with title and tabs */}
       <div className="sticky top-0 z-40 px-3 pt-3 pb-2">
+        <h1 className="text-[18px] font-bold text-gray-900 mb-2">
+          {locale === 'en' ? 'My Messages' : '我的消息'}
+        </h1>
         {/* Category filter chips */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {chips.map((c) => {
@@ -299,53 +302,46 @@ export default function MobileChatPage() {
           <ul className="space-y-3">
             {filtered.map((m) => {
               const unread = !m.is_read
+              const displayCategory = m.category || (locale === 'en' ? 'Technical Connection' : '技术对接')
               return (
                 <li key={m.id}>
                   <label className="block">
                     <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
-                      {/* Checkbox overlay area for easier selection */}
-                      <div className="absolute left-3 top-3">
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 rounded border-gray-300"
-                          checked={selectedIds.has(m.id)}
-                          onChange={(e) => toggleSelectOne(m.id, e.target.checked)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </div>
-                      <button
-                        className="w-full text-left"
-                        onClick={() => markAsReadOne(m)}
-                      >
-                        <div className="pl-6 flex items-start">
-                          {/* Unread dot */}
-                          <div className={`mt-2 w-2 h-2 rounded-full ${unread ? 'bg-blue-500' : 'bg-transparent'}`} />
-                          <div className="ml-2 flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-7 h-7 rounded-full bg-[#1d4ed8] flex items-center justify-center">
-                                  <Mail className="w-4 h-4 text-white" />
-                                </div>
-                                <div className={`text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}>
-                                  {m.title}
-                                </div>
-                              </div>
-                              <div className="text-[12px] text-gray-500 whitespace-nowrap">{formatDate(m.created_at)}</div>
-                            </div>
-                            {m.category && (
-                              <div className="mt-1 text-[12px] text-gray-500 truncate">
-                                {m.category}
-                              </div>
-                            )}
-                            {/* Category tag row */}
-                            <div className="mt-2">
-                              <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100 border border-gray-200 text-[10px] font-medium rounded-full px-2 py-0.5">
-                                {m.category || (locale === 'en' ? 'Technical Connection' : '技术对接')}
-                              </Badge>
+                      <div className="w-full text-left">
+                        {/* Two-column: left prefix, right content to align title/content/date */}
+                        <div className="flex items-start gap-2 min-w-0">
+                          {/* left prefix */}
+                          <div className="flex items-center gap-2 pt-0.5">
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4 rounded border-gray-300"
+                              checked={selectedIds.has(m.id)}
+                              onChange={(e) => toggleSelectOne(m.id, e.target.checked)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <div className={`w-2 h-2 rounded-full ${unread ? 'bg-blue-500' : 'bg-transparent'}`} />
+                            <div className="w-7 h-7 rounded-full bg-[#1d4ed8] flex items-center justify-center">
+                              <Mail className="w-4 h-4 text-white" />
                             </div>
                           </div>
+                          {/* right content column */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <button
+                                className={`text-left text-[14px] font-semibold leading-tight truncate ${unread ? 'text-gray-900' : 'text-gray-700'}`}
+                                onClick={() => markAsReadOne(m)}
+                              >
+                                {m.title}
+                              </button>
+                              <Badge className="shrink-0 whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-100 border border-gray-200 text-[10px] font-medium rounded-full px-2 py-0.5">
+                                {displayCategory}
+                              </Badge>
+                            </div>
+                            <div className="mt-0.5 text-[12px] text-gray-500 truncate">{m.content}</div>
+                            <div className="mt-1 text-[12px] text-gray-500">{formatDate(m.created_at)}</div>
+                          </div>
                         </div>
-                      </button>
+                      </div>
                     </div>
                   </label>
                 </li>
