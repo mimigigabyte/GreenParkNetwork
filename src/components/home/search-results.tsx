@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
 import { TechProduct, SortType } from '@/api/tech';
-import { Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown, ChevronDown as ChevronDownIcon, FileText, Download, Mail } from 'lucide-react';
+import { Clock, ArrowDownAZ, ArrowUpAZ, ChevronDown, ChevronDown as ChevronDownIcon, FileText, Download, Mail, Heart } from 'lucide-react';
 import { ContactUsModal } from '@/components/contact/contact-us-modal';
 import { useAuthContext } from '@/components/auth/auth-provider';
 import { SimplePagination } from '@/components/ui/simple-pagination';
+import { addFavorite, getFavorites, removeFavorite } from '@/api/favorites';
 
 interface SearchResultsProps {
   products: TechProduct[];
@@ -25,6 +25,13 @@ interface SearchResultsProps {
   onPageSizeChange?: (pageSize: number) => void;
   // 搜索关键词，用于高亮标题与描述中的匹配片段
   highlightKeyword?: string;
+  // UI控制参数
+  showSummary?: boolean;
+  showSort?: boolean;
+  showPagination?: boolean;
+  // 收藏状态回调
+  onFavoriteRemoved?: (technologyId: string) => void;
+  onFavoriteAdded?: (product: TechProduct) => void;
 }
 
 export function SearchResults({ 
@@ -33,20 +40,32 @@ export function SearchResults({
   totalPages, 
   onPageChange,
   totalResults,
-  currentCategory,
+  currentCategory: _currentCategory,
   companyCount, // 可选参数，如果未提供则基于搜索结果计算
   technologyCount, // 可选参数，如果未提供则使用totalResults
   onSortChange,
   locale,
   pageSize = 20,
   onPageSizeChange,
-  highlightKeyword
+  highlightKeyword,
+  showSummary,
+  showSort,
+  showPagination,
+  onFavoriteRemoved,
+  onFavoriteAdded
 }: SearchResultsProps) {
   const { user } = useAuthContext();
-  const t = useTranslations('home');
+  const userId = user?.id;
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set());
   const [currentSort, setCurrentSort] = useState<SortType>('updateTime');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
+  const [pendingFavoriteId, setPendingFavoriteId] = useState<string | null>(null);
+
+  const shouldShowSummary = showSummary ?? true;
+  const shouldShowSort = showSort ?? true;
+  const shouldShowPagination = showPagination ?? true;
 
   // 计算实际的企业数量（基于搜索结果去重）
   const actualCompanyCount = companyCount ?? new Set(products.map(product => product.companyName)).size;
@@ -78,6 +97,37 @@ export function SearchResults({
     };
   }, [isDropdownOpen]);
 
+  useEffect(() => {
+    let active = true;
+
+    if (!userId) {
+      setFavoriteIds(new Set());
+      setIsLoadingFavorites(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setIsLoadingFavorites(true);
+    getFavorites(userId)
+      .then((items) => {
+        if (!active) return;
+        setFavoriteIds(new Set(items.map((item) => item.technologyId)));
+      })
+      .catch((error) => {
+        console.error('加载收藏列表失败:', error);
+      })
+      .finally(() => {
+        if (active) {
+          setIsLoadingFavorites(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
   const toggleDescription = (productId: string) => {
     const newExpanded = new Set(expandedDescriptions);
     if (newExpanded.has(productId)) {
@@ -88,24 +138,53 @@ export function SearchResults({
     setExpandedDescriptions(newExpanded);
   };
 
-  const getCategoryName = (categoryId: string) => {
-    const categoryMapZh: { [key: string]: string } = {
-      'energy-saving': '节能环保技术',
-      'clean-energy': '清洁能源技术',
-      'clean-production': '清洁生产技术',
-      'new-energy-vehicle': '新能源汽车技术'
-    };
-    
-    const categoryMapEn: { [key: string]: string } = {
-      'energy-saving': 'Energy Saving',
-      'clean-energy': 'Clean Energy',
-      'clean-production': 'Clean Production',
-      'new-energy-vehicle': 'New Energy Vehicle'
-    };
-    
-    const categoryMap = locale === 'en' ? categoryMapEn : categoryMapZh;
-    const fallback = locale === 'en' ? 'Technology' : '技术';
-    return categoryMap[categoryId] || fallback;
+  const handleToggleFavorite = async (productId: string) => {
+    const isEnglish = locale === 'en';
+
+    if (!userId) {
+      alert(isEnglish ? 'You must register and login to save favorites' : '必须注册登录才能收藏技术');
+      return;
+    }
+
+    setPendingFavoriteId(productId);
+
+    const alreadyFavorited = favoriteIds.has(productId);
+
+    try {
+      if (alreadyFavorited) {
+        const success = await removeFavorite(productId);
+        if (success) {
+          setFavoriteIds((prev) => {
+            const updated = new Set(prev);
+            updated.delete(productId);
+            return updated;
+          });
+          onFavoriteRemoved?.(productId);
+        } else {
+          alert(isEnglish ? 'Failed to remove favorite, please try again later' : '取消收藏失败，请稍后重试');
+        }
+      } else {
+        const favorite = await addFavorite(productId);
+        if (favorite) {
+          setFavoriteIds((prev) => {
+            const updated = new Set(prev);
+            updated.add(productId);
+            return updated;
+          });
+          const product = products.find((item) => item.id === productId);
+          if (product) {
+            onFavoriteAdded?.(product);
+          }
+        } else {
+          alert(isEnglish ? 'Failed to add favorite, please try again later' : '收藏失败，请稍后重试');
+        }
+      }
+    } catch (error) {
+      console.error('收藏操作失败:', error);
+      alert(isEnglish ? 'Failed to update favorite, please try again later' : '收藏操作失败，请稍后重试');
+    } finally {
+      setPendingFavoriteId(null);
+    }
   };
 
   const handleSortChange = (sortType: SortType) => {
@@ -243,66 +322,89 @@ export function SearchResults({
     <section className="pt-2 pb-8" style={{backgroundColor: '#edeef7'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 结果信息和排序 */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="text-sm text-gray-600">
-            {locale === 'en' ? (
-              <>
-                Search Results: Found{' '}
-                <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
-                green low-carbon technologies from{' '}
-                <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
-                companies
-              </>
-            ) : (
-              <>
-                相关结果：为您搜索到来自
-                <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
-                家企业的
-                <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
-                项绿色低碳技术
-              </>
+        {(shouldShowSummary || shouldShowSort) && (
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            {shouldShowSummary && (
+              <div className="text-sm text-gray-600">
+                {locale === 'en' ? (
+                  <>
+                    Search Results: Found{' '}
+                    <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
+                    green low-carbon technologies from{' '}
+                    <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
+                    companies
+                  </>
+                ) : (
+                  <>
+                    相关结果：为您搜索到来自
+                    <span className="font-black text-blue-600 mx-1">{actualCompanyCount}</span>
+                    家企业的
+                    <span className="font-black text-blue-600 mx-1">{actualTechnologyCount}</span>
+                    项绿色低碳技术
+                  </>
+                )}
+              </div>
+            )}
+            {shouldShowSort && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">{locale === 'en' ? 'Sort by:' : '排序方式:'}</span>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <CurrentIcon className={`w-4 h-4 ${currentSortOption?.className || 'text-gray-600'}`} />
+                    <span>{currentSortOption?.label || (locale === 'en' ? 'Update Time' : '更新时间')}</span>
+                    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                      {sortOptions.map((option) => {
+                        const IconComponent = option.icon;
+                        const isActive = currentSort === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => handleSortChange(option.value)}
+                            className={`w-full flex items-center space-x-2 px-3 py-2 text-sm text-left hover:bg-gray-50 ${
+                              isActive ? 'bg-green-50 text-green-700' : 'text-gray-700'
+                            }`}
+                          >
+                            <IconComponent className={`w-4 h-4 ${option.className}`} />
+                            <span>{option.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">{locale === 'en' ? 'Sort by:' : '排序方式:'}</span>
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <CurrentIcon className={`w-4 h-4 ${currentSortOption?.className || 'text-gray-600'}`} />
-                <span>{currentSortOption?.label || (locale === 'en' ? 'Update Time' : '更新时间')}</span>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                  {sortOptions.map((option) => {
-                    const IconComponent = option.icon;
-                    const isActive = currentSort === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => handleSortChange(option.value)}
-                        className={`w-full flex items-center space-x-2 px-3 py-2 text-sm text-left hover:bg-gray-50 ${
-                          isActive ? 'bg-green-50 text-green-700' : 'text-gray-700'
-                        }`}
-                      >
-                        <IconComponent className={`w-4 h-4 ${option.className}`} />
-                        <span>{option.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* 产品列表 */}
         <div className="space-y-6">
-          {products.map((product) => (
-            <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden">
+          {products.map((product) => {
+            const isFavorited = favoriteIds.has(product.id);
+            const isPendingFavorite = pendingFavoriteId === product.id;
+            const favoriteDisabled = isLoadingFavorites || isPendingFavorite;
+            const favoriteLabel = locale === 'en'
+              ? (isFavorited ? 'Favorited' : 'Favorite')
+              : (isFavorited ? '已收藏' : '收藏');
+            const favoriteTitle = !userId
+              ? (locale === 'en' ? 'You must register and login to save favorites' : '必须注册登录才能收藏技术')
+              : (isFavorited ? (locale === 'en' ? 'Already in favorites' : '已收藏') : (locale === 'en' ? 'Add to favorites' : '加入收藏'));
+            const favoriteButtonClasses = isFavorited
+              ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100'
+              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50';
+            const favoriteButtonText = isPendingFavorite
+              ? (locale === 'en' ? 'Saving...' : '处理中...')
+              : favoriteLabel;
+
+            return (
+              <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden">
                              {/* 上方区域：公司信息 */}
                <div className="relative px-6 py-4 flex justify-between items-center bg-green-50">
                  {/* 左侧绿色小竖条 */}
@@ -504,28 +606,40 @@ export function SearchResults({
                       )}
                     </div>
 
-                                         {/* 右下角：联系我们按钮 */}
-                     <div className="flex justify-end">
-                       <button 
-                         onClick={() => handleContactUs(product)}
-                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                         title={!user 
-                           ? (locale === 'en' ? "You must register and login to contact technology providers" : "必须注册登录才能联系技术提供方")
-                           : (locale === 'en' ? "Contact Us" : "联系我们")}
-                       >
-                         <Mail className="w-4 h-4 mr-2" />
-{locale === 'en' ? 'Contact Us' : '联系我们'}
-                       </button>
-                     </div>
+                    {/* 右下角：收藏与联系我们按钮 */}
+                    <div className="flex justify-end gap-3">
+                      <button
+                        onClick={() => handleToggleFavorite(product.id)}
+                        disabled={favoriteDisabled}
+                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${favoriteButtonClasses}`}
+                        title={favoriteTitle}
+                      >
+                        <Heart
+                          className={`w-4 h-4 mr-2 ${isFavorited ? 'fill-current stroke-current' : ''}`}
+                        />
+                        {favoriteButtonText}
+                      </button>
+                      <button 
+                        onClick={() => handleContactUs(product)}
+                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-70"
+                        title={!user 
+                          ? (locale === 'en' ? 'You must register and login to contact technology providers' : '必须注册登录才能联系技术提供方')
+                          : (locale === 'en' ? 'Contact Us' : '联系我们')}
+                      >
+                        <Mail className="w-4 h-4 mr-2" />
+                        {locale === 'en' ? 'Contact Us' : '联系我们'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* 简化分页器 */}
-        {totalPages > 0 && (
+        {shouldShowPagination && totalPages > 0 && (
           <div className="mt-8">
             <SimplePagination
               currentPage={currentPage}
@@ -550,4 +664,4 @@ export function SearchResults({
       />
     </section>
   );
-} 
+}

@@ -243,7 +243,13 @@ export default function MobileChatPage() {
       <section className="min-h-dvh flex items-center justify-center">
         <div className="text-center text-gray-600">
           <Bell className="w-10 h-10 mx-auto mb-3 text-gray-400" />
-          <p>{locale === 'en' ? 'Please login to view messages' : '请先登录查看消息'}</p>
+          <p className="mb-4">{locale === 'en' ? 'Please login to view messages' : '请先登录查看消息'}</p>
+          <button
+            onClick={() => router.push(`/${locale}/m/login`)}
+            className="h-11 px-5 rounded-xl bg-[#00b899] text-white"
+          >
+            {locale === 'en' ? 'Go to Login' : '前往登录'}
+          </button>
         </div>
       </section>
     )

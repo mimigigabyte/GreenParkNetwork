@@ -1,21 +1,55 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { getTechnologyById } from '@/api/tech'
+import { addFavorite, getFavoriteStatus, removeFavorite } from '@/api/favorites'
 import { Share2, Heart, Phone, ArrowLeft } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
+import { useAuthContext } from '@/components/auth/auth-provider'
 
 export default function MobileTechDetailPage({ params: { id } }: { params: { id: string } }) {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
+  const { user } = useAuthContext()
+  const basePath = locale === 'en' ? '/en' : '/zh'
+  const from = searchParams.get('from')
+
+  // 检查登录状态并提示
+  const checkAuthAndPrompt = () => {
+    if (!user) {
+      const message = locale === 'en'
+        ? 'Please register or login to continue'
+        : '请注册登录后继续操作'
+      if (confirm(message)) {
+        router.push(`/${locale}/m/login`)
+      }
+      return false
+    }
+    return true
+  }
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<any>(null)
   const [contactOpen, setContactOpen] = useState(false)
-  const [fav, setFav] = useState(false)
+  const [isFavorited, setIsFavorited] = useState(false)
+  const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [favoriteChecking, setFavoriteChecking] = useState(false)
+
+  const handleBackNavigation = () => {
+    if (from === 'favorites') {
+      router.push(`${basePath}/m/me/favorites`)
+      return
+    }
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+    router.push(`${basePath}/m/home`)
+  }
 
   useEffect(() => {
     let mounted = true
@@ -27,6 +61,38 @@ export default function MobileTechDetailPage({ params: { id } }: { params: { id:
     })()
     return () => { mounted = false }
   }, [id])
+
+  useEffect(() => {
+    let active = true
+
+    if (!user) {
+      setIsFavorited(false)
+      setFavoriteChecking(false)
+      return () => {
+        active = false
+      }
+    }
+
+    setFavoriteChecking(true)
+
+    ;(async () => {
+      try {
+        const status = await getFavoriteStatus(id)
+        if (!active) return
+        setIsFavorited(!!status?.isFavorited)
+      } catch (error) {
+        console.error('加载收藏状态失败:', error)
+      } finally {
+        if (active) {
+          setFavoriteChecking(false)
+        }
+      }
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [user?.id, id])
 
   if (loading) {
     return (
@@ -48,6 +114,40 @@ export default function MobileTechDetailPage({ params: { id } }: { params: { id:
 
   const title = locale==='en' ? (data.solutionTitleEn || data.solutionTitle) : data.solutionTitle
   const desc = locale==='en' ? (data.solutionDescriptionEn || data.fullDescriptionEn || '') : (data.solutionDescription || data.fullDescription || '')
+  const favoriteBusy = favoriteLoading || favoriteChecking
+
+  const handleFavoriteToggle = async () => {
+    if (!checkAuthAndPrompt()) {
+      return
+    }
+    if (favoriteLoading || favoriteChecking) {
+      return
+    }
+
+    setFavoriteLoading(true)
+    try {
+      if (isFavorited) {
+        const success = await removeFavorite(id)
+        if (success) {
+          setIsFavorited(false)
+        } else {
+          alert(locale==='en' ? 'Failed to remove favorite, please try again later' : '取消收藏失败，请稍后重试')
+        }
+      } else {
+        const favorite = await addFavorite(id)
+        if (favorite) {
+          setIsFavorited(true)
+        } else {
+          alert(locale==='en' ? 'Failed to add favorite, please try again later' : '收藏失败，请稍后重试')
+        }
+      }
+    } catch (error) {
+      console.error('更新收藏失败:', error)
+      alert(locale==='en' ? 'Failed to update favorite, please try again later' : '收藏操作失败，请稍后重试')
+    } finally {
+      setFavoriteLoading(false)
+    }
+  }
 
   return (
     <div className="pb-[120px]" style={{ backgroundColor: '#edeef7' }}>
@@ -175,19 +275,47 @@ export default function MobileTechDetailPage({ params: { id } }: { params: { id:
       <div className="fixed left-0 right-0 bottom-0 z-50 bg-white border-t">
         <div className="mx-auto max-w-md px-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)', paddingTop: 8 }}>
           <div className="flex items-center gap-2">
-            <button onClick={()=>router.push(`${locale==='en'?'/en':'/zh'}/m/home`)} className="h-10 w-10 rounded-full bg-white border border-gray-200 text-gray-800 inline-flex items-center justify-center">
+            <button onClick={handleBackNavigation} className="h-10 w-10 rounded-full bg-white border border-gray-200 text-gray-800 inline-flex items-center justify-center">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="grid grid-cols-3 gap-2 flex-1">
-              <button onClick={()=>setFav(v=>!v)} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5 transition-none">
-                <Heart className={`w-4 h-4 ${fav? 'fill-[#ef4444] stroke-[#ef4444]':'stroke-current'}`} />
-                <span>{locale==='en'?'Favorite':'收藏'}</span>
+              <button
+                onClick={handleFavoriteToggle}
+                disabled={favoriteBusy}
+                className={`h-10 rounded-xl border text-[13px] inline-flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${isFavorited ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'}`}
+              >
+                <Heart className={`w-4 h-4 ${isFavorited ? 'fill-current stroke-current' : 'stroke-current'}`} />
+                <span>
+                  {favoriteBusy
+                    ? (locale==='en' ? 'Saving...' : '处理中...')
+                    : (locale==='en'
+                        ? (isFavorited ? 'Favorited' : 'Favorite')
+                        : (isFavorited ? '已收藏' : '收藏'))}
+                </span>
               </button>
-              <button onClick={async()=>{ if (navigator.share) { try { await navigator.share({ title, text: title, url: typeof window!=='undefined'?window.location.href:'' }) } catch {} } }} className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5 transition-none">
+              <button
+                onClick={async()=>{
+                  if (checkAuthAndPrompt()) {
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({ title, text: title, url: typeof window!=='undefined'?window.location.href:'' })
+                      } catch {}
+                    }
+                  }
+                }}
+                className="h-10 rounded-xl bg-white border border-gray-200 text-gray-800 text-[13px] inline-flex items-center justify-center gap-1.5 transition-none"
+              >
                 <Share2 className="w-4 h-4" />
                 <span>{locale==='en'?'Share':'分享'}</span>
               </button>
-              <button onClick={()=>setContactOpen(true)} className="h-10 rounded-xl bg-[#00b899] hover:bg-[#009a7a] text-white text-[13px] inline-flex items-center justify-center gap-1.5 transition-colors">
+              <button
+                onClick={()=>{
+                  if (checkAuthAndPrompt()) {
+                    setContactOpen(true)
+                  }
+                }}
+                className="h-10 rounded-xl bg-[#00b899] hover:bg-[#009a7a] text-white text-[13px] inline-flex items-center justify-center gap-1.5 transition-colors"
+              >
                 <Phone className="w-4 h-4" />
                 <span>{locale==='en'?'Contact':'联系咨询'}</span>
               </button>

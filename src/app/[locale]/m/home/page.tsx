@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { Search, SlidersHorizontal, Clock, ArrowDownAZ, ArrowUpAZ, ArrowUpDown } from 'lucide-react'
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
+import { useAuthContext } from '@/components/auth/auth-provider'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
 import type { AdminCarouselImage } from '@/lib/types/admin'
 import { searchTechProducts, type SearchParams, type TechProduct, type SortType } from '@/api/tech'
@@ -27,6 +28,7 @@ export default function MobileHomePage() {
   const tHome = useTranslations('home')
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
   const modalLocale: 'en' | 'zh' = locale === 'en' ? 'en' : 'zh'
+  const { user } = useAuthContext()
 
   // Carousel
   const [carousel, setCarousel] = useState<AdminCarouselImage[]>([])
@@ -95,6 +97,20 @@ export default function MobileHomePage() {
     const cat = (transformed.mainCategories || []).find((c) => c.id === selectedCategory)
     return cat?.subCategories || []
   }, [transformed.mainCategories, selectedCategory])
+
+  // 检查登录状态并提示
+  const checkAuthAndPrompt = () => {
+    if (!user) {
+      const message = locale === 'en'
+        ? 'Please register or login to continue'
+        : '请注册登录后继续操作'
+      if (confirm(message)) {
+        router.push(`/${locale}/m/login`)
+      }
+      return false
+    }
+    return true
+  }
 
   const performSearch = async (resetPage = true) => {
     // Prevent overlapping requests that can duplicate results
@@ -348,7 +364,11 @@ export default function MobileHomePage() {
         {items.length < total && (
           <div className="mt-3">
             <button
-              onClick={() => performSearch(false)}
+              onClick={() => {
+                if (checkAuthAndPrompt()) {
+                  performSearch(false)
+                }
+              }}
               disabled={searchLoading}
               className={`w-full h-10 rounded-xl text-[14px] border ${searchLoading ? 'text-gray-400 border-gray-200 bg-gray-100' : 'text-[#00b899] border-[#a7f3d0] bg-[#ecfdf5]'}`}
             >

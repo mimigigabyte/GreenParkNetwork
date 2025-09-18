@@ -1,154 +1,44 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Heart, Tag, Building } from 'lucide-react'
-import { AdminTechnology } from '@/lib/types/admin'
+import { Heart } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
+import { SearchResults } from '@/components/home/search-results'
+import { useFavoritesData } from '@/hooks/useFavoritesData'
 
 interface FavoritesProps {
   locale: string
 }
 
-// 模拟的收藏技术数据
-const mockFavoriteTechnologies: Partial<AdminTechnology>[] = [
-  {
-    id: 'tech_001',
-    name_zh: '高效太阳能光伏板技术',
-    name_en: 'High-Efficiency Solar PV Panel Technology',
-    description_zh: '采用新型半导体材料，光电转换效率提升至25%，在低光照条件下依然表现出色。适合大规模电站和分布式屋顶应用。',
-    description_en: 'Uses new semiconductor materials to improve photoelectric conversion efficiency to 25%, and still performs well under low light conditions. Suitable for large-scale power stations and distributed rooftop applications.',
-    category: { 
-      id: 'cat_01', 
-      name_zh: '新能源',
-      name_en: 'New Energy',
-      slug: 'new-energy',
-      sort_order: 1,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    subcategory: { 
-      id: 'sub_01', 
-      name_zh: '太阳能',
-      name_en: 'Solar Energy',
-      slug: 'solar-energy',
-      sort_order: 1,
-      category_id: 'cat_01',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    image_url: 'https://images.unsplash.com/photo-1545208942-7632f264f288?q=80&w=800&auto=format&fit=crop',
-    is_active: true,
-    created_at: '2024-05-10T10:00:00Z',
-    tech_source: 'self_developed',
-    company: { 
-      id: 'comp_A', 
-      name_zh: '光能无限公司',
-      name_en: 'Solar Infinity Corp',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    }
-  },
-  {
-    id: 'tech_002',
-    name_zh: '智能电网优化调度系统',
-    name_en: 'Smart Grid Optimized Dispatch System',
-    description_zh: '基于AI算法，实时预测电网负荷与可再生能源发电量，智能调度电力资源，减少能源损耗，提高电网稳定性。',
-    description_en: 'Based on AI algorithms, it predicts grid load and renewable energy generation in real time, intelligently dispatches power resources, reduces energy loss, and improves grid stability.',
-    category: { 
-      id: 'cat_02', 
-      name_zh: '节能环保',
-      name_en: 'Energy Conservation',
-      slug: 'energy-conservation',
-      sort_order: 2,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    subcategory: { 
-      id: 'sub_02', 
-      name_zh: '智能电网',
-      name_en: 'Smart Grid',
-      slug: 'smart-grid',
-      sort_order: 2,
-      category_id: 'cat_02',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    image_url: 'https://images.unsplash.com/photo-1624397840027-9b044178b3a4?q=80&w=800&auto=format&fit=crop',
-    is_active: true,
-    created_at: '2024-03-15T14:30:00Z',
-    tech_source: 'cooperative',
-    company: { 
-      id: 'comp_B', 
-      name_zh: '未来电网集团',
-      name_en: 'Future Grid Group',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    }
-  },
-  {
-    id: 'tech_003',
-    name_zh: '工业余热回收利用技术',
-    name_en: 'Industrial Waste Heat Recovery Technology',
-    description_zh: '将工业生产过程中产生的废热通过热交换器回收，用于供暖、发电或生产其他产品，能源利用效率提高15%。',
-    description_en: 'Recovers waste heat generated in industrial production through heat exchangers for heating, power generation or producing other products, improving energy utilization efficiency by 15%.',
-    category: { 
-      id: 'cat_02', 
-      name_zh: '节能环保',
-      name_en: 'Energy Conservation',
-      slug: 'energy-conservation',
-      sort_order: 2,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    subcategory: { 
-      id: 'sub_03', 
-      name_zh: '能源回收',
-      name_en: 'Energy Recovery',
-      slug: 'energy-recovery',
-      sort_order: 3,
-      category_id: 'cat_02',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-      is_active: true
-    },
-    image_url: 'https://images.unsplash.com/photo-1578316892875-0e4835315216?q=80&w=800&auto=format&fit=crop',
-    is_active: false,
-    created_at: '2023-11-20T09:00:00Z',
-    tech_source: 'self_developed',
-    company_id: 'comp_C'
-  }
-]
 
 export default function Favorites({ locale }: FavoritesProps) {
-  const [favorites, setFavorites] = useState<Partial<AdminTechnology>[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { userId, authLoading, favoriteTechnologies, isLoading, removeFavoriteLocally } = useFavoritesData()
 
-  useEffect(() => {
-    // TODO: 替换为真实的API调用
-    const fetchFavorites = async () => {
-      setIsLoading(true)
-      // 模拟API延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setFavorites(mockFavoriteTechnologies)
-      setIsLoading(false)
-    }
-
-    fetchFavorites()
-  }, [])
-
-  if (isLoading) {
-    return <FavoritesSkeleton locale={locale} />
+  if (authLoading || isLoading) {
+    return <FavoritesSkeleton />
   }
 
-  if (favorites.length === 0) {
+  if (!userId) {
+    return (
+      <div>
+        <h3 className="text-lg font-medium mb-4">
+          {locale === 'en' ? 'My Favorites' : '我的收藏'}
+        </h3>
+        <div className="text-center py-12 border-2 border-dashed rounded-lg">
+          <Heart className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            {locale === 'en' ? 'Please login to view favorites' : '请登录后查看收藏'}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {locale === 'en'
+              ? 'Log in to sync your saved technologies across devices.'
+              : '登录后可同步您的技术收藏，随时随地轻松查看。'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (favoriteTechnologies.length === 0) {
     return (
       <div>
         <h3 className="text-lg font-medium mb-4">
@@ -170,62 +60,36 @@ export default function Favorites({ locale }: FavoritesProps) {
     )
   }
 
+  const companyCount = new Set(
+    favoriteTechnologies.map((tech) => (locale === 'en' ? (tech.companyNameEn || tech.companyName) : tech.companyName)).filter(Boolean)
+  ).size
+
   return (
     <div>
       <h3 className="text-lg font-medium mb-4">
-        {locale === 'en' ? `My Favorites (${favorites.length})` : `我的收藏 (${favorites.length})`}
+        {locale === 'en' ? `My Favorites (${favoriteTechnologies.length})` : `我的收藏 (${favoriteTechnologies.length})`}
       </h3>
-      <div className="space-y-4">
-        {favorites.map(tech => (
-          <div key={tech.id} className="flex items-start space-x-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
-            <img 
-              src={tech.image_url} 
-              alt={locale === 'en' ? tech.name_en : tech.name_zh}
-              className="w-32 h-24 object-cover rounded-md border"
-            />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-blue-600">
-                {locale === 'en' 
-                  ? `${tech.category?.name_en || tech.category?.name_zh} / ${tech.subcategory?.name_en || tech.subcategory?.name_zh}`
-                  : `${tech.category?.name_zh} / ${tech.subcategory?.name_zh}`
-                }
-              </p>
-              <h4 className="text-md font-bold text-gray-900 hover:underline cursor-pointer">
-                {locale === 'en' ? (tech.name_en || tech.name_zh) : tech.name_zh}
-              </h4>
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                {locale === 'en' 
-                  ? (tech.description_en || tech.description_zh) 
-                  : tech.description_zh
-                }
-              </p>
-              <div className="flex items-center text-xs text-gray-500 mt-2">
-                <Building className="w-3 h-3 mr-1" />
-                <span>
-                  {locale === 'en' 
-                    ? (tech.company?.name_en || tech.company?.name_zh || 'Unknown Source')
-                    : (tech.company?.name_zh || '未知来源')
-                  }
-                </span>
-                <span className="mx-2">|</span>
-                <span>
-                  {locale === 'en' ? 'Favorited on: ' : '收藏于: '}
-                  {tech.created_at ? new Date(tech.created_at).toLocaleDateString() : (locale === 'en' ? 'Unknown' : '未知')}
-                </span>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600">
-              <Heart className="w-4 h-4 mr-2" />
-              {locale === 'en' ? 'Unfavorite' : '取消收藏'}
-            </Button>
-          </div>
-        ))}
-      </div>
+      <SearchResults
+        products={favoriteTechnologies}
+        currentPage={1}
+        totalPages={1}
+        onPageChange={() => {}}
+        totalResults={favoriteTechnologies.length}
+        currentCategory=""
+        companyCount={companyCount}
+        technologyCount={favoriteTechnologies.length}
+        pageSize={favoriteTechnologies.length || 20}
+        onFavoriteRemoved={removeFavoriteLocally}
+        showSummary={false}
+        showSort={false}
+        showPagination={false}
+        locale={locale}
+      />
     </div>
   )
 }
 
-function FavoritesSkeleton({ locale }: { locale: string }) {
+function FavoritesSkeleton() {
   return (
     <div>
       <h3 className="text-lg font-medium mb-4"><Skeleton className="h-6 w-32"/></h3>

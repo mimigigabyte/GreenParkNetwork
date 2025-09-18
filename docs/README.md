@@ -49,6 +49,9 @@
 │   │   └── api/              # API路由
 │   │       ├── auth/         # 认证相关API
 │   │       ├── company/      # 企业信息相关API
+│   │       ├── user/         # 用户侧API
+│   │       │   └── favorites/route.ts  # 用户收藏CRUD接口
+│   │       ├── _utils/auth.ts # API路由共享认证工具
 │   │       └── admin/        # 管理后台API
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入
 │   │               ├── scrape/route.ts        # 单条抓取
@@ -75,10 +78,13 @@
 │   │   ├── utils.ts          # 通用工具函数
 │   │   ├── mock-data.ts      # Mock数据
 │   │   └── validators.ts     # 表单校验工具（邮箱/手机号）
+│   ├── hooks/                # 自定义Hooks
+│   │   └── useFavoritesData.ts # 收藏数据加载与状态同步
 │   └── api/                  # API调用封装
 │       ├── index.ts          # API客户端基础配置
 │       ├── auth.ts           # 用户认证API（包含验证码登录）
 │       ├── tech.ts           # 技术产品API
+│       ├── favorites.ts      # 用户收藏API封装
 │       └── company.ts        # 企业信息API
 ├── package.json              # 项目依赖配置
 ├── scripts/
@@ -87,6 +93,9 @@
 │   │   └── scrape-wipo-article.js    # 使用 Playwright 抓取 WIPO Green 技术详情页
 │   └── mcp/
 │       └── run-mcp-tool.js   # 通用 MCP 客户端脚本（可调用 Firecrawl MCP，不依赖Claude）
+├── supabase/
+│   └── migrations/           # Supabase数据库迁移脚本
+│       └── 010_create_user_favorites.sql  # 用户收藏关系表与策略
 ├── next.config.mjs          # Next.js配置
 ├── tsconfig.json            # TypeScript配置
 ├── tailwind.config.ts       # Tailwind CSS配置
