@@ -124,8 +124,8 @@ export async function GET(request: NextRequest) {
       technology_id: item.technology_id,
       created_at: item.created_at,
       technology: Array.isArray(item.technology)
-        ? (item.technology[0] as FavoriteRow['technology']) ?? null
-        : (item.technology as FavoriteRow['technology']) ?? null
+        ? (item.technology[0] as unknown as FavoriteRow['technology']) ?? null
+        : (item.technology as unknown as FavoriteRow['technology']) ?? null
     }))
 
     if (error) {
