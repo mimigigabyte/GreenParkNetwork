@@ -324,8 +324,8 @@ export default function MobileChatPage() {
                   >
                     <div className="w-full text-left">
                       {/* Single-row aligned: checkbox, dot, icon, title, status */}
-                      <div className="grid grid-cols-[68px_1fr_auto] items-center gap-1.5 min-w-0">
-                        <div className="flex items-center gap-1.5">
+                      <div className="grid grid-cols-[58px_1fr_auto] items-center gap-1 min-w-0">
+                        <div className="flex items-center gap-1">
                           <input
                             type="checkbox"
                             className="w-4 h-4 rounded border-gray-300"
@@ -346,8 +346,8 @@ export default function MobileChatPage() {
                         </Badge>
                       </div>
                       {/* content and date aligned with title (second column start) */}
-                      <div className="mt-1.5 pl-[74px] text-[12px] text-gray-500 truncate">{m.content}</div>
-                      <div className="mt-1.5 pl-[74px] text-[12px] text-gray-700">{formatDate(m.created_at)}</div>
+                      <div className="mt-1.5 pl-[62px] text-[12px] text-gray-500 truncate">{m.content}</div>
+                      <div className="mt-1.5 pl-[62px] text-[12px] text-gray-700">{formatDate(m.created_at)}</div>
                     </div>
                   </div>
                 </li>
