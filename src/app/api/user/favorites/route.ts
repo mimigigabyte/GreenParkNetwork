@@ -27,6 +27,26 @@ function mapFavorite(row: FavoriteRow) {
   }
 }
 
+function normalizeFavoriteRow(raw: any): FavoriteRow {
+  const techField = raw?.technology
+  let technology: Partial<AdminTechnology> | null = null
+
+  if (Array.isArray(techField)) {
+    const first = techField[0]
+    technology = first ? (first as unknown as Partial<AdminTechnology>) : null
+  } else if (techField && typeof techField === 'object') {
+    technology = techField as unknown as Partial<AdminTechnology>
+  }
+
+  return {
+    id: String(raw?.id ?? ''),
+    user_id: String(raw?.user_id ?? ''),
+    technology_id: String(raw?.technology_id ?? ''),
+    created_at: String(raw?.created_at ?? ''),
+    technology,
+  }
+}
+
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
@@ -118,15 +138,7 @@ export async function GET(request: NextRequest) {
       .eq('user_id', targetUserId)
       .order('created_at', { ascending: false })
 
-    let rows: FavoriteRow[] = (data || []).map((item) => ({
-      id: item.id,
-      user_id: item.user_id,
-      technology_id: item.technology_id,
-      created_at: item.created_at,
-      technology: Array.isArray(item.technology)
-        ? (item.technology[0] as unknown as FavoriteRow['technology']) ?? null
-        : (item.technology as unknown as FavoriteRow['technology']) ?? null
-    }))
+    let rows: FavoriteRow[] = (data || []).map(normalizeFavoriteRow)
 
     if (error) {
       console.error('获取收藏列表失败 (尝试降级):', error)
@@ -142,13 +154,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: '获取收藏列表失败' }, { status: 500 })
       }
 
-      rows = (fallbackRows || []).map((item) => ({
-        id: item.id,
-        user_id: item.user_id,
-        technology_id: item.technology_id,
-        created_at: item.created_at,
-        technology: null
-      }))
+      rows = (fallbackRows || []).map(normalizeFavoriteRow)
     }
 
     const favorites = rows.map(mapFavorite)
@@ -234,7 +240,8 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (!detailError && detailed) {
-      return NextResponse.json({ favorite: mapFavorite(detailed) }, { status: 201 })
+      const normalized = normalizeFavoriteRow(detailed)
+      return NextResponse.json({ favorite: mapFavorite(normalized) }, { status: 201 })
     }
 
     if (detailError) {
