@@ -611,7 +611,7 @@ export function SearchResults({
                       <button
                         onClick={() => handleToggleFavorite(product.id)}
                         disabled={favoriteDisabled}
-                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${favoriteButtonClasses}`}
+                        className={`inline-flex h-10 items-center px-4 text-sm font-medium rounded-md border transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${favoriteButtonClasses}`}
                         title={favoriteTitle}
                       >
                         <Heart
@@ -621,7 +621,7 @@ export function SearchResults({
                       </button>
                       <button 
                         onClick={() => handleContactUs(product)}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-70"
+                        className="inline-flex h-10 items-center px-4 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-70"
                         title={!user 
                           ? (locale === 'en' ? 'You must register and login to contact technology providers' : '必须注册登录才能联系技术提供方')
                           : (locale === 'en' ? 'Contact Us' : '联系我们')}

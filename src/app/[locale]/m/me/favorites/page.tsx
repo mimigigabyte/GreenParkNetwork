@@ -83,25 +83,27 @@ function MobileFavoritesList({ locale }: { locale: string }) {
         const tags = buildMobileTags(it, locale)
 
         return (
-          <article key={it.id} className="relative rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
-            <button
-              onClick={() => handleUnfavorite(it)}
-              className={`absolute top-3 right-3 h-7 w-7 rounded-full border flex items-center justify-center ${pendingId === it.id ? 'border-gray-200 bg-gray-100 text-gray-400' : 'border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100'}`}
-              aria-label={locale==='en'?'Unfavorite':'取消收藏'}
-              disabled={pendingId === it.id}
-            >
-              {pendingId === it.id ? (<Loader2 className="w-4 h-4 animate-spin" />) : (<Heart className="w-4 h-4 fill-current" />)}
-            </button>
-            <div className="flex items-center justify-between gap-2 pr-8">
+          <article key={it.id} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+            <div className="flex items-start gap-2">
               <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
                 {locale === 'en' ? (it.solutionTitleEn || it.solutionTitle) : it.solutionTitle}
               </h3>
-              <button
-                onClick={()=> router.push(`${locale==='en'?'/en':'/zh'}/m/tech/${it.id}?from=favorites`)}
-                className="shrink-0 px-2.5 h-6 rounded-full bg-[#00b899] text-white text-[11px] leading-none flex items-center"
-              >
-                {locale==='en' ? 'Details' : '查看详情'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={()=> router.push(`${locale==='en'?'/en':'/zh'}/m/tech/${it.id}?from=favorites`)}
+                  className="shrink-0 px-2.5 h-7 rounded-full bg-[#00b899] text-white text-[11px] leading-none flex items-center"
+                >
+                  {locale==='en' ? 'Details' : '查看详情'}
+                </button>
+                <button
+                  onClick={() => handleUnfavorite(it)}
+                  className={`h-7 w-7 rounded-full border flex items-center justify-center ${pendingId === it.id ? 'border-gray-200 bg-gray-100 text-gray-400' : 'border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100'}`}
+                  aria-label={locale==='en'?'Unfavorite':'取消收藏'}
+                  disabled={pendingId === it.id}
+                >
+                  {pendingId === it.id ? (<Loader2 className="w-4 h-4 animate-spin" />) : (<Heart className="w-4 h-4 fill-current" />)}
+                </button>
+              </div>
             </div>
             <div className="mt-2 flex gap-3">
               <div className="w-[96px] h-[96px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 relative">
