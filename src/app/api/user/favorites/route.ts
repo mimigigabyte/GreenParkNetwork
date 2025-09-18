@@ -118,7 +118,15 @@ export async function GET(request: NextRequest) {
       .eq('user_id', targetUserId)
       .order('created_at', { ascending: false })
 
-    let rows: FavoriteRow[] = data || []
+    let rows: FavoriteRow[] = (data || []).map((item) => ({
+      id: item.id,
+      user_id: item.user_id,
+      technology_id: item.technology_id,
+      created_at: item.created_at,
+      technology: Array.isArray(item.technology)
+        ? (item.technology[0] as FavoriteRow['technology']) ?? null
+        : (item.technology as FavoriteRow['technology']) ?? null
+    }))
 
     if (error) {
       console.error('获取收藏列表失败 (尝试降级):', error)
