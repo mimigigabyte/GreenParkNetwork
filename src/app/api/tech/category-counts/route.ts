@@ -52,7 +52,9 @@ interface RawCategory {
 }
 
 export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
-  if (!supabaseAdmin) {
+  const db = supabaseAdmin;
+
+  if (!db) {
     return NextResponse.json(
       {
         success: false,
@@ -64,14 +66,14 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
 
   try {
     const [{ data: rawCategories, error: categoriesError }, { count: totalTechnologyCount, error: totalCountError }] = await Promise.all([
-      supabaseAdmin
+      db
         .from('admin_categories')
         .select(
           `id, slug, name_zh, name_en, is_active, sort_order,
            subcategories:admin_subcategories(id, slug, name_zh, name_en, is_active, sort_order)`
         )
         .order('sort_order', { ascending: true }),
-      supabaseAdmin
+      db
         .from('admin_technologies')
         .select('id', { count: 'exact', head: true })
         .eq('is_active', true)
@@ -112,7 +114,7 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
       ((rawCategories as RawCategory[] | null) || [])
         .filter((category) => category?.is_active !== false)
         .map(async (category): Promise<CategoryCount | undefined> => {
-          const { count: categoryCount, error: categoryCountError } = await supabaseAdmin
+          const { count: categoryCount, error: categoryCountError } = await db
             .from('admin_technologies')
             .select('id', { count: 'exact', head: true })
             .eq('is_active', true)
@@ -130,7 +132,7 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
               .filter((sub) => sub?.is_active !== false)
               .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
               .map(async (sub): Promise<SubcategoryCount> => {
-                const { count: subCount, error: subCountError } = await supabaseAdmin
+                const { count: subCount, error: subCountError } = await db
                   .from('admin_technologies')
                   .select('id', { count: 'exact', head: true })
                   .eq('is_active', true)
