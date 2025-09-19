@@ -5,6 +5,7 @@ export const mockMainCategories: MainCategory[] = [
   {
     id: 'energy-saving',
     name: '节能环保产业',
+    count: 483,
     subCategories: [
       { id: 'efficient-energy', name: '高效节能产业', count: 156 },
       { id: 'advanced-environmental', name: '先进环保产业', count: 142 },
@@ -15,6 +16,7 @@ export const mockMainCategories: MainCategory[] = [
   {
     id: 'clean-production',
     name: '清洁生产产业',
+    count: 390,
     subCategories: [
       { id: 'clean-raw-materials', name: '清洁生产原料制造业', count: 134 },
       { id: 'clean-equipment', name: '清洁生产设备制造和设施建设业', count: 167 },
@@ -24,6 +26,7 @@ export const mockMainCategories: MainCategory[] = [
   {
     id: 'clean-energy',
     name: '清洁能源产业',
+    count: 804,
     subCategories: [
       { id: 'nuclear-power', name: '核电产业', count: 45 },
       { id: 'wind-energy', name: '风能产业', count: 123 },
@@ -38,6 +41,7 @@ export const mockMainCategories: MainCategory[] = [
   {
     id: 'new-energy-vehicle',
     name: '新能源汽车产业',
+    count: 404,
     subCategories: [
       { id: 'new-energy-vehicle-manufacturing', name: '新能源汽车整车制造', count: 89 },
       { id: 'new-energy-vehicle-parts', name: '新能源汽车装置、配件制造', count: 145 },
