@@ -51,6 +51,12 @@
 │   │       ├── company/      # 企业信息相关API
 │   │       ├── user/         # 用户侧API
 │   │       │   └── favorites/route.ts  # 用户收藏CRUD接口
+│   │       ├── tech/         # 技术公共API
+│   │       │   ├── category-counts/route.ts # 产业分类与子分类技术数量
+│   │       │   ├── categories/route.ts      # 技术分类列表
+│   │       │   ├── filter-options/route.ts  # 技术筛选选项
+│   │       │   ├── search/route.ts          # 技术搜索
+│   │       │   └── search-stats/route.ts    # 搜索统计数据
 │   │       ├── _utils/auth.ts # API路由共享认证工具
 │   │       └── admin/        # 管理后台API
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入

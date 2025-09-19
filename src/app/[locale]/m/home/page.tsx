@@ -412,9 +412,23 @@ export default function MobileHomePage() {
               <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Category':'主分类'}</div>
               <div className="relative">
                 <div className={`flex flex-wrap gap-2 ${expandCategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
-                  <button key="all" onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
+                  <button
+                    key="all"
+                    onClick={()=>{ setSelectedCategory(''); setSelectedSubcategory('') }}
+                    className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}
+                  >
+                    {locale==='en'
+                      ? `All (${transformed.totalTechnologyCount || 0})`
+                      : `全部 (${transformed.totalTechnologyCount || 0})`}
+                  </button>
                   {(transformed.mainCategories||[]).map(c => (
-                    <button key={c.id} onClick={()=>{ setSelectedCategory(c.id); setSelectedSubcategory('') }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===c.id?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{c.name}</button>
+                    <button
+                      key={c.id}
+                      onClick={()=>{ setSelectedCategory(c.id); setSelectedSubcategory('') }}
+                      className={`px-3 h-8 rounded-full border text-[12px] ${selectedCategory===c.id?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}
+                    >
+                      {`${c.name} (${c.count ?? 0})`}
+                    </button>
                   ))}
                 </div>
                 {!expandCategory && (transformed.mainCategories||[]).length > 10 && (
@@ -438,9 +452,23 @@ export default function MobileHomePage() {
                 <div className="text-[13px] text-gray-700 mb-1">{locale==='en'?'Subcategory':'子分类'}</div>
                 <div className="relative">
                   <div className={`flex flex-wrap gap-2 ${expandSubcategory ? '' : 'max-h-[72px] overflow-hidden'}`}>
-                    <button key="all-sub" onClick={()=>setSelectedSubcategory('')} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===''?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
+                    <button
+                      key="all-sub"
+                      onClick={()=>setSelectedSubcategory('')}
+                      className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===''?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}
+                    >
+                      {locale==='en'
+                        ? `All (${(transformed.mainCategories||[]).find(c=>c.id===selectedCategory)?.count ?? 0})`
+                        : `全部 (${(transformed.mainCategories||[]).find(c=>c.id===selectedCategory)?.count ?? 0})`}
+                    </button>
                     {subcategories.map((s: any) => (
-                      <button key={s.id} onClick={()=>setSelectedSubcategory(s.id)} className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===s.id?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}>{s.name}</button>
+                      <button
+                        key={s.id}
+                        onClick={()=>setSelectedSubcategory(s.id)}
+                        className={`px-3 h-8 rounded-full border text-[12px] ${selectedSubcategory===s.id?'bg-[#eef2ff] border-[#6b6ee2] text-[#4b50d4]':'bg-white border-gray-200 text-gray-600'}`}
+                      >
+                        {`${s.name} (${s.count ?? 0})`}
+                      </button>
                     ))}
                   </div>
                   {!expandSubcategory && subcategories.length > 10 && (

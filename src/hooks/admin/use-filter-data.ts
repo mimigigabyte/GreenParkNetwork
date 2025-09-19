@@ -10,6 +10,35 @@ interface FilterData {
   countries: AdminCountry[]
   provinces: AdminProvince[]
   developmentZones: AdminDevelopmentZone[]
+  totalTechnologyCount?: number
+}
+
+interface CountedSubcategory {
+  id: string
+  slug: string
+  nameZh: string
+  nameEn: string
+  count: number
+  sortOrder?: number
+  isVirtual?: boolean
+}
+
+interface CountedCategory {
+  id: string
+  slug: string
+  nameZh: string
+  nameEn: string
+  count: number
+  subcategories: CountedSubcategory[]
+}
+
+interface CategoryCountsApiResponse {
+  success: boolean
+  data?: {
+    totalTechnologyCount: number
+    categories: CountedCategory[]
+  }
+  error?: string
 }
 
 /**
@@ -20,7 +49,8 @@ export function useFilterData() {
     categories: [],
     countries: [],
     provinces: [],
-    developmentZones: []
+    developmentZones: [],
+    totalTechnologyCount: 0
   })
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -34,15 +64,108 @@ export function useFilterData() {
       setIsLoading(true)
       setError(null)
 
-      const [categoriesData, countriesData] = await Promise.all([
+      const [categoriesData, countriesData, categoryCounts] = await Promise.all([
         getCategories(),
-        getCountries()
+        getCountries(),
+        fetch('/api/tech/category-counts')
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch category counts: ${response.status}`)
+            }
+            return response.json() as Promise<CategoryCountsApiResponse>
+          })
+          .catch((err) => {
+            console.error('获取分类数量失败:', err)
+            return null
+          })
       ])
+
+      const categoryCountMap = new Map<string, { count: number; category: CountedCategory }>()
+      const subcategoryCountMap = new Map<string, { count: number; subcategory: CountedSubcategory }>()
+      let totalTechnologyCount = 0
+
+      if (categoryCounts?.success && categoryCounts.data) {
+        totalTechnologyCount = categoryCounts.data.totalTechnologyCount || 0
+        for (const category of categoryCounts.data.categories) {
+          const categoryEntry = { count: category.count, category }
+          const categoryKeyId = category.id
+          const categoryKeySlug = category.slug
+          if (categoryKeyId) {
+            categoryCountMap.set(categoryKeyId, categoryEntry)
+          }
+          if (categoryKeySlug) {
+            categoryCountMap.set(categoryKeySlug, categoryEntry)
+          }
+
+          for (const sub of category.subcategories || []) {
+            const subEntry = { count: sub.count, subcategory: sub }
+            const subKeyId = sub.id
+            const subKeySlug = sub.slug
+            if (subKeyId) {
+              subcategoryCountMap.set(subKeyId, subEntry)
+            }
+            if (subKeySlug) {
+              subcategoryCountMap.set(subKeySlug, subEntry)
+            }
+          }
+        }
+      }
+
+      const normalizedCategories = (Array.isArray(categoriesData) ? categoriesData : []).map(category => ({
+        ...category,
+        technology_count: categoryCountMap.get(category.id)?.count ?? categoryCountMap.get(category.slug)?.count ?? 0,
+        subcategories: (category.subcategories || []).map(sub => ({
+          ...sub,
+          technology_count: subcategoryCountMap.get(sub.id)?.count ?? subcategoryCountMap.get(sub.slug)?.count ?? 0
+        }))
+      }))
+
+      const enrichedCategories = normalizedCategories.map(category => {
+        const categoryEntry = categoryCountMap.get(category.id) ?? categoryCountMap.get(category.slug)
+        if (!categoryEntry) {
+          return category
+        }
+
+        const baseSubcategories = Array.isArray(category.subcategories) ? category.subcategories : []
+        const countsSubcategories = Array.isArray(categoryEntry.category?.subcategories)
+          ? categoryEntry.category.subcategories
+          : []
+
+        const existingMatch = (subId?: string | null, subSlug?: string | null) => {
+          return baseSubcategories.some(existing => existing.id === subId || existing.slug === subSlug)
+        }
+
+        const extraSubcategories = countsSubcategories
+          .filter(sub => !existingMatch(sub.id, sub.slug))
+          .map(sub => {
+            const fallbackId = sub.id || `${category.id}-virtual-${sub.slug || Date.now()}`
+            const now = new Date().toISOString()
+            return {
+              id: fallbackId,
+              category_id: category.id,
+              name_zh: sub.nameZh,
+              name_en: sub.nameEn,
+              slug: sub.slug || fallbackId,
+              sort_order: sub.sortOrder ?? 9999,
+              is_active: true,
+              created_at: now,
+              updated_at: now,
+              technology_count: sub.count,
+              __isVirtual: true
+            }
+          })
+
+        return {
+          ...category,
+          subcategories: [...baseSubcategories, ...extraSubcategories]
+        }
+      })
 
       setData(prev => ({
         ...prev,
-        categories: Array.isArray(categoriesData) ? categoriesData : [],
-        countries: Array.isArray(countriesData) ? countriesData : []
+        categories: enrichedCategories,
+        countries: Array.isArray(countriesData) ? countriesData : [],
+        totalTechnologyCount
       }))
       
       console.log('✅ 加载筛选数据成功:', {
@@ -314,14 +437,20 @@ function translateCountryName(nameZh: string, nameEn: string): string {
  */
 export function transformFilterDataForComponents(data: FilterData, locale: string = 'zh') {
   return {
+    totalTechnologyCount: data.totalTechnologyCount || 0,
     // 转换产业分类格式
     mainCategories: (data.categories || []).map(category => ({
       id: category.slug,
       name: locale === 'en' ? (category.name_en || category.name_zh) : category.name_zh,
-      subCategories: (category.subcategories || []).map(sub => ({
+      count: category.technology_count ?? 0,
+      subCategories: (category.subcategories || [])
+        .slice()
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(sub => ({
         id: sub.slug,
         name: locale === 'en' ? (sub.name_en || sub.name_zh) : sub.name_zh,
-        count: 0 // TODO: 从技术表中统计实际数量
+        count: sub.technology_count ?? 0,
+        isVirtual: sub.__isVirtual ?? false
       }))
     })),
 

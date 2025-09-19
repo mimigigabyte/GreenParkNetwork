@@ -24,6 +24,7 @@ export interface MultiLanguageField {
 export interface AdminCategory extends BaseEntity, MultiLanguageField {
   slug: string
   sort_order: number
+  technology_count?: number
   subcategories?: AdminSubcategory[]
 }
 
@@ -34,8 +35,10 @@ export interface AdminSubcategory extends BaseEntity, MultiLanguageField {
   category_id: string
   slug: string
   sort_order: number
+  technology_count?: number
   default_tech_image_url?: string // 默认技术图片URL
   category?: AdminCategory
+  __isVirtual?: boolean
 }
 
 /**

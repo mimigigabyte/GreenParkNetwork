@@ -56,6 +56,7 @@ export function SearchFilter({
   
   const [mainCategories, setMainCategories] = useState<MainCategory[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
+  const [totalMainCategoryCount, setTotalMainCategoryCount] = useState<number>(0);
   
   // 防抖相关状态
   const debounceTimerRef = useRef<NodeJS.Timeout>();
@@ -133,6 +134,7 @@ export function SearchFilter({
     if (filterData.categories.length > 0) {
       const transformedData = transformFilterDataForComponents(filterData, locale);
       setMainCategories(transformedData.mainCategories);
+      setTotalMainCategoryCount(transformedData.totalTechnologyCount || 0);
     }
   }, [filterData, locale]);
 
@@ -510,10 +512,12 @@ export function SearchFilter({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 disabled={isFilterLoading}
               >
-                <option value="all">{t('allCategories')}</option>
+                <option value="all">
+                  {`${t('allCategories')} (${totalMainCategoryCount})`}
+                </option>
                 {mainCategories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.name}
+                    {`${category.name} (${category.count})`}
                   </option>
                 ))}
               </select>
@@ -528,10 +532,12 @@ export function SearchFilter({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 disabled={selectedMainCategory === null || isFilterLoading}
               >
-                <option value="all">{t('allSubCategories')}</option>
+                <option value="all">
+                  {`${t('allSubCategories')} (${mainCategories.find(cat => cat.id === selectedMainCategory)?.count ?? totalMainCategoryCount})`}
+                </option>
                 {getCurrentSubCategories().map((subCategory) => (
                   <option key={subCategory.id} value={subCategory.id}>
-                    {subCategory.name}
+                    {`${subCategory.name} (${subCategory.count})`}
                   </option>
                 ))}
               </select>

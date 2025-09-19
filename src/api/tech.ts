@@ -46,12 +46,14 @@ export interface SubCategory {
   id: string;
   name: string;
   count: number;
+  isVirtual?: boolean;
 }
 
 // 主分类类型
 export interface MainCategory {
   id: string;
   name: string;
+  count: number;
   subCategories: SubCategory[];
 }
 
