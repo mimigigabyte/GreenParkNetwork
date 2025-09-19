@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { ChevronUp, ChevronDown, Search, Filter } from 'lucide-react'
 import { TablePagination } from './table-pagination'
 
-interface Column<T> {
+export interface Column<T> {
   key: keyof T | string
   title: string
   sortable?: boolean
