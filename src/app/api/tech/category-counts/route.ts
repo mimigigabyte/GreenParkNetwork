@@ -28,8 +28,9 @@ interface CategoryCountsResponse {
   error?: string;
 }
 
-type SubcategoryCount = CategoryCountsResponse['data']['categories'][number]['subcategories'][number];
-type CategoryCount = CategoryCountsResponse['data']['categories'][number];
+type CategoryCountsPayload = NonNullable<CategoryCountsResponse['data']>;
+type CategoryCount = CategoryCountsPayload['categories'][number];
+type SubcategoryCount = CategoryCount['subcategories'][number];
 
 interface RawSubcategory {
   id: string;
