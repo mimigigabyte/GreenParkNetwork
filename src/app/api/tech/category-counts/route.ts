@@ -180,7 +180,7 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
             subcategories: enhancedSubcategories,
           };
         })
-    )).filter(Boolean);
+    )).filter((item): item is CategoryCount => Boolean(item));
 
     return NextResponse.json({
       success: true,
