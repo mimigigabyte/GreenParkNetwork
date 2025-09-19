@@ -451,7 +451,7 @@ export default function UserTechnologiesPage() {
         )
       }
     }
-  ]
+  ];
 
   return (
     <div className="space-y-6">
