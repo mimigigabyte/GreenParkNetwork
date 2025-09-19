@@ -323,7 +323,7 @@ export default function MobileHomePage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      {it.featuredWeight > 0 && (
+                      {(it.featuredWeight ?? 0) > 0 && (
                         <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 rounded">
                           <img src="/images/icons/premium.png" alt="featured" className="w-3 h-3 mr-1" />
                           {locale === 'en' ? 'Featured' : '精选'}
