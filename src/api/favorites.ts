@@ -91,7 +91,9 @@ export async function expandFavoriteTechnologies(favorites: FavoriteItem[]): Pro
     }
   })
 
-  return uniqueById(technologies)
+  const unique = uniqueById(technologies)
+  unique.sort((a, b) => (b.featuredWeight ?? 0) - (a.featuredWeight ?? 0))
+  return unique
 }
 
 export async function getFavoriteTechnologies(userId?: string): Promise<TechProduct[]> {

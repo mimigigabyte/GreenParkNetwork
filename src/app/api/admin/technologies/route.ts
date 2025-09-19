@@ -321,6 +321,7 @@ export async function POST(request: NextRequest) {
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
       custom_label: technologyData.custom_label,
+      featured_weight: technologyData.featured_weight ?? 0,
       attachment_urls: technologyData.attachment_urls,
       attachments: technologyData.attachments,
       is_active: technologyData.is_active,

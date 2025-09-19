@@ -254,6 +254,7 @@ export async function GET(request: NextRequest) {
     console.log('🎯 开始执行联合查询，应用的筛选条件总数:', Object.values(filterConditions).filter(Boolean).length);
     
     const { data: technologies, error, count } = await query
+      .order('featured_weight', { ascending: false })
       // Primary order by selected field, then tie-break by id for stable pagination
       .order(orderField, { ascending: orderAscending })
       .order('id', { ascending: true })
@@ -369,6 +370,7 @@ export async function GET(request: NextRequest) {
         developmentZoneName: developmentZonesMap.get(tech.company_development_zone_id)?.name_zh || '',
         developmentZoneNameEn: developmentZonesMap.get(tech.company_development_zone_id)?.name_en || '',
         custom_label: tech.custom_label || '', // 自定义标签
+        featuredWeight: tech.featured_weight ?? 0,
         // 原有字段保持兼容性
         category: category || '',
         subCategory: '',

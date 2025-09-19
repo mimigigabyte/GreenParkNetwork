@@ -377,6 +377,17 @@ export default function TechnologiesPage() {
       )
     },
     {
+      key: 'featured_weight',
+      title: '精选权重',
+      sortable: true,
+      width: '110px',
+      render: (_: unknown, record: AdminTechnology) => (
+        <span className="text-sm font-medium text-gray-700">
+          {typeof record.featured_weight === 'number' ? record.featured_weight : 0}
+        </span>
+      )
+    },
+    {
       key: 'category',
       title: '分类',
       render: (_: unknown, record: AdminTechnology) => (
@@ -928,6 +939,20 @@ export default function TechnologiesPage() {
                             </span>
                           ) : (
                             <span className="text-sm text-gray-500">-</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">精选排序权重</label>
+                        <div className="bg-gray-50 p-3 rounded-lg flex items-center gap-2">
+                          <span className="text-sm text-gray-900">
+                            {typeof viewingTechnology.featured_weight === 'number' ? viewingTechnology.featured_weight : 0}
+                          </span>
+                          {viewingTechnology.featured_weight && viewingTechnology.featured_weight > 0 && (
+                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold text-amber-700 bg-amber-100 border border-amber-200 rounded">
+                              精选
+                            </span>
                           )}
                         </div>
                       </div>

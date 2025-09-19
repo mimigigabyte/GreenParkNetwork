@@ -508,14 +508,22 @@ export function SearchResults({
                                      {/* 右侧：技术名称和简介 */}
                    <div className="lg:w-3/4 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">
-                        {(() => {
-                          const title = locale === 'en' 
-                            ? (product.solutionTitleEn || product.solutionTitle) 
-                            : product.solutionTitle;
-                          return highlightText(title || '');
-                        })()}
-                      </h4>
+                      <div className="flex items-center gap-2 mb-4">
+                        {product.featuredWeight > 0 && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-amber-700 bg-amber-100 border border-amber-200 rounded">
+                            <img src="/images/icons/premium.png" alt="featured" className="w-3.5 h-3.5 mr-1" />
+                            {locale === 'en' ? 'Featured' : '精选'}
+                          </span>
+                        )}
+                        <h4 className="text-xl font-bold text-gray-900">
+                          {(() => {
+                            const title = locale === 'en'
+                              ? (product.solutionTitleEn || product.solutionTitle)
+                              : product.solutionTitle;
+                            return highlightText(title || '');
+                          })()}
+                        </h4>
+                      </div>
                       
                       {/* 简介文字 - 最多6行 */}
                       <div className="mb-4">

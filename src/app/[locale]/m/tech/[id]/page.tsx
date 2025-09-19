@@ -164,9 +164,19 @@ export default function MobileTechDetailPage({ params: { id } }: { params: { id:
       {/* Title + tags card */}
       <div className="mt-3 rounded-2xl bg-white border border-gray-100 p-3">
         <div className="flex items-start justify-between gap-2">
-          <h1 className="flex-1 min-w-0 text-[20px] font-semibold text-gray-900 leading-snug">
-            {title}
-          </h1>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              {typeof data.featuredWeight === 'number' && data.featuredWeight > 0 && (
+                <span className="inline-flex items-center px-2 py-0.5 text-[12px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 rounded">
+                  <img src="/images/icons/premium.png" alt="featured" className="w-3.5 h-3.5 mr-1" />
+                  {locale === 'en' ? 'Featured' : '精选'}
+                </span>
+              )}
+              <h1 className="flex-1 min-w-0 text-[20px] font-semibold text-gray-900 leading-snug">
+                {title}
+              </h1>
+            </div>
+          </div>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {data.categoryName && (

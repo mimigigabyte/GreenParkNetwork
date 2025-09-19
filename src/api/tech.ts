@@ -38,6 +38,7 @@ export interface TechProduct {
   developmentZoneName?: string; // 国家级经开区名称
   developmentZoneNameEn?: string; // 国家级经开区英文名称
   custom_label?: string; // 自定义标签
+  featuredWeight?: number; // 精选权重
 }
 
 // 子分类类型

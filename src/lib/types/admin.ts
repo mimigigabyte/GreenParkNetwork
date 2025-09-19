@@ -161,6 +161,7 @@ export interface AdminTechnology extends BaseEntity {
   category_id?: string
   subcategory_id?: string
   custom_label?: string // 自定义标签，不超过20字符
+  featured_weight?: number // 精选排序权重，数值越大越靠前
   attachment_urls?: string[] // 为了向后兼容保留
   attachments?: TechnologyAttachment[] // 新的附件结构
   created_by?: string // 创建者用户ID

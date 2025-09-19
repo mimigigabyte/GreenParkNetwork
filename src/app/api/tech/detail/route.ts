@@ -81,6 +81,7 @@ export async function GET(req: NextRequest) {
       provinceNameEn: province.data?.name_en || '',
       developmentZone: zone.data?.code || '',
       custom_label: tech.custom_label || '',
+      featuredWeight: tech.featured_weight ?? 0,
       updateTime: tech.updated_at || tech.created_at,
       website_url: tech.website_url || ''
     }

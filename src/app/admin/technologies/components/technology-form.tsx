@@ -30,6 +30,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     category_id: '',
     subcategory_id: '',
     custom_label: '', // 自定义标签
+    featured_weight: 0,
     attachment_urls: [] as string[], // 技术资料（为了向后兼容）
     attachments: [] as TechnologyAttachment[], // 新的附件结构
     is_active: true,
@@ -235,6 +236,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         category_id: technology.category_id || '',
         subcategory_id: technology.subcategory_id || '',
         custom_label: technology.custom_label || '',
+        featured_weight: technology.featured_weight ?? 0,
         attachment_urls: technology.attachment_urls || [],
         attachments: technology.attachments || [],
         is_active: technology.is_active,
@@ -263,6 +265,35 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       if (technology.company_province_id) {
         loadDevelopmentZones(technology.company_province_id)
       }
+    } else {
+      setFormData({
+        name_zh: '',
+        name_en: '',
+        description_zh: '',
+        description_en: '',
+        image_url: '',
+        website_url: '',
+        tech_source: 'self_developed',
+        acquisition_method: '' as TechAcquisitionMethod,
+        category_id: '',
+        subcategory_id: '',
+        custom_label: '',
+        featured_weight: 0,
+        attachment_urls: [],
+        attachments: [],
+        is_active: true,
+        company_id: '',
+        company_name_zh: '',
+        company_name_en: '',
+        company_logo_url: '',
+        company_country_id: '',
+        company_province_id: '',
+        company_development_zone_id: ''
+      })
+      setSubcategories([])
+      setProvinces([])
+      setDevelopmentZones([])
+      setLogoPreview(null)
     }
   }, [technology])
 
@@ -376,6 +407,10 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
       newErrors.description_en = '技术介绍不能超过2000字'
     }
 
+    if (!Number.isFinite(formData.featured_weight) || formData.featured_weight < 0) {
+      newErrors.featured_weight = '精选权重必须为非负整数'
+    }
+
     if (formData.website_url) {
       // Accept scheme-less domains like "www.example.com" by using a relaxed regex
       const url = formData.website_url.trim()
@@ -456,6 +491,7 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
         category_id: formData.category_id || undefined,
         subcategory_id: formData.subcategory_id || undefined,
         custom_label: formData.custom_label.trim() || undefined,
+        featured_weight: Number.isFinite(formData.featured_weight) ? Math.max(0, Math.floor(formData.featured_weight)) : 0,
         attachment_urls: formData.attachment_urls.length > 0 ? formData.attachment_urls : undefined,
         attachments: formData.attachments.length > 0 ? formData.attachments : undefined,
         is_active: formData.is_active,
@@ -684,6 +720,30 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
               </div>
             </div>
             
+          {/* 精选权重 */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              精选排序权重
+            </label>
+            <input
+              type="number"
+              min={0}
+              value={formData.featured_weight}
+              onChange={(e) => {
+                const value = Number(e.target.value)
+                setFormData(prev => ({ ...prev, featured_weight: Number.isNaN(value) ? 0 : value }))
+              }}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                errors.featured_weight ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="默认0，值越大排序越靠前"
+            />
+            <p className="text-xs text-gray-500 mt-1">仅管理员可设置，值越大在前端列表中排序越靠前。</p>
+            {errors.featured_weight && (
+              <p className="mt-1 text-xs text-red-600">{errors.featured_weight}</p>
+            )}
+          </div>
+
           {/* 自定义标签 */}
           <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">

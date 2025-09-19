@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error, count } = await query
+      .order('featured_weight', { ascending: false })
       .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(from, to)
 
@@ -146,6 +147,7 @@ export async function POST(request: NextRequest) {
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
       custom_label: technologyData.custom_label, // 自定义标签
+      featured_weight: 0,
       // 处理附件数据：支持新旧格式
       attachment_urls: (() => {
         // 如果有新的attachments数组，提取URL

@@ -60,6 +60,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       category_id: technologyData.category_id,
       subcategory_id: technologyData.subcategory_id,
       custom_label: technologyData.custom_label,
+      featured_weight: technologyData.featured_weight,
       attachment_urls: technologyData.attachment_urls,
       attachments: technologyData.attachments,
       is_active: technologyData.is_active,

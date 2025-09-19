@@ -118,7 +118,17 @@ export default function MobileMyTechnologiesPage() {
               <article key={it.id} className="relative rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">{title}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {typeof it.featured_weight === 'number' && it.featured_weight > 0 && (
+                        <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 rounded">
+                          <img src="/images/icons/premium.png" alt="featured" className="w-3 h-3 mr-1" />
+                          {locale === 'en' ? 'Featured' : '精选'}
+                        </span>
+                      )}
+                      <h3 className="flex-1 min-w-0 text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">{title}</h3>
+                    </div>
+                  </div>
                   <span className={`shrink-0 inline-flex px-2 py-1 text-[11px] font-semibold rounded-full ${getStatusClass(it.review_status)}`}>
                     {getStatusLabel(it.review_status)}
                   </span>
