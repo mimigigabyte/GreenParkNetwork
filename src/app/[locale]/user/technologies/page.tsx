@@ -237,7 +237,7 @@ export default function UserTechnologiesPage() {
       key: 'image_url',
       title: locale === 'en' ? 'Image' : '图片',
       width: '100px',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: string | number | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <div className="flex items-center space-x-2">
           {value ? (
             <div className="relative">
@@ -260,7 +260,7 @@ export default function UserTechnologiesPage() {
       key: 'name_zh',
       title: locale === 'en' ? 'Technology Name' : '技术名称',
       sortable: true,
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: string | number | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <div className="max-w-xs">
           <div className="font-medium text-gray-900 truncate">{locale === 'en' ? record.name_en || record.name_zh : record.name_zh}</div>
           {locale === 'zh' && record.name_en && (
@@ -275,7 +275,7 @@ export default function UserTechnologiesPage() {
     {
       key: 'category',
       title: locale === 'en' ? 'Category' : '分类',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: string | number | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <div className="text-sm">
           {record.category && (
             <div className="flex items-center text-blue-600 mb-1">
@@ -297,7 +297,7 @@ export default function UserTechnologiesPage() {
     {
       key: 'tech_source',
       title: locale === 'en' ? 'Tech Source' : '技术来源',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: string | number | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
           {getTechSourceLabel(value as string)}
         </span>
@@ -379,7 +379,7 @@ export default function UserTechnologiesPage() {
       key: 'is_active',
       title: locale === 'en' ? 'Status' : '启用状态',
       width: '80px',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: string | number | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
           value as boolean 
             ? 'bg-green-100 text-green-800' 
