@@ -63,9 +63,9 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
   }
 
   try {
-    const [{ data: categoriesData, error: categoriesError }, { count: totalTechnologyCount, error: totalCountError }] = await Promise.all([
+    const [{ data: rawCategories, error: categoriesError }, { count: totalTechnologyCount, error: totalCountError }] = await Promise.all([
       supabaseAdmin
-        .from<RawCategory>('admin_categories')
+        .from('admin_categories')
         .select(
           `id, slug, name_zh, name_en, is_active, sort_order,
            subcategories:admin_subcategories(id, slug, name_zh, name_en, is_active, sort_order)`
@@ -109,7 +109,7 @@ export async function GET(): Promise<NextResponse<CategoryCountsResponse>> {
     }
 
     const categories = (await Promise.all(
-      (categoriesData || [])
+      ((rawCategories as RawCategory[] | null) || [])
         .filter((category) => category?.is_active !== false)
         .map(async (category): Promise<CategoryCount | undefined> => {
           const { count: categoryCount, error: categoryCountError } = await supabaseAdmin
