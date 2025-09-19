@@ -211,7 +211,7 @@ export const getTechnologyById = async (id: string): Promise<ApiResponse<TechPro
     return { success: true, data: result.data, error: undefined }
   } catch (error) {
     console.error('Error fetching technology detail:', error)
-    return { success: false, data: undefined as any, error: error instanceof Error ? error.message : 'Unknown error' }
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
