@@ -339,12 +339,12 @@ export default function TechnologiesPage() {
     }
   }
 
-  const columns = [
+  const columns: import('@/components/admin/data-table/data-table').Column<AdminTechnology>[] = [
     {
       key: 'image_url',
       title: '图片',
       width: '100px',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: AdminTechnology[keyof AdminTechnology], record: AdminTechnology, index: number) => (
         <div className="flex items-center space-x-2">
           {value ? (
             <div className="relative">
@@ -367,7 +367,7 @@ export default function TechnologiesPage() {
       key: 'name_zh',
       title: '技术名称',
       sortable: true,
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: AdminTechnology[keyof AdminTechnology], record: AdminTechnology, index: number) => (
         <div className="max-w-xs">
           <div className="font-medium text-gray-900 truncate">{value as string}</div>
           {record.name_en && (
@@ -576,7 +576,7 @@ export default function TechnologiesPage() {
       key: 'is_active',
       title: '启用状态',
       width: '80px',
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: AdminTechnology[keyof AdminTechnology], record: AdminTechnology, index: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
           value as boolean 
             ? 'bg-green-100 text-green-800' 
@@ -590,7 +590,7 @@ export default function TechnologiesPage() {
       key: 'created_at',
       title: '创建时间',
       sortable: true,
-      render: (value: string | boolean | string[] | AdminCategory | AdminSubcategory | AdminCountry | AdminProvince | AdminDevelopmentZone | AdminCompany | TechnologyAttachment[] | undefined, record: AdminTechnology, index: number) => (
+      render: (value: AdminTechnology[keyof AdminTechnology], record: AdminTechnology, index: number) => (
         <span className="text-sm text-gray-500">
           {new Date(value as string).toLocaleDateString('zh-CN')}
         </span>
