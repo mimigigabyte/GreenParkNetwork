@@ -7,7 +7,6 @@ import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-t
 import { ImageUpload } from '@/components/admin/forms/image-upload'
 import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
 import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
-import { getCountries } from '@/lib/supabase/admin-locations'
 import { generateCompanyLogo } from '@/lib/logoGenerator'
 import { FileText, Trash2, Upload } from 'lucide-react'
 
@@ -147,11 +146,19 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
   // 加载国家数据
   const loadCountries = async () => {
     try {
-      const countriesData = await getCountries()
-      setCountries(countriesData)
-      console.log('✅ 技术表单-加载国家数据成功:', countriesData.length, '个国家（包含中国）')
+      const response = await fetch('/api/admin/countries')
+      if (!response.ok) {
+        console.error('❌ 技术表单-加载国家数据失败:', response.status)
+        setCountries([])
+        return
+      }
+
+      const result = await response.json()
+      const data = Array.isArray(result) ? result : (result?.data ?? [])
+      setCountries(Array.isArray(data) ? data : [])
+      console.log('✅ 技术表单-加载国家数据成功:', data.length, '个国家')
     } catch (error) {
-      console.error('❌ 技术表单-加载国家数据失败:', error)
+      console.error('❌ 技术表单-加载国家数据出错:', error)
       setCountries([])
     }
   }
