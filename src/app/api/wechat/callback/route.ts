@@ -40,8 +40,29 @@ export async function POST(request: NextRequest) {
 
     // 校验state（若存在）
     const cookieState = request.cookies.get('wx_state')?.value
-    if (cookieState && state && cookieState !== state) {
+    const globalAny = globalThis as any
+    const store: Map<string, number> | undefined = globalAny.__wechatStateStore
+
+    const now = Date.now()
+    let stateValid = !state
+    if (state && cookieState && cookieState === state) {
+      stateValid = true
+    } else if (state && store && store.has(state)) {
+      const createdAt = store.get(state) || 0
+      if (now - createdAt <= 10 * 60 * 1000) {
+        stateValid = true
+        store.delete(state)
+      } else {
+        store.delete(state)
+      }
+    }
+
+    if (!stateValid) {
       return NextResponse.json({ success: false, error: '非法的state参数' }, { status: 400 })
+    }
+
+    if (state && store && store.has(state)) {
+      store.delete(state)
     }
 
     const appId = process.env.WECHAT_APP_ID
@@ -176,10 +197,19 @@ export async function POST(request: NextRequest) {
       userMetadata: userRow.user_metadata || {}
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: { user, token, refreshToken, isNewUser }
     })
+
+    response.cookies.set('wx_state', '', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 0
+    })
+
+    return response
   } catch (e) {
     console.error('WeChat callback error', e)
     return NextResponse.json({ success: false, error: '微信登录回调处理失败' }, { status: 500 })
