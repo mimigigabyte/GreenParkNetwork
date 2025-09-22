@@ -499,15 +499,39 @@ export default function MobileHomePage() {
               ) : (
                 <div className="relative">
                   <div className={`flex flex-wrap gap-2 ${expandCountry ? '' : 'max-h-[72px] overflow-hidden'}`}>
-                    <button key="all-country" onClick={()=>{ setSelectedCountry(''); setSelectedProvince(''); setSelectedZone(''); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>{locale==='en'?'All':'全部'}</button>
-                    {transformed.countries.map(c => (
-                      <button key={c.value} onClick={async()=>{ setSelectedCountry(c.value); setSelectedProvince(''); setSelectedZone(''); const id = (fd.countries||[]).find(x=>x.code===c.value)?.id; if (id) await loadProvinces(id); }} className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===c.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}>
-                        <span className="inline-flex items-center gap-1">
-                          {c.logo_url && <img src={c.logo_url} alt="flag" className="w-3.5 h-3.5 rounded-sm" />}
-                          {c.label}
-                        </span>
-                      </button>
-                    ))}
+                  <button
+                    key="all-country"
+                    onClick={()=>{
+                      setSelectedCountry('');
+                      setSelectedProvince('');
+                      setSelectedZone('');
+                      setExpandCountry(false);
+                    }}
+                    className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===''?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}
+                  >
+                    {locale==='en'?'All':'全部'}
+                  </button>
+                  {transformed.countries.map(c => (
+                    <button
+                      key={c.value}
+                      onClick={async()=>{
+                        setSelectedCountry(c.value);
+                        setSelectedProvince('');
+                        setSelectedZone('');
+                        if (c.value === 'china') {
+                          setExpandCountry(false);
+                        }
+                        const id = (fd.countries||[]).find(x=>x.code===c.value)?.id;
+                        if (id) await loadProvinces(id);
+                      }}
+                      className={`px-3 h-8 rounded-full border text-[12px] ${selectedCountry===c.value?'bg-[#e6fffa] border-[#00b899] text-[#007f66]':'bg-white border-gray-200 text-gray-600'}`}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        {c.logo_url && <img src={c.logo_url} alt="flag" className="w-3.5 h-3.5 rounded-sm" />}
+                        {c.label}
+                      </span>
+                    </button>
+                  ))}
                   </div>
                   {!expandCountry && transformed.countries.length > 12 && (
                     <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent" />

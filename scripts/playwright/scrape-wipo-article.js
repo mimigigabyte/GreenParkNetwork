@@ -144,6 +144,7 @@ function normalizeBenefitsDescription(text = '') {
 }
 
 async function main() {
+  console.log(`🕒 启动 Playwright 浏览器，目标 ${INPUT_URL}`);
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
@@ -155,6 +156,7 @@ async function main() {
     } catch {}
   });
   const page = await context.newPage();
+  console.log('🌐 正在打开目标页面...');
 
   // Capture JSON API responses to improve reliability
   const apiPayloads = [];
@@ -174,8 +176,10 @@ async function main() {
 
   try {
     await page.goto(INPUT_URL, { waitUntil: 'load', timeout: 60000 });
+    console.log('✅ 页面初始加载完成，等待内容渲染...');
     // wait for network to settle for SPA content
     try { await page.waitForLoadState('networkidle', { timeout: 15000 }); } catch {}
+    console.log('🔄 网络空闲检查完成，开始提取关键元素...');
 
     // Heuristic waits for article content
     const waitSelectors = [
@@ -257,6 +261,7 @@ async function main() {
     await page.waitForTimeout(500);
 
     // Extract via DOM first
+    console.log('🔍 开始解析页面 DOM 结构...');
     const domData = await page.evaluate(() => {
       const sel = (q) => document.querySelector(q);
       const all = (q) => Array.from(document.querySelectorAll(q));
@@ -813,6 +818,7 @@ async function main() {
     });
 
     // Try to enhance using captured API JSON if some fields are empty
+    console.log('🧩 DOM 基础字段提取完成，尝试补全缺失信息...');
     let enhanced = { ...domData };
     if (!enhanced.description || !enhanced.benefits || !enhanced.technologyNameEN || /wipogreen database|wipo\s*green/i.test(enhanced.technologyNameEN)) {
       for (const { url, body } of apiPayloads) {
@@ -905,6 +911,15 @@ async function main() {
       enriched.benefitsDescription = normalizeBenefitsDescription(enriched.benefitsDescription);
     }
 
+    console.log('📊 字段提取摘要', JSON.stringify({
+      id: enriched.id,
+      title: enriched.technologyNameEN,
+      company: enriched.companyName,
+      descLength: (enriched.description || '').length,
+      benefitsLength: (enriched.benefits || '').length,
+      benefitsDescLength: (enriched.benefitsDescription || '').length,
+    }));
+
     // High-quality CN translation via free services (best-effort)
     async function translateNameHighQuality(enText) {
       if (!enText) return '';
@@ -943,6 +958,7 @@ async function main() {
       const betterCN = await translateNameHighQuality(enriched.technologyNameEN);
       if (betterCN) enriched.technologyNameCN = betterCN;
     } catch {}
+    console.log('🈶 中文名称和关键词生成完成');
 
     // If benefits still look wrong (empty or numeric array), try to dump nearby DOM for debugging
     const needsDebug = !enriched.benefits || Array.isArray(enriched.benefits);

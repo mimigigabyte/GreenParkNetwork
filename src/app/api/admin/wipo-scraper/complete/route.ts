@@ -113,8 +113,13 @@ function composeEnglish(item: any) {
   return parts.join('\n')
 }
 
-async function processTranslation(item: any) {
-  console.log(`📝 正在处理数据 ID=${item.id}`)
+async function processTranslation(item: any, logger: (message: string, meta?: any) => void = () => {}) {
+  const log = (message: string, meta?: any) => {
+    logger(message, meta)
+    console.log(message, meta ?? '')
+  }
+
+  log(`📝 正在处理数据 ID=${item.id}`)
   
   const english = composeEnglish(item)
   
@@ -126,7 +131,7 @@ async function processTranslation(item: any) {
   const hasBenefits = Boolean(benefitsStr.trim())
   const hasBenefitsDescription = Boolean(benefitsDescStr.trim())
   
-  console.log(`🔍 内容验证 ID=${item.id}:`, {
+  log(`🔍 内容验证 ID=${item.id}`, {
     hasDescription,
     hasBenefits, 
     hasBenefitsDescription,
@@ -140,7 +145,7 @@ async function processTranslation(item: any) {
   if (hasDescription) {
     zhDesc = await translateMultilineToChinese(descStr)
     if (!zhDesc) {
-      console.warn(`⚠️ 描述翻译失败 ID=${item.id}, 使用原文`)
+      log(`⚠️ 描述翻译失败 ID=${item.id}, 使用原文`)
       zhDesc = descStr
     }
   }
@@ -149,7 +154,7 @@ async function processTranslation(item: any) {
   if (hasBenefits) {
     zhTypes = await translateMultilineToChinese(benefitsStr)
     if (!zhTypes) {
-      console.warn(`⚠️ 收益类型翻译失败 ID=${item.id}, 使用原文`)
+      log(`⚠️ 收益类型翻译失败 ID=${item.id}, 使用原文`)
       zhTypes = benefitsStr
     }
   }
@@ -158,7 +163,7 @@ async function processTranslation(item: any) {
   if (hasBenefitsDescription) {
     zhDetails = await translateMultilineToChinese(benefitsDescStr)
     if (!zhDetails) {
-      console.warn(`⚠️ 收益描述翻译失败 ID=${item.id}, 使用原文`)
+      log(`⚠️ 收益描述翻译失败 ID=${item.id}, 使用原文`)
       zhDetails = benefitsDescStr
     }
   }
@@ -190,8 +195,8 @@ async function processTranslation(item: any) {
     `ID：${item.id || ''}`
   ].join('\n')
   
-  console.log(`✅ 翻译完成 ID=${item.id}`)
-  
+  log(`✅ 翻译完成 ID=${item.id}`)
+
   return { description_en: english, description_zh: chinese }
 }
 
@@ -203,6 +208,7 @@ export async function POST(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
     
     console.log(`🚀 开始抓取+处理工作流 ID=${id}`)
+    const aggregatedLogs: string[] = []
     
     // Step 1: 抓取数据
     console.log(`🕷️ 正在抓取 ID=${id}`)
@@ -212,22 +218,50 @@ export async function POST(req: NextRequest) {
     let out = ''
     let err = ''
     await new Promise<void>((resolve, reject) => {
-      proc.stdout.on('data', (d) => out += d.toString())
-      proc.stderr.on('data', (d) => err += d.toString())
+      proc.stdout.on('data', (d) => {
+        const chunk = d.toString()
+        out += chunk
+        chunk.split(/\r?\n/).forEach(line => {
+          const trimmed = line.trim()
+          if (trimmed) aggregatedLogs.push(trimmed)
+        })
+      })
+      proc.stderr.on('data', (d) => {
+        const chunk = d.toString()
+        err += chunk
+        chunk.split(/\r?\n/).forEach(line => {
+          const trimmed = line.trim()
+          if (trimmed) aggregatedLogs.push(`stderr: ${trimmed}`)
+        })
+      })
       proc.on('close', (code) => code === 0 ? resolve() : reject(new Error(err || `exit ${code}`)))
     })
     
     const jsonStart = out.lastIndexOf('{')
     const scrapedData = jsonStart >= 0 ? JSON.parse(out.slice(jsonStart)) : null
-    
+
     if (!scrapedData) {
       throw new Error('抓取数据失败：未获取到有效数据')
     }
-    
+
     console.log(`✅ 抓取完成 ID=${id}`)
+
+    const cleanedScrapeLogs = aggregatedLogs.filter((line) => {
+      if (!line) return false
+      const t = line.trim()
+      if (!t) return false
+      if (t.startsWith('{') || t.startsWith('}')) return false
+      if (/^".+":/.test(t)) return false
+      return true
+    })
     
     // Step 2: 处理和翻译数据（不自动导入）
-    const translatedData = await processTranslation(scrapedData)
+    const translatedLogs: string[] = []
+    const logger = (message: string, meta?: any) => {
+      const formatted = meta ? `${message} ${JSON.stringify(meta)}` : message
+      translatedLogs.push(formatted)
+    }
+    const translatedData = await processTranslation(scrapedData, logger)
     
     console.log(`✅ 处理完成 ID=${id} - 等待人工验证后批量导入`)
     
@@ -239,6 +273,7 @@ export async function POST(req: NextRequest) {
         description_zh: translatedData.description_zh,
         processed: true  // 标记为已处理，但未导入
       },
+      logs: [...cleanedScrapeLogs, ...translatedLogs],
       message: `ID=${id} 抓取和处理完成，请验证后批量导入`
     })
     

@@ -60,7 +60,12 @@ export default function WipoScraperPage() {
         const ac = new AbortController()
         const to = setTimeout(() => ac.abort(), 180000) // 3 minutes timeout for scrape+process
         
-        setLogs(prev => [...prev, `🕷️ 正在抓取 ID=${id} (${i+1}/${ids.length})`])
+        const articleUrl = `https://wipogreen.wipo.int/wipogreen-database/articles/${id}`
+        setLogs(prev => [
+          ...prev,
+          `🕷️ 正在抓取 ID=${id} (${i+1}/${ids.length})`,
+          `🌐 请求页面: ${articleUrl}`
+        ])
         
         const res = await fetch('/api/admin/wipo-scraper/complete', { 
           method: 'POST', 
@@ -72,6 +77,9 @@ export default function WipoScraperPage() {
         
         const data = await res.json()
         if (data?.success) {
+          if (Array.isArray(data.logs) && data.logs.length) {
+            setLogs(prev => [...prev, ...data.logs.map((line: string) => `   ${line}`)])
+          }
           setItems(prev => [...prev, data.data])
           setLogs(prev => [...prev, `✅ 完成 ID=${id} - 抓取和处理成功，等待验证后导入`])
         } else {
@@ -79,7 +87,9 @@ export default function WipoScraperPage() {
           setFailedIds(prev => Array.from(new Set([...prev, String(id)])))
         }
       } catch (e: any) {
-        setLogs(prev => [...prev, `❌ 异常 ID=${id}：${e?.message || String(e)}`])
+        const isAbort = e?.name === 'AbortError'
+        const message = isAbort ? '请求超时（超过 3 分钟未完成）' : e?.message || String(e)
+        setLogs(prev => [...prev, `❌ 异常 ID=${id}：${message}`])
         setFailedIds(prev => Array.from(new Set([...prev, String(id)])))
       }
       setProgress(Math.round(((i+1)/ids.length)*100))
@@ -118,7 +128,9 @@ export default function WipoScraperPage() {
           setFailedIds(prev => Array.from(new Set([...prev, String(id)])))
         }
       } catch (e: any) {
-        setLogs(prev => [...prev, `抓取异常 ID=${id}：${e?.message || String(e)}`])
+        const isAbort = e?.name === 'AbortError'
+        const message = isAbort ? '请求超时（超过 60 秒未完成）' : e?.message || String(e)
+        setLogs(prev => [...prev, `抓取异常 ID=${id}：${message}`])
         setFailedIds(prev => Array.from(new Set([...prev, String(id)])))
       }
       setProgress(Math.round(((i+1)/ids.length)*100))
