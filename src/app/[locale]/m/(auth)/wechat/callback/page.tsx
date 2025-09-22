@@ -1,11 +1,21 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { wechatAuthApi } from '@/api/wechat'
 import { useAuthContext } from '@/components/auth/auth-provider'
 
+export const dynamic = 'force-dynamic'
+
 export default function WechatCallbackPage() {
+  return (
+    <Suspense fallback={<section className="min-h-dvh flex items-center justify-center"><span className="text-sm text-gray-600">Loading...</span></section>}>
+      <WechatCallbackContent />
+    </Suspense>
+  )
+}
+
+function WechatCallbackContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -47,4 +57,3 @@ export default function WechatCallbackPage() {
     </section>
   )
 }
-
