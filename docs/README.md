@@ -62,6 +62,13 @@
 │   │       ├── wechat/
 │   │       │   ├── oauth-url/route.ts      # 生成微信网页授权URL（设置state）
 │   │       │   └── callback/route.ts       # 微信回调：换取openid/用户信息并登录
+│   │       ├── messages/
+│   │       │   └── internal/
+│   │       │       ├── route.ts              # 获取当前用户站内信列表
+│   │       │       ├── unread-count/route.ts # 获取未读站内信数量
+│   │       │       ├── mark-read/route.ts    # 批量/单条标记为已读
+│   │       │       ├── mark-all-read/route.ts# 标记全部站内信为已读
+│   │       │       └── delete/route.ts       # 批量删除站内信
 │   │       └── admin/        # 管理后台API
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入
 │   │               ├── scrape/route.ts        # 单条抓取

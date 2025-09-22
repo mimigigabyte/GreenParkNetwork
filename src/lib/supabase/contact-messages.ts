@@ -1,4 +1,5 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { safeFetch, handleApiResponse } from '@/lib/safe-fetch';
 
 // 联系消息数据类型定义
 export interface ContactMessage {
@@ -275,24 +276,18 @@ export async function sendInternalMessage(data: SendInternalMessageData): Promis
  * 获取用户收到的站内信
  */
 export async function getReceivedInternalMessages(): Promise<InternalMessage[]> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .select('*')
-    .eq('to_user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
+  try {
+    const response = await safeFetch('/api/messages/internal', {
+      method: 'GET',
+      useAuth: true,
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
     console.error('获取站内信失败:', error);
-    throw new Error(error.message || '获取站内信失败');
+    throw error instanceof Error ? error : new Error('获取站内信失败');
   }
-
-  return data || [];
 }
 
 /**
@@ -328,145 +323,120 @@ export async function getInternalMessageById(messageId: string): Promise<Interna
  * 标记站内信为已读
  */
 export async function markInternalMessageAsRead(messageId: string): Promise<InternalMessage> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .update({ 
+  try {
+    const response = await safeFetch('/api/messages/internal/mark-read', {
+      method: 'POST',
+      useAuth: true,
+      body: JSON.stringify({ ids: [messageId] }),
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0] as InternalMessage;
+    }
+    return {
+      id: messageId,
+      from_user_id: '',
+      to_user_id: '',
+      title: '',
+      content: '',
       is_read: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       read_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', messageId)
-    .eq('to_user_id', user.id) // 确保只能更新发给自己的消息
-    .select()
-    .single();
-
-  if (error) {
+    } as InternalMessage;
+  } catch (error) {
     console.error('标记站内信为已读失败:', error);
-    throw new Error(error.message || '标记站内信为已读失败');
+    throw error instanceof Error ? error : new Error('标记站内信为已读失败');
   }
-
-  return data;
 }
 
 /**
  * 获取未读站内信数量
  */
 export async function getUnreadInternalMessageCount(): Promise<number> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
+  try {
+    const response = await safeFetch('/api/messages/internal/unread-count', {
+      method: 'GET',
+      useAuth: true,
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    if (typeof data === 'number') return data;
+    if (typeof data?.count === 'number') return data.count;
     return 0;
-  }
-
-  const { count, error } = await supabase
-    .from('internal_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('to_user_id', user.id)
-    .eq('is_read', false);
-
-  if (error) {
+  } catch (error) {
     console.error('获取未读站内信数量失败:', error);
-    return 0;
+    throw error instanceof Error ? error : new Error('获取未读站内信数量失败');
   }
-
-  return count || 0;
 }
 
 /**
  * 批量标记站内信为已读
  */
 export async function markInternalMessagesAsRead(messageIds: string[]): Promise<InternalMessage[]> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
   if (messageIds.length === 0) {
     return [];
   }
 
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .update({ 
-      is_read: true,
-      read_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .in('id', messageIds)
-    .eq('to_user_id', user.id) // 确保只能更新发给自己的消息
-    .select();
-
-  if (error) {
+  try {
+    const response = await safeFetch('/api/messages/internal/mark-read', {
+      method: 'POST',
+      useAuth: true,
+      body: JSON.stringify({ ids: messageIds }),
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
     console.error('批量标记站内信为已读失败:', error);
-    throw new Error(error.message || '批量标记站内信为已读失败');
+    throw error instanceof Error ? error : new Error('批量标记站内信为已读失败');
   }
-
-  return data || [];
 }
 
 /**
  * 标记所有站内信为已读
  */
 export async function markAllInternalMessagesAsRead(): Promise<number> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .update({ 
-      is_read: true,
-      read_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq('to_user_id', user.id)
-    .eq('is_read', false)
-    .select('id');
-
-  if (error) {
+  try {
+    const response = await safeFetch('/api/messages/internal/mark-all-read', {
+      method: 'POST',
+      useAuth: true,
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    if (typeof data === 'number') return data;
+    const updated = Number(data?.updated ?? 0);
+    return Number.isFinite(updated) ? updated : 0;
+  } catch (error) {
     console.error('标记所有站内信为已读失败:', error);
-    throw new Error(error.message || '标记所有站内信为已读失败');
+    throw error instanceof Error ? error : new Error('标记所有站内信为已读失败');
   }
-
-  return data?.length || 0;
 }
 
 /**
  * 批量删除站内信
  */
 export async function deleteInternalMessages(messageIds: string[]): Promise<number> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
   if (messageIds.length === 0) {
     return 0;
   }
 
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .delete()
-    .in('id', messageIds)
-    .eq('to_user_id', user.id) // 确保只能删除发给自己的消息
-    .select('id');
-
-  if (error) {
+  try {
+    const response = await safeFetch('/api/messages/internal/delete', {
+      method: 'POST',
+      useAuth: true,
+      body: JSON.stringify({ ids: messageIds }),
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    if (Array.isArray(data)) return data.length;
+    const count = Number(data?.deleted ?? data?.count ?? 0);
+    return Number.isFinite(count) ? count : 0;
+  } catch (error) {
     console.error('批量删除站内信失败:', error);
-    throw new Error(error.message || '批量删除站内信失败');
+    throw error instanceof Error ? error : new Error('批量删除站内信失败');
   }
-
-  return data?.length || 0;
 }
 
 /**
