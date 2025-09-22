@@ -29,6 +29,7 @@
 │   ├── app/                   # Next.js App Router
 │   │   ├── [locale]/m/         # 移动端(H5)路由（与Web并存）
 │   │   │   ├── (auth)/login/page.tsx   # 移动端登录
+│   │   │   ├── (auth)/wechat/callback/page.tsx # 移动端微信登录回调页
 │   │   │   ├── layout.tsx              # 移动端共享布局（底部Tab）
 │   │   │   ├── page.tsx                # 重定向到 /home
 │   │   │   ├── home/page.tsx           # 移动端首页
@@ -58,6 +59,9 @@
 │   │       │   ├── search/route.ts          # 技术搜索
 │   │       │   └── search-stats/route.ts    # 搜索统计数据
 │   │       ├── _utils/auth.ts # API路由共享认证工具
+│   │       ├── wechat/
+│   │       │   ├── oauth-url/route.ts      # 生成微信网页授权URL（设置state）
+│   │       │   └── callback/route.ts       # 微信回调：换取openid/用户信息并登录
 │   │       └── admin/        # 管理后台API
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入
 │   │               ├── scrape/route.ts        # 单条抓取
@@ -89,6 +93,7 @@
 │   └── api/                  # API调用封装
 │       ├── index.ts          # API客户端基础配置
 │       ├── auth.ts           # 用户认证API（包含验证码登录）
+│       ├── wechat.ts         # 微信登录API（获取授权URL/换取code登录）
 │       ├── tech.ts           # 技术产品API
 │       ├── favorites.ts      # 用户收藏API封装
 │       └── company.ts        # 企业信息API

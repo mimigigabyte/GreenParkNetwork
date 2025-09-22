@@ -13,6 +13,7 @@ import { useAuthContext } from '@/components/auth/auth-provider'
 import { emailVerificationApi } from '@/api/emailVerification'
 import { supabase } from '@/lib/supabase'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
+import { wechatAuthApi } from '@/api/wechat'
 
 export default function MobileLoginPage() {
   // Wrap searchParams consumer in Suspense to satisfy Next.js requirement
@@ -61,6 +62,30 @@ function LoginContent() {
 
   const goAfterLogin = () => router.replace(`/${locale}/m/home`)
   const goAfterRegister = () => router.push(`/${locale}/company-profile`)
+
+  // 微信登录
+  async function handleWeChatLogin() {
+    try {
+      // 简单检测是否在微信内置浏览器
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent.toLowerCase() : ''
+      const inWeChat = ua.includes('micromessenger')
+      if (!inWeChat) {
+        alert(locale === 'en' ? 'Please open in WeChat to continue' : '请在微信内打开完成登录')
+        return
+      }
+
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+      const redirectUri = `${origin}/${locale}/m/wechat/callback`
+      const resp = await wechatAuthApi.getOAuthUrl(redirectUri)
+      if (resp.success && resp.data?.url) {
+        window.location.href = resp.data.url
+      } else {
+        alert(resp.error || (locale==='en' ? 'Failed to start WeChat login' : '获取微信登录链接失败'))
+      }
+    } catch (e) {
+      alert(locale==='en' ? 'Failed to start WeChat login' : '发起微信登录失败')
+    }
+  }
 
   async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -360,7 +385,7 @@ function LoginContent() {
         <>
           {/* 微信登录（仅登录模式显示） */}
           <div className="mt-5 text-center">
-            <button type="button" className="inline-flex items-center gap-2 text-gray-700 text-[14px]">
+            <button type="button" onClick={handleWeChatLogin} className="inline-flex items-center gap-2 text-gray-700 text-[14px]">
               <img src="/images/icons/微信.png" alt="wechat" className="w-4 h-4"/>
               <span className="text-[12px]">{locale==='en' ? 'WeChat Login' : '微信登录'}</span>
             </button>
