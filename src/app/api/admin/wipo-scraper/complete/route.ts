@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
       proc.stdout.on('data', (d) => {
         const chunk = d.toString()
         out += chunk
-        chunk.split(/\r?\n/).forEach(line => {
+        chunk.split(/\r?\n/).forEach((line: string) => {
           const trimmed = line.trim()
           if (trimmed) aggregatedLogs.push(trimmed)
         })
@@ -229,7 +229,7 @@ export async function POST(req: NextRequest) {
       proc.stderr.on('data', (d) => {
         const chunk = d.toString()
         err += chunk
-        chunk.split(/\r?\n/).forEach(line => {
+        chunk.split(/\r?\n/).forEach((line: string) => {
           const trimmed = line.trim()
           if (trimmed) aggregatedLogs.push(`stderr: ${trimmed}`)
         })
