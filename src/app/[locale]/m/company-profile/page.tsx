@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { ChevronDown } from 'lucide-react'
@@ -28,17 +28,6 @@ export default function MobileCompanyProfilePage() {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [qccDataFetched, setQccDataFetched] = useState(false) // 是否获取了企查查数据
-  const [debugMessages, setDebugMessages] = useState<string[]>([])
-
-  const logDebug = useCallback((message: string) => {
-    const timestamp = new Date().toLocaleTimeString()
-    const entry = `[${timestamp}] ${message}`
-    setDebugMessages(prev => {
-      const next = [...prev, entry]
-      return next.slice(-8)
-    })
-    console.log(`[CompanyProfileDebug] ${message}`)
-  }, [])
 
   const [formData, setFormData] = useState({
     requirement: '',
@@ -59,27 +48,25 @@ export default function MobileCompanyProfilePage() {
 
   // 认证初始化（与 Web 保持一致，发现 token 则触发 checkUser）
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       const customTokenExists = !!localStorage.getItem('custom_auth_token')
       const legacyTokenExists = !!localStorage.getItem('access_token')
-      logDebug(`init check -> customTokenExists=${customTokenExists} legacyTokenExists=${legacyTokenExists} userLoaded=${!!user}`)
       if ((customTokenExists || legacyTokenExists) && !user && !loading) {
         try { await checkUser() } catch {}
       }
     })()
-  }, [user, loading, checkUser, logDebug])
+  }, [user, loading, checkUser])
 
   // 自动填充联系人（与 Web 同步）
   useEffect(() => {
     if (user) {
-      logDebug(`user ready -> id=${user.id} authType=${user.authType ?? 'unknown'} email=${user.email ?? 'null'} phone=${user.phone ?? 'null'}`)
       setFormData(prev => ({
         ...prev,
         contactPhone: user.phone || prev.contactPhone,
         contactEmail: user.email || prev.contactEmail,
       }))
     }
-  }, [user, logDebug])
+  }, [user])
 
   const { data: fd, isLoading: isLoadingFilter, loadProvinces, loadDevelopmentZones } = useFilterData()
   const transformed = useMemo(() => transformFilterDataForComponents(fd, locale), [fd, locale])
@@ -147,12 +134,7 @@ export default function MobileCompanyProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validateStep(2)) return
-    if (!user) {
-      logDebug('submit blocked -> no user detected')
-      alert(locale==='en'?'Please login first':'请先登录');
-      return
-    }
-    logDebug(`submit start -> authType=${user.authType ?? 'unknown'} userId=${user.id}`)
+    if (!user) { alert(locale==='en'?'Please login first':'请先登录'); return }
     setSubmitLoading(true)
     try {
       // 优先采用用户上传的URL；若无，再按企业名自动生成
@@ -175,11 +157,9 @@ export default function MobileCompanyProfilePage() {
       const res = await submitCompanyProfile(submitData)
       if (res.success) {
         localStorage.setItem('company_name', formData.companyName)
-        logDebug('submit success -> navigating home')
         // 直接跳转，不显示alert避免在返回时出现提示
         router.replace(`/${locale}/m/home`)
       } else {
-        logDebug(`submit failed -> ${res.error ?? res.message ?? 'unknown error'}`)
         alert(res.error || (locale==='en'?'Submit failed':'提交失败'))
       }
     } finally { setSubmitLoading(false) }
@@ -217,14 +197,6 @@ export default function MobileCompanyProfilePage() {
           :`完善信息，即刻开启绿色低碳之旅 (第 ${step}/2 步)`
         }
           </div>
-          {debugMessages.length > 0 && (
-            <div className="mt-3 rounded-xl bg-gray-100 p-3 text-[11px] text-gray-600 space-y-1 max-h-40 overflow-y-auto">
-              <div className="font-medium text-gray-700">调试信息</div>
-              {debugMessages.map((msg, idx) => (
-                <div key={idx} className="font-mono leading-relaxed break-all">{msg}</div>
-              ))}
-            </div>
-          )}
         </div>
 
         {step === 1 ? (

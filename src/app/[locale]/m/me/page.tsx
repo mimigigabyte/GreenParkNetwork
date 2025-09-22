@@ -12,6 +12,7 @@ export default function MobileMePage() {
 
   const displayName = user ? (user?.name || user?.email || user?.phone || (locale==='en'?'Guest':'访客')) : (locale==='en'?'Not logged in':'未登录')
   const initial = user ? (displayName?.charAt(0)?.toUpperCase() || 'U') : null
+  const needsBinding = !!user && !user.phone && !user.email
 
   return (
     <div className="pb-20" style={{ backgroundColor: '#edeef7' }}>
@@ -19,9 +20,24 @@ export default function MobileMePage() {
         {/* Header card — themed green gradient, no border frame */}
         <div className="rounded-3xl bg-gradient-to-br from-[#10b981] to-[#059669] px-4 py-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center text-[18px] font-semibold text-[#007f66] shadow">
-              {user ? initial : <User className="w-7 h-7" />}
-            </div>
+            {user?.avatar_url ? (
+              <div className="relative w-14 h-14 rounded-full bg-white/95 overflow-hidden shadow">
+                <div className="absolute inset-0 flex items-center justify-center text-[18px] font-semibold text-[#007f66]">
+                  {initial}
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={user.avatar_url}
+                  alt={displayName}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { (e.currentTarget.style.display = 'none') }}
+                />
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center text-[18px] font-semibold text-[#007f66] shadow">
+                {user ? initial : <User className="w-7 h-7" />}
+              </div>
+            )}
             <div className="min-w-0 text-white flex-1">
               <div className="flex items-center justify-between min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
@@ -41,7 +57,22 @@ export default function MobileMePage() {
                   </button>
                 )}
               </div>
-              <div className="text-[12px] opacity-90 truncate">{user?.phone || user?.email || (locale==='en'?'Please log in to access features':'请登录以使用功能')}</div>
+              <div className="text-[12px] opacity-90 truncate">
+                {user
+                  ? needsBinding
+                    ? (
+                      <button
+                        type="button"
+                        onClick={() => router.push(`${locale==='en'?'/en':'/zh'}/m/me/basic`)}
+                        className="underline text-white/90 hover:text-white"
+                      >
+                        {locale==='en' ? 'Bind phone or email' : '去绑定手机或邮箱'}
+                      </button>
+                    )
+                    : (user.phone || user.email)
+                  : (locale==='en'?'Please log in to access features':'请登录以使用功能')
+                }
+              </div>
             </div>
           </div>
         </div>

@@ -237,7 +237,7 @@ export default function BasicInfo({ locale }: BasicInfoProps) {
             <Input id="email" type="email" value={user.email || ''} disabled className="flex-1" />
             <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button size="sm" className="bg-[#00b899] hover:bg-[#009a7a] text-white">
                   {locale === 'en' ? 'Modify' : '修改'}
                 </Button>
               </DialogTrigger>
