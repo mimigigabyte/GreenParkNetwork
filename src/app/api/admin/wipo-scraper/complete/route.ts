@@ -246,7 +246,7 @@ export async function POST(req: NextRequest) {
 
     console.log(`✅ 抓取完成 ID=${id}`)
 
-    const cleanedScrapeLogs = aggregatedLogs.filter((line) => {
+    const cleanedScrapeLogs = aggregatedLogs.filter((line: string) => {
       if (!line) return false
       const t = line.trim()
       if (!t) return false
