@@ -94,13 +94,15 @@ export async function POST(request: NextRequest) {
   try {
     // 使用通用认证函数
     const user = await authenticateUser(request);
-    
+
     if (!user) {
       return NextResponse.json(
         { error: '用户未登录' },
         { status: 401 }
       );
     }
+
+    const dbClient = user.authType === 'custom' ? supabaseAdmin : supabase
 
     const body = await request.json();
     
@@ -185,7 +187,7 @@ export async function POST(request: NextRequest) {
 
     console.log('创建企业，logo URL:', logoUrl);
 
-    const { data: companyData, error: insertError } = await supabase
+    const { data: companyData, error: insertError } = await dbClient
       .from('admin_companies')
       .insert(insertData)
       .select(`
@@ -232,6 +234,8 @@ export async function PUT(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const dbClient = user.authType === 'custom' ? supabaseAdmin : supabase
 
     const body = await request.json();
     
@@ -317,7 +321,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // 查找用户的企业信息
-    const { data: userCompany } = await supabase
+    const { data: userCompany } = await dbClient
       .from('admin_companies')
       .select('id')
       .eq('user_id', user.id)
@@ -331,7 +335,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { data: companyData, error: updateError } = await supabase
+    const { data: companyData, error: updateError } = await dbClient
       .from('admin_companies')
       .update(updateData)
       .eq('id', userCompany.id)
@@ -381,7 +385,9 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取用户的企业信息（所有用户都使用admin_companies表）
-    const { data: companyData, error: selectError } = await supabase
+    const dbClient = user.authType === 'custom' ? supabaseAdmin : supabase
+
+    const { data: companyData, error: selectError } = await dbClient
       .from('admin_companies')
       .select(`
         *,
