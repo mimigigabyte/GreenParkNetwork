@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
         .from('admin_countries')
         .select('id')
         .eq('code', country)
+        .eq('is_active', true)
         .single();
       countryId = countryData?.id;
     }
@@ -152,6 +153,7 @@ export async function POST(request: NextRequest) {
         .from('admin_provinces')
         .select('id')
         .eq('code', province)
+        .eq('is_active', true)
         .single();
       provinceId = provinceData?.id;
     }
@@ -162,13 +164,13 @@ export async function POST(request: NextRequest) {
         .from('admin_development_zones')
         .select('id')
         .eq('code', economicZone)
+        .eq('is_active', true)
         .single();
       developmentZoneId = zoneData?.id;
     }
 
     // 保存企业信息到数据库（所有用户都使用admin_companies表）
-    const insertData = {
-      user_id: user.id,
+    const baseInsert = {
       name_zh: companyName,
       country_id: countryId,
       province_id: provinceId,
@@ -184,6 +186,15 @@ export async function POST(request: NextRequest) {
       credit_code: creditCode || null, // 统一社会信用代码
       is_active: true
     };
+
+    // 兼容两种用户体系：Supabase/Auth 和 Custom（WeChat）
+    // 数据库需要有 custom_user_id 列；若没有，将回退仅写入基础信息（会失去绑定能力）
+    const insertData: any = { ...baseInsert }
+    if (user.authType === 'custom') {
+      insertData.custom_user_id = user.id
+    } else {
+      insertData.user_id = user.id
+    }
 
     console.log('创建企业，logo URL:', logoUrl);
 
@@ -272,6 +283,7 @@ export async function PUT(request: NextRequest) {
         .from('admin_countries')
         .select('id')
         .eq('code', country)
+        .eq('is_active', true)
         .single();
       countryId = countryData?.id;
     }
@@ -282,6 +294,7 @@ export async function PUT(request: NextRequest) {
         .from('admin_provinces')
         .select('id')
         .eq('code', province)
+        .eq('is_active', true)
         .single();
       provinceId = provinceData?.id;
     }
@@ -292,6 +305,7 @@ export async function PUT(request: NextRequest) {
         .from('admin_development_zones')
         .select('id')
         .eq('code', economicZone)
+        .eq('is_active', true)
         .single();
       developmentZoneId = zoneData?.id;
     }
@@ -320,13 +334,25 @@ export async function PUT(request: NextRequest) {
       console.log('没有logo URL需要保存');
     }
 
-    // 查找用户的企业信息
-    const { data: userCompany } = await dbClient
-      .from('admin_companies')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .single();
+    // 查找用户的企业信息（兼容两种用户体系）
+    let userCompany
+    if (user.authType === 'custom') {
+      const { data } = await dbClient
+        .from('admin_companies')
+        .select('id')
+        .eq('custom_user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle()
+      userCompany = data || null
+    } else {
+      const { data } = await dbClient
+        .from('admin_companies')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle()
+      userCompany = data || null
+    }
 
     if (!userCompany) {
       return NextResponse.json(
@@ -387,7 +413,7 @@ export async function GET(request: NextRequest) {
     // 获取用户的企业信息（所有用户都使用admin_companies表）
     const dbClient = user.authType === 'custom' ? supabaseAdmin : supabase
 
-    const { data: companyData, error: selectError } = await dbClient
+    let companyQuery = dbClient
       .from('admin_companies')
       .select(`
         *,
@@ -395,9 +421,16 @@ export async function GET(request: NextRequest) {
         province:admin_provinces(*),
         development_zone:admin_development_zones(*)
       `)
-      .eq('user_id', user.id)
       .eq('is_active', true)
-      .single();
+
+    if (user.authType === 'custom') {
+      // 若没有 custom_user_id 列会报错，前端会处理为无数据
+      companyQuery = companyQuery.eq('custom_user_id', user.id)
+    } else {
+      companyQuery = companyQuery.eq('user_id', user.id)
+    }
+
+    const { data: companyData, error: selectError } = await companyQuery.single();
 
     if (selectError && selectError.code !== 'PGRST116') {
       console.error('获取企业信息失败:', selectError);
