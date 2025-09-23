@@ -1,4 +1,5 @@
 import { AdminTechnology, PaginationParams, PaginatedResponse } from '@/lib/types/admin'
+import { safeFetch, handleApiResponse } from '@/lib/safe-fetch'
 
 // 获取用户技术列表
 export async function getUserTechnologiesApi(params: Partial<PaginationParams & { userId: string }>): Promise<PaginatedResponse<AdminTechnology>> {
@@ -36,50 +37,36 @@ export async function getUserTechnologiesApi(params: Partial<PaginationParams & 
 
 // 用户创建技术
 export async function createUserTechnologyApi(technologyData: Partial<AdminTechnology>): Promise<AdminTechnology> {
-  const response = await fetch('/api/user/technologies', {
+  const response = await safeFetch('/api/user/technologies', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    useAuth: true,
     body: JSON.stringify(technologyData),
   })
 
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || '创建技术失败')
-  }
-
-  return await response.json()
+  const result = await handleApiResponse(response)
+  return result?.data ?? result
 }
 
 // 用户更新技术
 export async function updateUserTechnologyApi(id: string, technologyData: Partial<AdminTechnology>): Promise<AdminTechnology> {
-  const response = await fetch(`/api/user/technologies/${id}`, {
+  const response = await safeFetch(`/api/user/technologies/${id}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    useAuth: true,
     body: JSON.stringify(technologyData),
   })
 
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || '更新技术失败')
-  }
-
-  return await response.json()
+  const result = await handleApiResponse(response)
+  return result?.data ?? result
 }
 
 // 用户删除技术
 export async function deleteUserTechnologyApi(id: string, userId: string): Promise<void> {
-  const response = await fetch(`/api/user/technologies/${id}?userId=${userId}`, {
+  const response = await safeFetch(`/api/user/technologies/${id}?userId=${encodeURIComponent(userId)}`, {
     method: 'DELETE',
+    useAuth: true,
   })
 
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || '删除技术失败')
-  }
+  await handleApiResponse(response)
 }
 
 // 获取单个用户技术详情
