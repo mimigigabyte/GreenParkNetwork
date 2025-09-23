@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: '请求体无效' }, { status: 400 })
   }
 
-  const contactName = (body.contact_name || body.contactName || '').trim()
-  const contactPhone = (body.contact_phone || body.contactPhone || '').trim()
-  const contactEmail = (body.contact_email || body.contactEmail || '').trim()
+  const contactName = (body.contact_name ?? body.contactName ?? '').trim()
+  const contactPhone = (body.contact_phone ?? body.contactPhone ?? '').trim()
+  const contactEmail = (body.contact_email ?? body.contactEmail ?? '').trim()
   const message = (body.message || '').trim()
   const category = (body.category || body.type || '').trim() || '技术对接'
   const technologyId = body.technology_id || body.technologyId || null
@@ -63,13 +63,17 @@ export async function POST(request: NextRequest) {
   }
 
   const isCustom = user.authType === 'custom'
+  const resolvedContactName = contactName || '未提供'
+  const resolvedContactPhone = contactPhone || user.phone || '未提供'
+  const resolvedContactEmail = contactEmail || user.email || '未提供'
+
   const insertData: any = {
     technology_id: technologyId,
     technology_name: technologyName,
     company_name: companyName,
-    contact_name: contactName || null,
-    contact_phone: contactPhone || null,
-    contact_email: contactEmail || null,
+    contact_name: resolvedContactName,
+    contact_phone: resolvedContactPhone,
+    contact_email: resolvedContactEmail,
     message,
     category,
     status: 'pending' as const,
