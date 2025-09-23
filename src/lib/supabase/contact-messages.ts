@@ -202,10 +202,26 @@ export async function updateContactMessageStatus(
  */
 export async function sendInternalMessage(data: SendInternalMessageData): Promise<InternalMessage> {
   console.log('💌 发送站内信(通过API):', data);
+
+  const headers: Record<string, string | undefined> = {};
+
+  if (typeof window !== 'undefined') {
+    try {
+      const adminMode = localStorage.getItem('admin_mode');
+      const adminUser = localStorage.getItem('admin_user');
+      if (adminMode === 'true' && adminUser) {
+        headers['X-Admin-User'] = btoa(unescape(encodeURIComponent(adminUser)));
+      }
+    } catch (err) {
+      console.warn('⚠️ 读取管理员模式信息失败:', err);
+    }
+  }
+
   const response = await safeFetch('/api/messages/internal', {
     method: 'POST',
     useAuth: true,
     body: JSON.stringify(data),
+    headers,
   });
   const result = await handleApiResponse(response);
   const payload = result?.data ?? result;

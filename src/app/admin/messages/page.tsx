@@ -249,6 +249,7 @@ export default function AdminMessagesPage() {
     try {
       await sendInternalMessage({
         to_user_id: selectedMessage.user_id,
+        custom_to_user_id: selectedMessage.custom_user_id,
         contact_message_id: selectedMessage.id,
         title: replyContent.title,
         content: replyContent.content,
