@@ -118,25 +118,7 @@ export async function GET(request: NextRequest) {
           company_name_zh,
           company_name_en,
           company_logo_url,
-          attachment_urls,
-          category:admin_categories(
-            id,
-            name_zh,
-            name_en,
-            slug
-          ),
-          subcategory:admin_subcategories(
-            id,
-            name_zh,
-            name_en,
-            slug
-          ),
-          company:admin_companies(
-            id,
-            name_zh,
-            name_en,
-            logo_url
-          )
+          attachment_urls
         )
       `)
       .eq(userColumn, targetUserId)
@@ -239,25 +221,7 @@ export async function POST(request: NextRequest) {
           company_name_zh,
           company_name_en,
           company_logo_url,
-          attachment_urls,
-          category:admin_categories(
-            id,
-            name_zh,
-            name_en,
-            slug
-          ),
-          subcategory:admin_subcategories(
-            id,
-            name_zh,
-            name_en,
-            slug
-          ),
-          company:admin_companies(
-            id,
-            name_zh,
-            name_en,
-            logo_url
-          )
+          attachment_urls
         )
       `)
       .eq('id', favoriteRow.id)

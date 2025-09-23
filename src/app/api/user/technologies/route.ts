@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
+    const userColumn = user.authType === 'custom' ? 'custom_created_by' : 'created_by'
+
     let query = client
       .from('admin_technologies')
       .select(`
@@ -48,7 +50,7 @@ export async function GET(request: NextRequest) {
         category:category_id(name_zh, name_en, slug),
         subcategory:subcategory_id(name_zh, name_en, slug)
       `, { count: 'exact' })
-      .eq('created_by', requestedUserId)
+      .eq(userColumn, requestedUserId)
 
     if (search) {
       query = query.or(`name_zh.ilike.%${search}%,name_en.ilike.%${search}%,description_zh.ilike.%${search}%`)
@@ -153,28 +155,35 @@ export async function POST(request: NextRequest) {
       ? (/^https?:\/\//i.test(body.website_url.trim()) ? body.website_url.trim() : `https://${body.website_url.trim()}`)
       : undefined
 
+    const insertPairs: Record<string, any> = {
+      name_zh: body.name_zh,
+      name_en: body.name_en,
+      description_zh: body.description_zh,
+      description_en: body.description_en,
+      website_url: normalizedWebsite,
+      image_url: finalImageUrl,
+      tech_source: body.tech_source,
+      acquisition_method: body.acquisition_method,
+      category_id: body.category_id,
+      subcategory_id: body.subcategory_id,
+      custom_label: body.custom_label,
+      attachment_urls: Array.isArray(body.attachments)
+        ? body.attachments.map((att: any) => att.url)
+        : body.attachment_urls || [],
+      attachments: body.attachments,
+      is_active: body.is_active ?? true,
+      review_status: 'pending_review',
+      ...companyData,
+    }
+
+    if (user.authType === 'custom') {
+      insertPairs.custom_created_by = user.id
+    } else {
+      insertPairs.created_by = user.id
+    }
+
     const insertData = Object.fromEntries(
-      Object.entries({
-        name_zh: body.name_zh,
-        name_en: body.name_en,
-        description_zh: body.description_zh,
-        description_en: body.description_en,
-        website_url: normalizedWebsite,
-        image_url: finalImageUrl,
-        tech_source: body.tech_source,
-        acquisition_method: body.acquisition_method,
-        category_id: body.category_id,
-        subcategory_id: body.subcategory_id,
-        custom_label: body.custom_label,
-        attachment_urls: Array.isArray(body.attachments)
-          ? body.attachments.map((att: any) => att.url)
-          : body.attachment_urls || [],
-        attachments: body.attachments,
-        is_active: body.is_active ?? true,
-        review_status: 'pending_review',
-        created_by: user.id,
-        ...companyData,
-      }).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+      Object.entries(insertPairs).filter(([_, value]) => value !== undefined && value !== null && value !== '')
     )
 
     const { data, error } = await client
@@ -221,7 +230,7 @@ async function notifyAdminNewTechnology(client: any, technology: any) {
 
     const now = new Date().toISOString()
     const notifications = adminIds.map((adminId) => ({
-      from_user_id: technology.created_by,
+      from_user_id: technology.created_by || null,
       to_user_id: adminId,
       title: '新技术提交审核',
       content: `用户提交了新技术“${technology.name_zh || technology.name_en || ''}”，请及时审核。`,

@@ -43,7 +43,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
 
-    if (data.created_by && data.created_by !== user.id) {
+    const ownerMatches = data.custom_created_by
+      ? data.custom_created_by === user.id
+      : data.created_by === user.id
+
+    if (!ownerMatches) {
       return NextResponse.json({ error: '无权限查看该技术' }, { status: 403 })
     }
 
@@ -79,7 +83,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
 
-    if (existingTech.created_by && existingTech.created_by !== user.id) {
+    const ownerMatches = existingTech.custom_created_by
+      ? existingTech.custom_created_by === user.id
+      : existingTech.created_by === user.id
+
+    if (!ownerMatches) {
       return NextResponse.json({ error: '无权限更新此技术' }, { status: 403 })
     }
 
@@ -147,7 +155,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const { data: existingTech, error: fetchError } = await client
       .from('admin_technologies')
-      .select('id, created_by')
+      .select('id, created_by, custom_created_by')
       .eq('id', params.id)
       .maybeSingle()
 
@@ -160,7 +168,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
 
-    if (existingTech.created_by && existingTech.created_by !== user.id) {
+    const ownerMatches = existingTech.custom_created_by
+      ? existingTech.custom_created_by === user.id
+      : existingTech.created_by === user.id
+
+    if (!ownerMatches) {
       return NextResponse.json({ error: '无权限删除此技术' }, { status: 403 })
     }
 
@@ -180,4 +192,3 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-
