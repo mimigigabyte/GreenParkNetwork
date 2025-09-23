@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendWeChatServiceTextMessage } from '@/lib/wechat/service-account'
 
 // 使用service role key创建Supabase客户端
 const supabaseUrl = 'https://qpeanozckghazlzzhrni.supabase.co'
@@ -73,9 +74,9 @@ export async function POST(
 
 // 发送审核通知的辅助函数
 async function sendReviewNotification(
-  userId: string, 
-  technology: { name_zh: string; id: string }, 
-  action: string, 
+  userId: string,
+  technology: { name_zh: string; id: string },
+  action: string,
   reason?: string
 ) {
   console.log('🔔 开始发送审核通知:', { userId, action, technologyName: technology.name_zh })
@@ -109,5 +110,28 @@ async function sendReviewNotification(
     throw error
   }
   
+  try {
+    const { data: customUser, error: customError } = await supabase
+      .from('custom_users')
+      .select('wechat_openid, user_metadata')
+      .eq('id', userId)
+      .single()
+
+    if (customError) {
+      console.warn('🔔 微信消息查询用户失败:', customError)
+    } else {
+      const openId = (customUser?.wechat_openid || (customUser?.user_metadata as any)?.wechat_openid) as string | undefined
+      if (openId) {
+        const wechatText = `${messageData.title}\n\n${messageContent}\n\n请在【消息中心】查看详情。`
+        await sendWeChatServiceTextMessage({ openId, content: wechatText })
+        console.log('🔔 微信服务号消息发送成功')
+      } else {
+        console.log('🔔 用户缺少微信 openid，跳过服务号推送')
+      }
+    }
+  } catch (wxError) {
+    console.error('🔔 微信服务号推送失败:', wxError)
+  }
+
   console.log('🔔 审核通知发送成功')
 }
