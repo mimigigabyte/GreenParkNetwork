@@ -35,11 +35,12 @@
 │   │   │   ├── home/page.tsx           # 移动端首页
 │   │   │   ├── chat/page.tsx           # 移动端消息中心（复用Web端接口与逻辑，H5样式重构）
 │   │   │   ├── company-profile/page.tsx # 移动端企业信息完善（与Web逻辑一致，含Logo上传）
-│   │   │   ├── me/page.tsx             # 移动端我的
-│   │   │   └── me/company/page.tsx     # 移动端我的-企业信息（Logo可上传与展示）
-│   │   │   └── me/technologies/page.tsx # 移动端我的-技术发布列表/搜索/发布
-│   │   │   └── me/technologies/[id]/page.tsx # 移动端我的-技术详情
-│   │   │   └── me/technologies/page.tsx # 移动端我的-技术发布（搜索、发布、列表、加载更多）
+│   │   │   ├── me/                     # 移动端我的相关页面
+│   │   │   │   ├── page.tsx            # 移动端我的
+│   │   │   │   ├── company/page.tsx    # 移动端我的-企业信息（Logo可上传与展示）
+│   │   │   │   ├── feedback/page.tsx   # 移动端我的-问题反馈
+│   │   │   │   ├── technologies/page.tsx # 移动端我的-技术发布（搜索、发布、列表、加载更多）
+│   │   │   │   └── technologies/[id]/page.tsx # 移动端我的-技术详情
 │   │   ├── globals.css       # 全局样式文件
 │   │   ├── layout.tsx        # 根布局组件
 │   │   ├── page.tsx          # 首页组件

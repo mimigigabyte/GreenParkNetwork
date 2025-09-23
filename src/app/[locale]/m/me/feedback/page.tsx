@@ -14,6 +14,12 @@ export default function MobileFeedbackPage() {
 
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' })
   const [submitting, setSubmitting] = useState(false)
+  const [messageError, setMessageError] = useState<string | null>(null)
+
+  const toNullable = (value?: string | null) => {
+    const trimmed = value?.trim()
+    return trimmed ? trimmed : null
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,20 +28,26 @@ export default function MobileFeedbackPage() {
       return
     }
     if (!form.message.trim()) {
-      alert(locale === 'en' ? 'Please enter your feedback' : '请输入反馈内容')
+      setMessageError(locale === 'en' ? 'Feedback content is required' : '反馈内容为必填项')
       return
     }
+    setMessageError(null)
     setSubmitting(true)
     try {
+      const contactName = toNullable(form.name) ?? toNullable(user?.name ?? null)
+      const contactPhone = toNullable(form.phone) ?? toNullable(user?.phone ?? null)
+      const contactEmail = toNullable(form.email) ?? toNullable(user?.email ?? null)
+
       await createContactMessage({
-        contact_name: form.name || user.name || undefined,
-        contact_phone: form.phone || user.phone || undefined,
-        contact_email: form.email || user.email || undefined,
+        contact_name: contactName,
+        contact_phone: contactPhone,
+        contact_email: contactEmail,
         message: form.message.trim(),
         category: '用户反馈' // 明确标记为用户反馈
       })
       alert(locale==='en'?'Submitted successfully':'提交成功')
       setForm({ name: '', phone: '', email: '', message: '' })
+      setMessageError(null)
     } catch (err) {
       console.error(err)
       alert(locale==='en'?'Submit failed':'提交失败')
@@ -66,13 +78,20 @@ export default function MobileFeedbackPage() {
             </Field>
           </div>
           <Field
-            label={locale==='en'?'Message':'反馈内容'}
+            label={locale==='en'?'Feedback Content':'反馈内容'}
             required
             requiredLabel={locale==='en'?'(required)':'（必填）'}
+            error={messageError}
           >
             <textarea
               value={form.message}
-              onChange={e=>setForm(f=>({...f,message:e.target.value}))}
+              onChange={e=>{
+                const nextValue = e.target.value
+                setForm(f=>({...f,message:nextValue}))
+                if (messageError && nextValue.trim()) {
+                  setMessageError(null)
+                }
+              }}
               rows={6}
               className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[14px]"
             />
@@ -86,14 +105,16 @@ export default function MobileFeedbackPage() {
   )
 }
 
-function Field({ label, children, required, requiredLabel }: { label: string; children: React.ReactNode; required?: boolean; requiredLabel?: string }) {
+function Field({ label, children, required, requiredLabel, error }: { label: string; children: React.ReactNode; required?: boolean; requiredLabel?: string; error?: string | null }) {
+  const labelColor = required ? 'text-red-500' : 'text-gray-600'
   return (
     <label className="block">
-      <div className="mb-1 text-[12px] text-gray-600">
+      <div className={`mb-1 text-[12px] ${labelColor}`}>
         {label}
         {required && <span className="ml-1 text-red-500">{requiredLabel || '(required)'}</span>}
       </div>
       {children}
+      {error && <div className="mt-1 text-[12px] text-red-500">{error}</div>}
     </label>
   )
 }

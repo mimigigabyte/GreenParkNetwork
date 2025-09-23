@@ -8,9 +8,9 @@ export interface ContactMessage {
   technology_id?: string;
   technology_name?: string;
   company_name?: string;
-  contact_name: string;
-  contact_phone: string;
-  contact_email: string;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
   message: string;
   status: 'pending' | 'processed';
   category?: '技术对接' | '用户反馈'; // 新增分类字段
@@ -26,9 +26,9 @@ export interface CreateContactMessageData {
   technology_id?: string;
   technology_name?: string;
   company_name?: string;
-  contact_name: string;
-  contact_phone: string;
-  contact_email: string;
+  contact_name?: string | null;
+  contact_phone?: string | null;
+  contact_email?: string | null;
   message: string;
   category?: '技术对接' | '用户反馈'; // 新增分类字段
 }
