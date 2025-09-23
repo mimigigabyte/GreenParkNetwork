@@ -69,6 +69,7 @@
 │   │       │       ├── mark-read/route.ts    # 批量/单条标记为已读
 │   │       │       ├── mark-all-read/route.ts# 标记全部站内信为已读
 │   │       │       └── delete/route.ts       # 批量删除站内信
+│   │       │   └── contact/route.ts          # 用户联系咨询/问题反馈的创建与查询
 │   │       └── admin/        # 管理后台API
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入
 │   │               ├── scrape/route.ts        # 单条抓取

@@ -61,71 +61,26 @@ export interface SendInternalMessageData {
  * 创建联系消息
  */
 export async function createContactMessage(data: CreateContactMessageData): Promise<ContactMessage> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    console.error('用户认证失败:', authError);
-    throw new Error('用户未登录');
-  }
-
-  const messageData = {
-    user_id: user.id,
-    ...data,
-    category: data.category || '技术对接', // 默认为技术对接
-    status: 'pending' as const
-  };
-
-  console.log('准备插入联系消息数据:', messageData);
-
-  const { data: result, error } = await supabase
-    .from('contact_messages')
-    .insert([messageData])
-    .select()
-    .single();
-
-  if (error) {
-    console.error('创建联系消息失败:', error);
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    console.error('Error details:', error.details);
-    throw new Error(error.message || '创建联系消息失败');
-  }
-
-  console.log('联系消息创建成功:', result);
-  
-  // 自动给管理员发送通知
-  try {
-    await notifyAdminNewContactMessage(result);
-  } catch (notifyError) {
-    console.error('发送管理员通知失败，但联系消息已保存:', notifyError);
-    // 不抛出错误，因为主要功能（保存联系消息）已成功
-  }
-  
-  return result;
+  const response = await safeFetch('/api/messages/contact', {
+    method: 'POST',
+    useAuth: true,
+    body: JSON.stringify(data),
+  });
+  const result = await handleApiResponse(response);
+  return (result?.data ?? result) as ContactMessage;
 }
 
 /**
  * 获取用户的联系消息列表
  */
 export async function getUserContactMessages(): Promise<ContactMessage[]> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
-  const { data, error } = await supabase
-    .from('contact_messages')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('获取联系消息失败:', error);
-    throw new Error(error.message || '获取联系消息失败');
-  }
-
-  return data || [];
+  const response = await safeFetch('/api/messages/contact', {
+    method: 'GET',
+    useAuth: true,
+  });
+  const result = await handleApiResponse(response);
+  const data = result?.data ?? result;
+  return Array.isArray(data) ? data : [];
 }
 
 /**
@@ -437,91 +392,4 @@ export async function deleteInternalMessages(messageIds: string[]): Promise<numb
     console.error('批量删除站内信失败:', error);
     throw error instanceof Error ? error : new Error('批量删除站内信失败');
   }
-}
-
-/**
- * 通知管理员有新的联系消息
- */
-async function notifyAdminNewContactMessage(contactMessage: ContactMessage): Promise<void> {
-  console.log('开始通知管理员新的联系消息:', contactMessage.id);
-  
-  // 尝试获取所有管理员用户
-  const client = supabaseAdmin || supabase;
-  const { data: adminData, error: adminError } = await client
-    .from('users')
-    .select('id')
-    .eq('role', 'admin');
-  let admins = adminData;
-  
-  // 如果没有角色字段或没有管理员，使用备用方案
-  if (adminError || !admins || admins.length === 0) {
-    console.warn('没有找到管理员用户，尝试备用方案:', adminError?.message);
-    
-    // 备用方案1: 查找邮箱包含admin的用户
-    const { data: adminByEmail } = await client
-      .from('users')
-      .select('id')
-      .ilike('email', '%admin%');
-    
-    if (adminByEmail && adminByEmail.length > 0) {
-      admins = adminByEmail;
-      console.log('通过邮箱找到管理员用户:', adminByEmail.length);
-    } else {
-      // 备用方案2: 使用第一个注册的用户
-      const { data: firstUser } = await client
-        .from('users')
-        .select('id')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .single();
-      
-      if (firstUser) {
-        admins = [firstUser];
-        console.log('使用第一个注册用户作为临时管理员:', firstUser.id);
-      } else {
-        console.warn('没有找到任何用户，无法发送通知');
-        return;
-      }
-    }
-  }
-  
-  // 根据消息类型创建不同的通知内容
-  const isFeedback = contactMessage.category === '用户反馈';
-  const titlePrefix = isFeedback ? '新的用户反馈' : '新的联系咨询';
-  const titleSuffix = isFeedback ? '问题反馈' : (contactMessage.technology_name || '技术咨询');
-  const category = isFeedback ? '用户反馈' : '技术对接';
-  
-  // 为每个管理员创建站内信
-  const notifications = admins.map(admin => ({
-    from_user_id: contactMessage.user_id,
-    to_user_id: admin.id,
-    contact_message_id: contactMessage.id,
-    title: `${titlePrefix}：${titleSuffix}`,
-    content: `您收到了一条新的${isFeedback ? '用户反馈' : '联系消息'}：
-
-联系人：${contactMessage.contact_name}
-联系电话：${contactMessage.contact_phone}
-联系邮箱：${contactMessage.contact_email}
-${isFeedback ? '' : `咨询技术：${contactMessage.technology_name || '无'}
-所属公司：${contactMessage.company_name || '无'}`}
-
-${isFeedback ? '反馈' : '留言'}内容：
-${contactMessage.message}
-
-请前往管理后台查看并处理此消息。`,
-    category: category
-  }));
-  
-  console.log('准备发送的通知数量:', notifications.length);
-  
-  const { error } = await client
-    .from('internal_messages')
-    .insert(notifications);
-  
-  if (error) {
-    console.error('发送管理员通知失败:', error);
-    throw new Error('发送管理员通知失败');
-  }
-  
-  console.log('管理员通知发送成功');
 }
