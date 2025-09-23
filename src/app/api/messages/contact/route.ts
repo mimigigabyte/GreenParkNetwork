@@ -18,10 +18,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: '未登录' }, { status: 401 })
   }
 
+  const userColumn = user.authType === 'custom' ? 'custom_user_id' : 'user_id'
+
   const { data, error } = await db
     .from('contact_messages')
     .select('*')
-    .eq('user_id', user.id)
+    .eq(userColumn, user.id)
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
 
 async function notifyAdmins(client: any, contactMessage: any) {
   const { data: admins, error } = await client
-    .from('users')
+    .from('auth.users')
     .select('id')
     .eq('role', 'admin')
 
@@ -120,8 +122,10 @@ async function notifyAdmins(client: any, contactMessage: any) {
   const category = isFeedback ? '用户反馈' : '技术对接'
   const now = new Date().toISOString()
 
+  const fromUserId = contactMessage.user_id || null
+
   const notifications = admins.map((admin: any) => ({
-    from_user_id: contactMessage.user_id,
+    from_user_id: fromUserId,
     to_user_id: admin.id,
     contact_message_id: contactMessage.id,
     title: `${titlePrefix}：${titleSuffix}`,
