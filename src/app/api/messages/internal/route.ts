@@ -40,41 +40,55 @@ export async function POST(request: NextRequest) {
   let user = await authenticateRequestUser(request)
   let adminOverride = false
 
-  if (!user && serviceSupabase) {
-    const adminHeader = request.headers.get('x-admin-user')
-    if (adminHeader) {
-      try {
-        const decoded = Buffer.from(adminHeader, 'base64').toString('utf8')
-        const parsed = JSON.parse(decoded) as AdminOverrideUser
-        if (parsed?.id) {
-          const { data: adminRecord, error: adminError } = await serviceSupabase
-            .from('auth.users')
-            .select('id, email, phone, role, raw_app_meta_data')
-            .eq('id', parsed.id)
-            .single()
-
-          if (!adminError && adminRecord) {
-            const meta = adminRecord.raw_app_meta_data as { role?: string } | null | undefined
-            const role = parsed.role || adminRecord.role || meta?.role
-            if (role === 'admin') {
-              user = {
-                id: adminRecord.id,
-                email: adminRecord.email,
-                phone: adminRecord.phone,
-                authType: 'supabase'
-              }
-              adminOverride = true
-            } else {
-              console.warn('Admin override拒绝：角色不匹配', { parsedRole: parsed.role, recordRole: adminRecord.role, metaRole: meta?.role })
-            }
-          } else if (adminError) {
-            console.warn('Admin override查询失败:', adminError)
-          }
-        }
-      } catch (overrideError) {
-        console.warn('Admin override解析失败:', overrideError)
-      }
+  let parsedOverride: AdminOverrideUser | null = null
+  const adminHeader = request.headers.get('x-admin-user')
+  if (!user && adminHeader) {
+    try {
+      const decoded = Buffer.from(adminHeader, 'base64').toString('utf8')
+      parsedOverride = JSON.parse(decoded) as AdminOverrideUser
+    } catch (overrideError) {
+      console.warn('Admin override解析失败:', overrideError)
     }
+  }
+
+  if (!user && parsedOverride?.id && serviceSupabase) {
+    try {
+      const { data: adminRecord, error: adminError } = await serviceSupabase
+        .from('auth.users')
+        .select('id, email, phone, role, raw_app_meta_data')
+        .eq('id', parsedOverride.id)
+        .single()
+
+      if (!adminError && adminRecord) {
+        const meta = adminRecord.raw_app_meta_data as { role?: string } | null | undefined
+        const role = parsedOverride.role || adminRecord.role || meta?.role
+        if (role === 'admin') {
+          user = {
+            id: adminRecord.id,
+            email: adminRecord.email,
+            phone: adminRecord.phone,
+            authType: 'supabase'
+          }
+          adminOverride = true
+        } else {
+          console.warn('Admin override拒绝：角色不匹配', { parsedRole: parsedOverride.role, recordRole: adminRecord.role, metaRole: meta?.role })
+        }
+      } else if (adminError) {
+        console.warn('Admin override查询失败:', adminError)
+      }
+    } catch (queryError) {
+      console.warn('Admin override校验异常:', queryError)
+    }
+  }
+
+  if (!user && parsedOverride?.id) {
+    user = {
+      id: parsedOverride.id,
+      email: parsedOverride.email ?? null,
+      phone: parsedOverride.phone ?? null,
+      authType: 'supabase'
+    }
+    adminOverride = true
   }
 
   if (!user) {
