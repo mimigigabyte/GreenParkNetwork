@@ -11,6 +11,7 @@ import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-t
 import { uploadMultipleFilesWithInfo, FileAttachment } from '@/lib/supabase-storage'
 import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { safeFetch, handleApiResponse } from '@/lib/safe-fetch'
 
 interface UserTechnologyFormProps {
   technology?: AdminTechnology | null
@@ -72,9 +73,10 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
     if (!user?.id) return
     
     try {
-      const response = await fetch(`/api/user/company?userId=${user.id}`)
-      if (response.ok) {
-        const company = await response.json()
+      const response = await safeFetch('/api/user/company', { method: 'GET', useAuth: true })
+      const result = await handleApiResponse(response)
+      const company = result || {}
+      if (company) {
         setCompanyInfo({
           company_id: company.id || '',
           company_name_zh: company.name_zh || '',
@@ -285,16 +287,14 @@ export function UserTechnologyForm({ technology, onSuccess, onCancel }: UserTech
             : `https://${formData.website_url.trim()}`)
         : undefined
 
-      const technologyData = {
-        ...formData,
-        website_url: normalizedWebsite,
-        // 企业关联信息（自动填充）
-        ...companyInfo,
-        // 添加用户ID用于创建者跟踪
-        userId: user?.id,
-        // 用户创建的技术默认启用
-        is_active: true
-      }
+    const technologyData = {
+      ...formData,
+      website_url: normalizedWebsite,
+      // 企业关联信息（自动填充）
+      ...companyInfo,
+      // 用户创建的技术默认启用
+      is_active: true
+    }
       
       if (technology?.id) {
         // 检查是否是已发布的技术

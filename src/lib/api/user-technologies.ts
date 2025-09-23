@@ -16,16 +16,10 @@ export async function getUserTechnologiesApi(params: Partial<PaginationParams & 
   if (params.sortOrder) searchParams.append('sortOrder', params.sortOrder)
   if (params.userId) searchParams.append('userId', params.userId)
 
-  const response = await fetch(`/api/user/technologies?${searchParams}`)
-  
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || '获取用户技术列表失败')
-  }
-
-  const result = await response.json()
+  const response = await safeFetch(`/api/user/technologies?${searchParams}`, { useAuth: true })
+  const result = await handleApiResponse(response)
   return {
-    data: result.data || [],
+    data: result?.data || [],
     pagination: result.pagination || {
       page: 1,
       pageSize: 10,

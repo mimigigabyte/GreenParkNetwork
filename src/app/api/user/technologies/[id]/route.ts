@@ -1,25 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 import { createClient } from '@supabase/supabase-js'
+import { authenticateRequestUser, serviceSupabase } from '@/app/api/_utils/auth'
+import { supabaseAdmin } from '@/lib/supabase'
 
-// GET - 获取单个用户技术详情（含分类/子分类、附件等）
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+const db = serviceSupabase
+  ?? supabaseAdmin
+  ?? (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+      : null)
+
+function requireDb() {
+  if (!db) {
+    throw new Error('Supabase service client is not configured')
+  }
+  return db
+}
+
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-    const { id } = params
+    const client = requireDb()
+    const user = await authenticateRequestUser(request)
+    if (!user) {
+      return NextResponse.json({ error: '未登录' }, { status: 401 })
+    }
 
-    const { data, error } = await db
+    const { data, error } = await client
       .from('admin_technologies')
       .select(`
         *,
         category:category_id(*),
         subcategory:subcategory_id(*)
       `)
-      .eq('id', id)
-      .single()
+      .eq('id', params.id)
+      .maybeSingle()
 
     if (error) {
-      console.error('获取用户技术详情失败:', error)
+      console.error('获取技术详情失败:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -27,146 +43,141 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
 
+    if (data.created_by && data.created_by !== user.id) {
+      return NextResponse.json({ error: '无权限查看该技术' }, { status: 403 })
+    }
+
     return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error('用户技术详情API错误:', error)
+    console.error('用户技术详情 API 错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-// PUT - 用户更新技术
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const client = requireDb()
+    const user = await authenticateRequestUser(request)
+    if (!user) {
+      return NextResponse.json({ error: '未登录' }, { status: 401 })
+    }
 
-    const { id } = params
-    const technologyData = await request.json()
-    
-    // 首先检查技术是否存在且是否属于该用户
-    const { data: existingTech, error: checkError } = await db
+    const body = await request.json()
+
+    const { data: existingTech, error: fetchError } = await client
       .from('admin_technologies')
-      .select('id, created_by, subcategory_id')
-      .eq('id', id)
-      .single()
-    
-    if (checkError || !existingTech) {
+      .select('*')
+      .eq('id', params.id)
+      .maybeSingle()
+
+    if (fetchError) {
+      console.error('查询技术失败:', fetchError)
+      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    }
+
+    if (!existingTech) {
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
-    
-    // 检查权限：只有创建者才能更新
-    if (technologyData.userId && existingTech.created_by !== technologyData.userId) {
+
+    if (existingTech.created_by && existingTech.created_by !== user.id) {
       return NextResponse.json({ error: '无权限更新此技术' }, { status: 403 })
     }
-    
-    // 校验：子分类必填（使用提交值或沿用原值后的最终结果）
-    const finalSubcategoryId = technologyData.subcategory_id ?? existingTech.subcategory_id
+
+    const finalSubcategoryId = body.subcategory_id ?? existingTech.subcategory_id
     if (!finalSubcategoryId) {
       return NextResponse.json({ error: '技术子分类不能为空' }, { status: 400 })
     }
-    
-    // 准备更新数据
-    const updateData = {
-      name_zh: technologyData.name_zh,
-      name_en: technologyData.name_en,
-      description_zh: technologyData.description_zh,
-      description_en: technologyData.description_en,
-      website_url: technologyData.website_url,
-      image_url: technologyData.image_url,
-      tech_source: technologyData.tech_source,
-      acquisition_method: technologyData.acquisition_method, // 添加技术获取方式字段
-      category_id: technologyData.category_id,
-      subcategory_id: technologyData.subcategory_id ?? existingTech.subcategory_id,
-      custom_label: technologyData.custom_label, // 自定义标签
-      // 处理附件数据：支持新旧格式
-      attachment_urls: (() => {
-        // 如果有新的attachments数组，提取URL
-        if (technologyData.attachments && Array.isArray(technologyData.attachments)) {
-          return technologyData.attachments.map((att: any) => att.url)
-        }
-        // 否则使用旧的attachment_urls
-        return technologyData.attachment_urls || []
-      })(),
-      
-      // 同时保存完整的附件信息（如果数据库支持）
-      attachments: technologyData.attachments,
-      is_active: technologyData.is_active,
-      
-      // 企业关联字段
-      company_id: technologyData.company_id,
-      company_name_zh: technologyData.company_name_zh,
-      company_name_en: technologyData.company_name_en,
-      company_logo_url: technologyData.company_logo_url,
-      company_country_id: technologyData.company_country_id,
-      company_province_id: technologyData.company_province_id,
-      company_development_zone_id: technologyData.company_development_zone_id,
-      
-      // 审核状态更新支持
-      review_status: technologyData.review_status,
-      
-      updated_at: new Date().toISOString()
-    }
-    
-    // 过滤掉undefined和null值
-    const filteredData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+
+    const updateData = Object.fromEntries(
+      Object.entries({
+        name_zh: body.name_zh,
+        name_en: body.name_en,
+        description_zh: body.description_zh,
+        description_en: body.description_en,
+        website_url: body.website_url,
+        image_url: body.image_url,
+        tech_source: body.tech_source,
+        acquisition_method: body.acquisition_method,
+        category_id: body.category_id,
+        subcategory_id: finalSubcategoryId,
+        custom_label: body.custom_label,
+        attachment_urls: Array.isArray(body.attachments)
+          ? body.attachments.map((att: any) => att.url)
+          : body.attachment_urls || [],
+        attachments: body.attachments,
+        is_active: body.is_active,
+        company_id: body.company_id,
+        company_name_zh: body.company_name_zh,
+        company_name_en: body.company_name_en,
+        company_logo_url: body.company_logo_url,
+        company_country_id: body.company_country_id,
+        company_province_id: body.company_province_id,
+        company_development_zone_id: body.company_development_zone_id,
+        review_status: body.review_status ?? existingTech.review_status,
+        updated_at: new Date().toISOString(),
+      }).filter(([_, value]) => value !== undefined && value !== null && value !== '')
     )
-    
-    const { data, error } = await db
+
+    const { data, error } = await client
       .from('admin_technologies')
-      .update(filteredData)
-      .eq('id', id)
+      .update(updateData)
+      .eq('id', params.id)
       .select()
-      .single()
+      .maybeSingle()
 
     if (error) {
       console.error('更新用户技术失败:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error('用户技术更新API错误:', error)
+    console.error('用户技术更新 API 错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// DELETE - 用户删除技术
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const db = supabaseAdmin ?? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+    const client = requireDb()
+    const user = await authenticateRequestUser(request)
+    if (!user) {
+      return NextResponse.json({ error: '未登录' }, { status: 401 })
+    }
 
-    const { id } = params
-    const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    
-    // 首先检查技术是否存在且是否属于该用户
-    const { data: existingTech, error: checkError } = await db
+    const { data: existingTech, error: fetchError } = await client
       .from('admin_technologies')
       .select('id, created_by')
-      .eq('id', id)
-      .single()
-    
-    if (checkError || !existingTech) {
+      .eq('id', params.id)
+      .maybeSingle()
+
+    if (fetchError) {
+      console.error('查询技术失败:', fetchError)
+      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    }
+
+    if (!existingTech) {
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
-    
-    // 检查权限：只有创建者才能删除
-    if (userId && existingTech.created_by !== userId) {
+
+    if (existingTech.created_by && existingTech.created_by !== user.id) {
       return NextResponse.json({ error: '无权限删除此技术' }, { status: 403 })
     }
 
-    const { error } = await db
+    const { error } = await client
       .from('admin_technologies')
       .delete()
-      .eq('id', id)
+      .eq('id', params.id)
 
     if (error) {
       console.error('删除用户技术失败:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ message: '删除成功' })
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('用户技术删除API错误:', error)
+    console.error('用户技术删除 API 错误:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
