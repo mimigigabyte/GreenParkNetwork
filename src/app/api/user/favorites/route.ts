@@ -183,20 +183,37 @@ export async function POST(request: NextRequest) {
 
     const adminClient = getAdminClient()
     const userColumn = user.authType === 'custom' ? 'custom_user_id' : 'user_id'
-    const conflictTarget = user.authType === 'custom' ? 'custom_user_id,technology_id' : 'user_id,technology_id'
 
-    const payload: Record<string, string> = { technology_id: technologyId }
-    payload[userColumn] = user.id
-
-    const { data: upserted, error: upsertError } = await adminClient
+    const { data: existing, error: existingError } = await adminClient
       .from('user_favorites')
-      .upsert(payload, { onConflict: conflictTarget })
       .select('id, user_id, custom_user_id, technology_id, created_at')
-      .single()
+      .eq(userColumn, user.id)
+      .eq('technology_id', technologyId)
+      .maybeSingle()
 
-    if (upsertError) {
-      console.error('收藏失败:', upsertError)
+    if (existingError && existingError.code !== 'PGRST116') {
+      console.error('查询收藏状态失败:', existingError)
       return NextResponse.json({ error: '收藏失败' }, { status: 500 })
+    }
+
+    let favoriteRow = existing
+
+    if (!favoriteRow) {
+      const payload: Record<string, string> = { technology_id: technologyId }
+      payload[userColumn] = user.id
+
+      const { data: inserted, error: insertError } = await adminClient
+        .from('user_favorites')
+        .insert(payload)
+        .select('id, user_id, custom_user_id, technology_id, created_at')
+        .single()
+
+      if (insertError) {
+        console.error('收藏失败:', insertError)
+        return NextResponse.json({ error: '收藏失败' }, { status: 500 })
+      }
+
+      favoriteRow = inserted
     }
 
     const { data: detailed, error: detailError } = await adminClient
@@ -243,20 +260,20 @@ export async function POST(request: NextRequest) {
           )
         )
       `)
-      .eq('id', upserted.id)
+      .eq('id', favoriteRow.id)
       .maybeSingle()
 
     if (!detailError && detailed) {
       const normalized = normalizeFavoriteRow(detailed)
-      return NextResponse.json({ favorite: mapFavorite(normalized) }, { status: 201 })
+      return NextResponse.json({ favorite: mapFavorite(normalized) }, { status: existing ? 200 : 201 })
     }
 
     if (detailError) {
       console.error('获取收藏详情失败:', detailError)
     }
 
-    const normalizedFallback = normalizeFavoriteRow(upserted)
-    return NextResponse.json({ favorite: mapFavorite(normalizedFallback) }, { status: 201 })
+    const normalizedFallback = normalizeFavoriteRow(favoriteRow!)
+    return NextResponse.json({ favorite: mapFavorite(normalizedFallback) }, { status: existing ? 200 : 201 })
   } catch (error) {
     console.error('收藏接口POST异常:', error)
     return NextResponse.json({ error: '收藏失败' }, { status: 500 })
