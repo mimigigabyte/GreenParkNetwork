@@ -18,11 +18,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: '缺少消息ID' }, { status: 400 })
   }
 
+  const toColumn = user.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
+
   const { data, error } = await serviceSupabase
     .from('internal_messages')
     .delete()
     .in('id', ids)
-    .eq('to_user_id', user.id)
+    .eq(toColumn, user.id)
     .select('id')
 
   if (error) {

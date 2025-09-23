@@ -11,10 +11,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: '服务不可用' }, { status: 500 })
   }
 
+  const toColumn = user.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
+
   const { data, error } = await serviceSupabase
     .from('internal_messages')
     .select('*')
-    .eq('to_user_id', user.id)
+    .eq(toColumn, user.id)
     .order('created_at', { ascending: false })
 
   if (error) {

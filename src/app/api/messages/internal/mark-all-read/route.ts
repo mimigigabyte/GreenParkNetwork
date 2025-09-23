@@ -12,6 +12,8 @@ export async function POST(request: NextRequest) {
   }
 
   const timestamp = new Date().toISOString()
+  const toColumn = user.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
+
   const { data, error } = await serviceSupabase
     .from('internal_messages')
     .update({
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
       read_at: timestamp,
       updated_at: timestamp,
     })
-    .eq('to_user_id', user.id)
+    .eq(toColumn, user.id)
     .eq('is_read', false)
     .select('id')
 

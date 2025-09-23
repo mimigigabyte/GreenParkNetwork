@@ -123,9 +123,11 @@ async function notifyAdmins(client: any, contactMessage: any) {
   const now = new Date().toISOString()
 
   const fromUserId = contactMessage.user_id || null
+  const customFromUserId = contactMessage.custom_user_id || null
 
   const notifications = admins.map((admin: any) => ({
     from_user_id: fromUserId,
+    custom_from_user_id: customFromUserId,
     to_user_id: admin.id,
     contact_message_id: contactMessage.id,
     title: `${titlePrefix}：${titleSuffix}`,
