@@ -133,9 +133,14 @@ export class AuthSync {
   static setAdminMode(user: User): void {
     console.log('🔧 设置管理员模式:', user.email);
     
+    const adminUser: User = {
+      ...user,
+      role: 'admin'
+    };
+
     // 在 localStorage 中标记管理员模式
     localStorage.setItem('admin_mode', 'true');
-    localStorage.setItem('admin_user', JSON.stringify(user));
+    localStorage.setItem('admin_user', JSON.stringify(adminUser));
   }
   
   /**
@@ -147,7 +152,11 @@ export class AuthSync {
     
     if (adminMode === 'true' && adminUserStr) {
       try {
-        const user = JSON.parse(adminUserStr);
+        const user = JSON.parse(adminUserStr) as User;
+        if (!user.role) {
+          user.role = 'admin';
+          localStorage.setItem('admin_user', JSON.stringify(user));
+        }
         return { isAdmin: true, user };
       } catch {
         return { isAdmin: false };
