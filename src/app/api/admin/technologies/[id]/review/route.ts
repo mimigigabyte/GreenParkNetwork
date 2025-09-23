@@ -54,14 +54,18 @@ export async function POST(
       return NextResponse.json({ error: '技术不存在' }, { status: 404 })
     }
 
-    // TODO: 这里可以添加消息通知逻辑
-    // 发送消息给技术创建者，告知审核结果
-    if (data.created_by) {
+    const targetUserId = data.custom_created_by || data.created_by
+    if (targetUserId) {
       try {
-        await sendReviewNotification(data.created_by, data, action, reason)
+        await sendReviewNotification({
+          userId: data.created_by || null,
+          customUserId: data.custom_created_by || null,
+          technology: data,
+          action,
+          reason,
+        })
       } catch (notificationError) {
         console.error('发送审核通知失败:', notificationError)
-        // 不影响主要流程，只记录错误
       }
     }
 
@@ -73,19 +77,26 @@ export async function POST(
 }
 
 // 发送审核通知的辅助函数
-async function sendReviewNotification(
-  userId: string,
-  technology: { name_zh: string; id: string },
-  action: string,
+async function sendReviewNotification({
+  userId,
+  customUserId,
+  technology,
+  action,
+  reason,
+}: {
+  userId: string | null
+  customUserId: string | null
+  technology: { name_zh: string; id: string }
+  action: string
   reason?: string
-) {
-  console.log('🔔 开始发送审核通知:', { userId, action, technologyName: technology.name_zh })
+}) {
+  console.log('🔔 开始发送审核通知:', { userId, customUserId, action, technologyName: technology.name_zh })
   
   const messageContent = action === 'approve' 
     ? `您提交的技术"${technology.name_zh}"已通过审核，现已发布到平台上。`
     : `您提交的技术"${technology.name_zh}"未通过审核。\n\n退回原因：${reason}`
 
-  const messageData = {
+  const messageData: any = {
     from_user_id: null, // 系统消息，没有发送者
     to_user_id: userId,
     title: action === 'approve' ? '技术审核通过' : '技术审核退回',
@@ -93,6 +104,9 @@ async function sendReviewNotification(
     category: '发布审核', // 设置为发布审核分类
     is_read: false,
     created_at: new Date().toISOString()
+  }
+  if (customUserId) {
+    messageData.custom_to_user_id = customUserId
   }
   
   console.log('🔔 准备插入的消息数据:', messageData)
@@ -111,22 +125,24 @@ async function sendReviewNotification(
   }
   
   try {
-    const { data: customUser, error: customError } = await supabase
-      .from('custom_users')
-      .select('wechat_openid, user_metadata')
-      .eq('id', userId)
-      .single()
+    if (customUserId) {
+      const { data: customUser, error: customError } = await supabase
+        .from('custom_users')
+        .select('wechat_openid, user_metadata')
+        .eq('id', customUserId)
+        .single()
 
-    if (customError) {
-      console.warn('🔔 微信消息查询用户失败:', customError)
-    } else {
-      const openId = (customUser?.wechat_openid || (customUser?.user_metadata as any)?.wechat_openid) as string | undefined
-      if (openId) {
-        const wechatText = `${messageData.title}\n\n${messageContent}\n\n请在【消息中心】查看详情。`
-        await sendWeChatServiceTextMessage({ openId, content: wechatText })
-        console.log('🔔 微信服务号消息发送成功')
+      if (customError) {
+        console.warn('🔔 微信消息查询用户失败:', customError)
       } else {
-        console.log('🔔 用户缺少微信 openid，跳过服务号推送')
+        const openId = (customUser?.wechat_openid || (customUser?.user_metadata as any)?.wechat_openid) as string | undefined
+        if (openId) {
+          const wechatText = `${messageData.title}\n\n${messageContent}\n\n请在【消息中心】查看详情。`
+          await sendWeChatServiceTextMessage({ openId, content: wechatText })
+          console.log('🔔 微信服务号消息发送成功')
+        } else {
+          console.log('🔔 用户缺少微信 openid，跳过服务号推送')
+        }
       }
     }
   } catch (wxError) {

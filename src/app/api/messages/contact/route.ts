@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
   const technologyName = body.technology_name || body.technologyName || ''
   const companyName = body.company_name || body.companyName || ''
 
-  if (!contactName || !contactPhone || !contactEmail || !message) {
-    return NextResponse.json({ success: false, error: '请填写完整的联系信息' }, { status: 400 })
+  if (!message) {
+    return NextResponse.json({ success: false, error: '请填写反馈内容' }, { status: 400 })
   }
 
   const isCustom = user.authType === 'custom'
@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
     technology_id: technologyId,
     technology_name: technologyName,
     company_name: companyName,
-    contact_name: contactName,
-    contact_phone: contactPhone,
-    contact_email: contactEmail,
+    contact_name: contactName || null,
+    contact_phone: contactPhone || null,
+    contact_email: contactEmail || null,
     message,
     category,
     status: 'pending' as const,

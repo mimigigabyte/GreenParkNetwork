@@ -17,15 +17,21 @@ export default function MobileFeedbackPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) { alert(locale==='en'?'Please login first':'请先登录'); return }
-    if (!form.message.trim()) { alert(locale==='en'?'Please enter message':'请输入反馈内容'); return }
+    if (!user) {
+      alert(locale === 'en' ? 'Please login first' : '请先登录')
+      return
+    }
+    if (!form.message.trim()) {
+      alert(locale === 'en' ? 'Please enter your feedback' : '请输入反馈内容')
+      return
+    }
     setSubmitting(true)
     try {
       await createContactMessage({
-        contact_name: form.name || (user.name || 'User'),
-        contact_phone: form.phone || (user.phone || ''),
-        contact_email: form.email || (user.email || ''),
-        message: form.message,
+        contact_name: form.name || user.name || undefined,
+        contact_phone: form.phone || user.phone || undefined,
+        contact_email: form.email || user.email || undefined,
+        message: form.message.trim(),
         category: '用户反馈' // 明确标记为用户反馈
       })
       alert(locale==='en'?'Submitted successfully':'提交成功')
@@ -48,19 +54,28 @@ export default function MobileFeedbackPage() {
           <h2 className="text-[16px] font-semibold text-gray-900">{locale==='en'?'Feedback':'问题反馈'}</h2>
         </div>
         <form onSubmit={onSubmit} className="space-y-3">
-          <Field label={locale==='en'?'Name(optional)':'姓名（可选）'}>
+          <Field label={locale==='en'?'Name (optional)':'姓名（可选）'}>
             <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
           </Field>
           <div className="grid grid-cols-2 gap-2">
-            <Field label={locale==='en'?'Phone(optional)':'电话（可选）'}>
+            <Field label={locale==='en'?'Phone (optional)':'电话（可选）'}>
               <input value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
             </Field>
-            <Field label={locale==='en'?'Email(optional)':'邮箱（可选）'}>
+            <Field label={locale==='en'?'Email (optional)':'邮箱（可选）'}>
               <input value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} className="w-full h-10 rounded-xl border border-gray-200 px-3 text-[14px]" />
             </Field>
           </div>
-          <Field label={locale==='en'?'Message':'反馈内容'}>
-            <textarea value={form.message} onChange={e=>setForm(f=>({...f,message:e.target.value}))} rows={6} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[14px]" />
+          <Field
+            label={locale==='en'?'Message':'反馈内容'}
+            required
+            requiredLabel={locale==='en'?'(required)':'（必填）'}
+          >
+            <textarea
+              value={form.message}
+              onChange={e=>setForm(f=>({...f,message:e.target.value}))}
+              rows={6}
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[14px]"
+            />
           </Field>
           <button disabled={submitting} className={`w-full h-10 rounded-xl ${submitting?'bg-gray-300':'bg-[#00b899] hover:opacity-95'} text-white text-[14px]`}>
             {submitting ? (locale==='en'?'Submitting...':'提交中...') : (locale==='en'?'Submit':'提交')}
@@ -71,10 +86,13 @@ export default function MobileFeedbackPage() {
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, required, requiredLabel }: { label: string; children: React.ReactNode; required?: boolean; requiredLabel?: string }) {
   return (
     <label className="block">
-      <div className="mb-1 text-[12px] text-gray-600">{label}</div>
+      <div className="mb-1 text-[12px] text-gray-600">
+        {label}
+        {required && <span className="ml-1 text-red-500">{requiredLabel || '(required)'}</span>}
+      </div>
       {children}
     </label>
   )
