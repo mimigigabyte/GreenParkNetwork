@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: '请填写完整的联系信息' }, { status: 400 })
   }
 
-  const insertData = {
-    user_id: user.id,
+  const isCustom = user.authType === 'custom'
+  const insertData: any = {
     technology_id: technologyId,
     technology_name: technologyName,
     company_name: companyName,
@@ -73,6 +73,12 @@ export async function POST(request: NextRequest) {
     status: 'pending' as const,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+  }
+
+  if (isCustom) {
+    insertData.custom_user_id = user.id
+  } else {
+    insertData.user_id = user.id
   }
 
   const { data, error } = await db

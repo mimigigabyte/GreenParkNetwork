@@ -4,7 +4,8 @@ import type { AdminTechnology } from '@/lib/types/admin'
 
 interface FavoriteRow {
   id: string
-  user_id: string
+  user_id: string | null
+  custom_user_id?: string | null
   technology_id: string
   created_at: string
   technology?: Partial<AdminTechnology> | null
@@ -20,10 +21,10 @@ function getAdminClient() {
 function mapFavorite(row: FavoriteRow) {
   return {
     favoriteId: row.id,
-    userId: row.user_id,
+    userId: row.user_id || row.custom_user_id || '',
     technologyId: row.technology_id,
     favoritedAt: row.created_at,
-    technology: row.technology ?? null
+    technology: row.technology ?? null,
   }
 }
 
@@ -40,7 +41,8 @@ function normalizeFavoriteRow(raw: any): FavoriteRow {
 
   return {
     id: String(raw?.id ?? ''),
-    user_id: String(raw?.user_id ?? ''),
+    user_id: raw?.user_id ? String(raw.user_id) : null,
+    custom_user_id: raw?.custom_user_id ? String(raw.custom_user_id) : null,
     technology_id: String(raw?.technology_id ?? ''),
     created_at: String(raw?.created_at ?? ''),
     technology,
@@ -66,12 +68,13 @@ export async function GET(request: NextRequest) {
     }
 
     const adminClient = getAdminClient()
+    const userColumn = user.authType === 'custom' ? 'custom_user_id' : 'user_id'
 
     if (technologyId) {
       const { data, error } = await adminClient
         .from('user_favorites')
-        .select('id, technology_id, created_at')
-        .eq('user_id', targetUserId)
+        .select('id, user_id, custom_user_id, technology_id, created_at')
+        .eq(userColumn, targetUserId)
         .eq('technology_id', technologyId)
         .maybeSingle()
 
@@ -97,6 +100,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         user_id,
+        custom_user_id,
         technology_id,
         created_at,
         technology:admin_technologies(
@@ -135,7 +139,7 @@ export async function GET(request: NextRequest) {
           )
         )
       `)
-      .eq('user_id', targetUserId)
+      .eq(userColumn, targetUserId)
       .order('created_at', { ascending: false })
 
     let rows: FavoriteRow[] = (data || []).map(normalizeFavoriteRow)
@@ -145,8 +149,8 @@ export async function GET(request: NextRequest) {
 
       const { data: fallbackRows, error: fallbackError } = await adminClient
         .from('user_favorites')
-        .select('id, user_id, technology_id, created_at')
-        .eq('user_id', targetUserId)
+        .select('id, user_id, custom_user_id, technology_id, created_at')
+        .eq(userColumn, targetUserId)
         .order('created_at', { ascending: false })
 
       if (fallbackError) {
@@ -178,14 +182,16 @@ export async function POST(request: NextRequest) {
     }
 
     const adminClient = getAdminClient()
+    const userColumn = user.authType === 'custom' ? 'custom_user_id' : 'user_id'
+    const conflictTarget = user.authType === 'custom' ? 'custom_user_id,technology_id' : 'user_id,technology_id'
+
+    const payload: Record<string, string> = { technology_id: technologyId }
+    payload[userColumn] = user.id
 
     const { data: upserted, error: upsertError } = await adminClient
       .from('user_favorites')
-      .upsert(
-        { user_id: user.id, technology_id: technologyId },
-        { onConflict: 'user_id,technology_id' }
-      )
-      .select('id, user_id, technology_id, created_at')
+      .upsert(payload, { onConflict: conflictTarget })
+      .select('id, user_id, custom_user_id, technology_id, created_at')
       .single()
 
     if (upsertError) {
@@ -198,6 +204,7 @@ export async function POST(request: NextRequest) {
       .select(`
         id,
         user_id,
+        custom_user_id,
         technology_id,
         created_at,
         technology:admin_technologies(
@@ -248,15 +255,8 @@ export async function POST(request: NextRequest) {
       console.error('获取收藏详情失败:', detailError)
     }
 
-    const fallback: FavoriteRow = {
-      id: upserted.id,
-      user_id: upserted.user_id,
-      technology_id: upserted.technology_id,
-      created_at: upserted.created_at,
-      technology: null
-    }
-
-    return NextResponse.json({ favorite: mapFavorite(fallback) }, { status: 201 })
+    const normalizedFallback = normalizeFavoriteRow(upserted)
+    return NextResponse.json({ favorite: mapFavorite(normalizedFallback) }, { status: 201 })
   } catch (error) {
     console.error('收藏接口POST异常:', error)
     return NextResponse.json({ error: '收藏失败' }, { status: 500 })
@@ -285,11 +285,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     const adminClient = getAdminClient()
+    const userColumn = user.authType === 'custom' ? 'custom_user_id' : 'user_id'
 
     const { error } = await adminClient
       .from('user_favorites')
       .delete()
-      .eq('user_id', user.id)
+      .eq(userColumn, user.id)
       .eq('technology_id', technologyId)
 
     if (error) {
