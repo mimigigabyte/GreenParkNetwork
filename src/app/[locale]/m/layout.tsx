@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { ReactNode, useMemo } from 'react'
 import { Home, Upload, MessageSquare, User } from 'lucide-react'
 import { UnreadMessageProvider, useUnreadMessage } from '@/components/message/unread-message-context'
+import { LoadingOverlayProvider } from '@/components/common/loading-overlay'
 
 function MobileLayoutInner({
   children,
@@ -83,10 +84,12 @@ export default function MobileLayout({
   params: { locale: string }
 }) {
   return (
-    <UnreadMessageProvider>
-      <MobileLayoutInner locale={locale}>
-        {children}
-      </MobileLayoutInner>
-    </UnreadMessageProvider>
+    <LoadingOverlayProvider>
+      <UnreadMessageProvider>
+        <MobileLayoutInner locale={locale}>
+          {children}
+        </MobileLayoutInner>
+      </UnreadMessageProvider>
+    </LoadingOverlayProvider>
   )
 }

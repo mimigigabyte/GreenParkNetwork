@@ -8,6 +8,7 @@ import { Search, SlidersHorizontal, Clock, ArrowDownAZ, ArrowUpAZ, ArrowUpDown }
 import { ContactUsModal } from '@/components/contact/contact-us-modal'
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { useLoadingOverlay } from '@/components/common/loading-overlay'
 import { getPublicCarouselApi } from '@/lib/api/public-carousel'
 import type { AdminCarouselImage } from '@/lib/types/admin'
 import { searchTechProducts, type SearchParams, type TechProduct, type SortType } from '@/api/tech'
@@ -29,6 +30,7 @@ export default function MobileHomePage() {
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
   const modalLocale: 'en' | 'zh' = locale === 'en' ? 'en' : 'zh'
   const { user } = useAuthContext()
+  const { showLoading, hideLoading } = useLoadingOverlay()
 
   // Carousel
   const [carousel, setCarousel] = useState<AdminCarouselImage[]>([])
@@ -71,6 +73,7 @@ export default function MobileHomePage() {
   // Load carousel
   useEffect(() => {
     let mounted = true
+    showLoading()
     ;(async () => {
       try {
         const list = await getPublicCarouselApi()
@@ -78,13 +81,17 @@ export default function MobileHomePage() {
         if (list && list.length) setCarousel(list as AdminCarouselImage[])
         else setCarousel([])
       } catch {
-        setCarousel([])
+        if (mounted) setCarousel([])
       } finally {
-        setLoadingCarousel(false)
+        if (mounted) setLoadingCarousel(false)
+        hideLoading()
       }
     })()
-    return () => { mounted = false }
-  }, [])
+    return () => {
+      mounted = false
+      hideLoading()
+    }
+  }, [hideLoading, showLoading])
 
   // Auto-play
   useEffect(() => {
@@ -128,6 +135,7 @@ export default function MobileHomePage() {
       pageSize,
     }
     setSearchLoading(true)
+    showLoading()
     try {
       const r = await searchTechProducts(params)
       if (r.success && r.data) {
@@ -150,6 +158,7 @@ export default function MobileHomePage() {
       }
     } finally {
       setSearchLoading(false)
+      hideLoading()
     }
   }
 

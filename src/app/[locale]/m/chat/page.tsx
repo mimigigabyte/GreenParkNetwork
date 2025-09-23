@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuthContext } from '@/components/auth/auth-provider'
 import { useUnreadMessage } from '@/components/message/unread-message-context'
+import { useLoadingOverlay } from '@/components/common/loading-overlay'
 import {
   type InternalMessage,
   getReceivedInternalMessages,
@@ -34,6 +35,7 @@ export default function MobileChatPage() {
   const { user } = useAuthContext()
   const { toast } = useToast()
   const { refreshUnreadCount, decrementUnreadCount, setUnreadCount: setGlobalUnreadCount } = useUnreadMessage()
+  const { showLoading, hideLoading } = useLoadingOverlay()
 
   const [messages, setMessages] = useState<InternalMessage[]>([])
   const [filtered, setFiltered] = useState<InternalMessage[]>([])
@@ -59,6 +61,7 @@ export default function MobileChatPage() {
   const loadMessages = async () => {
     if (!user) return
     setLoading(true)
+    showLoading()
     try {
       const [list, unread] = await Promise.all([
         getReceivedInternalMessages(),
@@ -75,6 +78,7 @@ export default function MobileChatPage() {
       })
     } finally {
       setLoading(false)
+      hideLoading()
     }
   }
 
@@ -135,12 +139,15 @@ export default function MobileChatPage() {
   const markAsReadOne = async (m: InternalMessage) => {
     if (m.is_read) return
     try {
+      showLoading()
       await markInternalMessageAsRead(m.id)
       setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, is_read: true, read_at: new Date().toISOString() } : x)))
       setUnreadCount((c) => Math.max(0, c - 1))
       decrementUnreadCount(1) // 更新全局未读数量
     } catch (e) {
       console.error('标记已读失败', e)
+    } finally {
+      hideLoading()
     }
   }
 
@@ -150,6 +157,7 @@ export default function MobileChatPage() {
       return
     }
     setBatchLoading(true)
+    showLoading()
     try {
       const ids = Array.from(selectedIds)
       await markInternalMessagesAsRead(ids)
@@ -165,6 +173,7 @@ export default function MobileChatPage() {
       toast({ title: locale === 'en' ? 'Operation Failed' : '操作失败', description: locale === 'en' ? 'Failed to mark as read' : '标记已读失败', variant: 'destructive' })
     } finally {
       setBatchLoading(false)
+      hideLoading()
     }
   }
 
@@ -174,6 +183,7 @@ export default function MobileChatPage() {
       return
     }
     setBatchLoading(true)
+    showLoading()
     try {
       const ids = Array.from(selectedIds)
       await deleteInternalMessages(ids)
@@ -189,11 +199,13 @@ export default function MobileChatPage() {
       toast({ title: locale === 'en' ? 'Operation Failed' : '操作失败', description: locale === 'en' ? 'Failed to delete' : '删除失败', variant: 'destructive' })
     } finally {
       setBatchLoading(false)
+      hideLoading()
     }
   }
 
   const markAllAsRead = async () => {
     setBatchLoading(true)
+    showLoading()
     try {
       await markAllInternalMessagesAsRead()
       setMessages((prev) => prev.map((m) => ({ ...m, is_read: true, read_at: new Date().toISOString() })))
@@ -205,6 +217,7 @@ export default function MobileChatPage() {
       toast({ title: locale === 'en' ? 'Operation Failed' : '操作失败', description: locale === 'en' ? 'Failed to mark all' : '全部标记失败', variant: 'destructive' })
     } finally {
       setBatchLoading(false)
+      hideLoading()
     }
   }
 

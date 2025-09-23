@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // 强制动态渲染，避免缓存
 export const dynamic = 'force-dynamic';
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     let supabaseUsers = authUsers.users || [];
 
     // 2. 获取自定义认证用户列表
-    const { data: customUsers, error: customError } = await supabase
+    const { data: customUsers, error: customError } = await supabaseAdmin
       .from('custom_users')
       .select('*')
       .order('created_at', { ascending: false });
@@ -49,6 +49,32 @@ export async function GET(request: NextRequest) {
     }
 
     const customUsersList = customUsers || [];
+
+    const customUserIds = customUsersList.map((user) => user.id);
+    let customUserCompanies: Record<string, { id: string; name_zh: string | null; name_en: string | null }> = {};
+
+    if (customUserIds.length > 0) {
+      const { data: customCompanies, error: customCompanyError } = await supabaseAdmin
+        .from('admin_companies')
+        .select('id, name_zh, name_en, custom_user_id')
+        .in('custom_user_id', customUserIds)
+        .eq('is_active', true);
+
+      if (customCompanyError) {
+        console.error('获取自定义用户企业失败:', customCompanyError);
+      } else if (customCompanies) {
+        customUserCompanies = customCompanies.reduce((acc, company) => {
+          if (company.custom_user_id) {
+            acc[company.custom_user_id] = {
+              id: company.id,
+              name_zh: company.name_zh,
+              name_en: company.name_en,
+            };
+          }
+          return acc;
+        }, {} as typeof customUserCompanies);
+      }
+    }
 
     // 如果有搜索条件，过滤 Supabase 用户
     if (search) {
@@ -92,21 +118,27 @@ export async function GET(request: NextRequest) {
     );
 
     // 处理自定义用户
-    let processedCustomUsers = customUsersList.map(user => ({
-      id: user.id,
-      email: user.email,
-      phone_number: `${user.country_code}${user.phone}`,
-      name: user.name || `用户${user.phone.slice(-4)}`,
-      auth_type: 'custom',
-      company_id: null, // 自定义用户暂时没有企业关联
-      company: null,
-      created_at: user.created_at,
-      last_login_at: user.last_login_at,
-      email_confirmed: false, // 自定义用户通过手机注册，邮箱未验证
-      phone_confirmed: true, // 自定义用户通过手机验证码注册，手机已验证
-      is_active: user.is_active,
-      user_metadata: user.user_metadata || {}
-    }));
+    let processedCustomUsers = customUsersList.map(user => {
+      const company = customUserCompanies[user.id] || null;
+      const wechatOpenId = user.wechat_openid || user.user_metadata?.wechat_openid || '';
+      const phoneNumber = user.phone ? `${user.country_code || ''}${user.phone}` : '';
+
+      return {
+        id: user.id,
+        email: user.email,
+        phone_number: wechatOpenId || phoneNumber || '--',
+        name: user.name || wechatOpenId || (phoneNumber ? `用户${phoneNumber.slice(-4)}` : '微信用户'),
+        auth_type: 'custom',
+        company_id: company?.id || null,
+        company,
+        created_at: user.created_at,
+        last_login_at: user.last_login_at,
+        email_confirmed: !!user.email,
+        phone_confirmed: !!phoneNumber,
+        is_active: user.is_active,
+        user_metadata: user.user_metadata || {}
+      };
+    });
 
     // 如果有搜索条件，过滤自定义用户
     if (search) {

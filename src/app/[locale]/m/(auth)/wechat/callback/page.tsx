@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { wechatAuthApi } from '@/api/wechat'
 import { useAuthContext } from '@/components/auth/auth-provider'
+import { useLoadingOverlay } from '@/components/common/loading-overlay'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,6 +22,7 @@ function WechatCallbackContent() {
   const searchParams = useSearchParams()
   const { checkUser } = useAuthContext()
   const locale = pathname.startsWith('/en') ? 'en' : 'zh'
+  const { showLoading, hideLoading } = useLoadingOverlay()
 
   const [message, setMessage] = useState(locale === 'en' ? 'Signing in with WeChat...' : '正在通过微信登录...')
 
@@ -34,6 +36,7 @@ function WechatCallbackContent() {
 
     (async () => {
       try {
+        showLoading(locale === 'en' ? 'Signing in...' : '正在登录...')
         const res = await wechatAuthApi.loginByCode({ code, state })
         if (res.success && res.data) {
           await checkUser()
@@ -47,9 +50,12 @@ function WechatCallbackContent() {
         }
       } catch (e) {
         setMessage(locale === 'en' ? 'WeChat login failed' : '微信登录失败')
+      } finally {
+        hideLoading()
       }
     })()
-  }, [searchParams, router, checkUser, locale])
+    return () => hideLoading()
+  }, [searchParams, router, checkUser, locale, showLoading, hideLoading])
 
   return (
     <section className="min-h-dvh flex items-center justify-center">
