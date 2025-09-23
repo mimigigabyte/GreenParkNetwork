@@ -65,7 +65,7 @@
 │   │       │   └── callback/route.ts       # 微信回调：换取openid/用户信息并登录
 │   │       ├── messages/
 │   │       │   └── internal/
-│   │       │       ├── route.ts              # 获取当前用户站内信列表
+│   │       │       ├── route.ts              # 站内信API：GET列表 / POST发送（支持自定义用户+微信推送）
 │   │       │       ├── unread-count/route.ts # 获取未读站内信数量
 │   │       │       ├── mark-read/route.ts    # 批量/单条标记为已读
 │   │       │       ├── mark-all-read/route.ts# 标记全部站内信为已读

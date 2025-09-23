@@ -5,6 +5,7 @@ import { safeFetch, handleApiResponse } from '@/lib/safe-fetch';
 export interface ContactMessage {
   id: string;
   user_id: string;
+  custom_user_id?: string;
   technology_id?: string;
   technology_name?: string;
   company_name?: string;
@@ -50,7 +51,8 @@ export interface InternalMessage {
 
 // 发送站内信的数据类型
 export interface SendInternalMessageData {
-  to_user_id: string;
+  to_user_id?: string;
+  custom_to_user_id?: string;
   contact_message_id?: string;
   title: string;
   content: string;
@@ -199,32 +201,16 @@ export async function updateContactMessageStatus(
  * 发送站内信
  */
 export async function sendInternalMessage(data: SendInternalMessageData): Promise<InternalMessage> {
-  console.log('💌 发送站内信:', data);
-  
-  // 尝试获取用户信息，但不强制要求
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  const messageData = {
-    from_user_id: user?.id || null, // 如果没有用户，使用 null
-    ...data
-  };
-
-  console.log('💌 插入消息数据:', messageData);
-
-  const client = supabaseAdmin || supabase;
-  const { data: result, error } = await client
-    .from('internal_messages')
-    .insert([messageData])
-    .select()
-    .single();
-
-  if (error) {
-    console.error('💌 发送站内信失败:', error);
-    throw new Error(error.message || '发送站内信失败');
-  }
-
-  console.log('💌 站内信发送成功:', result);
-  return result;
+  console.log('💌 发送站内信(通过API):', data);
+  const response = await safeFetch('/api/messages/internal', {
+    method: 'POST',
+    useAuth: true,
+    body: JSON.stringify(data),
+  });
+  const result = await handleApiResponse(response);
+  const payload = result?.data ?? result;
+  console.log('💌 站内信发送成功(通过API):', payload);
+  return payload as InternalMessage;
 }
 
 /**
