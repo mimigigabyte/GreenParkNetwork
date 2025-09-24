@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { HeroSection } from '@/components/home/hero-section';
 import { ProductCategories } from '@/components/home/product-categories';
 import { SearchFilter } from '@/components/home/search-filter';
 import { SearchResults } from '@/components/home/search-results';
@@ -390,7 +389,7 @@ function HomePageContent({ locale }: { locale: string }) {
       <Header />
       
       <main>
-        <HeroSection onOpenAuth={openAuthModal} />
+      {/* HeroSection 暂时隐藏，根据需求再恢复 */}
         
         <ProductCategories
           categories={categories}

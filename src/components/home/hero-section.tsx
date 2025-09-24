@@ -48,7 +48,7 @@ export function HeroSection({ onOpenAuth }: HeroSectionProps) {
           setCarouselImages([{
             id: 'default',
             image_url: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-            title_zh: '国家级经开区绿色技术产品推广平台',
+            title_zh: '国家级经济技术开发区绿色术产品推广平台',
             title_en: 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform',
             description_zh: '推动可持续发展，共建绿色未来',
             description_en: 'Driving sustainable development, building a green future together',
@@ -62,7 +62,7 @@ export function HeroSection({ onOpenAuth }: HeroSectionProps) {
         setCarouselImages([{
           id: 'default',
           image_url: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-          title_zh: '国家级经开区绿色技术产品推广平台',
+          title_zh: '国家级经济技术开发区绿色术产品推广平台',
           title_en: 'National Economic Development Zone Green Low-Carbon Technology Promotion Platform',
           description_zh: '推动可持续发展，共建绿色未来',
           description_en: 'Driving sustainable development, building a green future together',
