@@ -10,9 +10,11 @@ interface AdminOverrideUser {
   role?: string | null
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   const user = await authenticateRequestUser(request)
-  if (!user) {
+  if (!user && !parsedOverride?.id) {
     return NextResponse.json({ success: false, error: '未登录' }, { status: 401 })
   }
 
@@ -149,11 +151,13 @@ export async function POST(request: NextRequest) {
     contact_message_id: contactMessageId,
   }
 
-  if (user.authType === 'custom') {
-    insertData.custom_from_user_id = user.id
-  } else {
-    insertData.from_user_id = user.id
-  }
+  if (!adminOverride && user) {
+    if (user.authType === 'custom') {
+      insertData.custom_from_user_id = user.id
+    } else {
+      insertData.from_user_id = user.id
+    }
+  } // adminOverride 时作为系统消息，不设置from_user_id字段
 
   if (resolvedCustomToUserId) {
     insertData.custom_to_user_id = resolvedCustomToUserId

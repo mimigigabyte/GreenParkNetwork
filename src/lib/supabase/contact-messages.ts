@@ -209,8 +209,10 @@ export async function sendInternalMessage(data: SendInternalMessageData): Promis
     try {
       const adminMode = localStorage.getItem('admin_mode');
       const adminUser = localStorage.getItem('admin_user');
-      if (adminMode === 'true' && adminUser) {
+      if (adminUser) {
         headers['X-Admin-User'] = btoa(unescape(encodeURIComponent(adminUser)));
+      } else if (adminMode === 'true') {
+        console.warn('管理员模式已开启但未找到admin_user');
       }
     } catch (err) {
       console.warn('⚠️ 读取管理员模式信息失败:', err);

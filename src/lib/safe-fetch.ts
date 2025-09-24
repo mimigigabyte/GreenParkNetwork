@@ -90,11 +90,13 @@ export async function safeFetch(url: string, options: SafeFetchOptions = {}): Pr
     // 创建安全的headers
     const safeHeaders = createSafeHeaders(baseHeaders);
     
+    const headerKeys = Object.keys(safeHeaders)
     console.log('🚀 Safe fetch请求:', {
       url,
       method: restOptions.method || 'GET',
       hasAuth: !!safeHeaders['Authorization'],
-      headersCount: Object.keys(safeHeaders).length
+      headersCount: headerKeys.length,
+      headerKeys
     });
     
     const response = await fetch(url, {

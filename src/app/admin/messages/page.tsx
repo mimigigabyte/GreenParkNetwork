@@ -247,6 +247,11 @@ export default function AdminMessagesPage() {
 
     setReplySending(true);
     try {
+      // 确保管理员模式头部就绪
+      if (adminUser) {
+        AuthSync.setAdminMode(adminUser);
+      }
+
       await sendInternalMessage({
         to_user_id: selectedMessage.user_id,
         custom_to_user_id: selectedMessage.custom_user_id,
