@@ -160,6 +160,20 @@ export default function AdminMessagesPage() {
     checkAdminMode();
   }, [user, authLoading]);
 
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      const { isAdmin, user: adminModeUser } = AuthSync.isAdminMode();
+      if (!isAdmin) {
+        AuthSync.setAdminMode(user);
+      }
+      setAdminUser(prev => prev ?? {
+        id: user.id,
+        name: user.name || user.email || 'Admin',
+        email: user.email || ''
+      });
+    }
+  }, [user]);
+
   // 初始加载和筛选变化时重新加载
   useEffect(() => {
     if (!authLoading) {
