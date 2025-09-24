@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { safeFetch, handleApiResponse } from '@/lib/safe-fetch';
 
 /**
  * 附件信息接口
@@ -22,78 +22,36 @@ export async function uploadFileToSupabase(
   bucket: string = 'images',
   folder: string = 'uploads'
 ): Promise<string> {
-  console.log(`开始上传文件到存储桶 '${bucket}', 文件夹 '${folder}'`);
-  console.log(`文件信息: ${file.name}, 大小: ${file.size}字节, 类型: ${file.type}`);
+  console.log(`开始上传文件到存储桶 '${bucket}', 文件夹 '${folder}'`)
+  console.log(`文件信息: ${file.name}, 大小: ${file.size}字节, 类型: ${file.type}`)
 
   try {
-    // 使用服务端API上传，避免前端RLS权限问题
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('bucket', bucket);
-    formData.append('folder', folder);
+    const formData = new FormData()
+    formData.append('file', file, file.name)
+    formData.append('bucket', bucket)
+    formData.append('folder', folder)
 
-    // 检查当前是否在管理员页面
-    const isAdminPage = window.location.pathname.startsWith('/admin');
-    const uploadUrl = isAdminPage ? '/api/admin/upload' : '/api/upload';
-    
-    // 准备请求头
-    const headers: Record<string, string> = {};
-    
-    // 如果不是管理员页面，需要添加用户认证token（为 getSession 增加超时，并回退到本地token）
-    if (!isAdminPage) {
-      let token: string | null = null
-      try {
-        const sessionResult = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timeout')), 3000))
-        ]) as { data: { session?: any } }
-        token = sessionResult?.data?.session?.access_token || null
-      } catch {}
-      if (!token) {
-        try { token = localStorage.getItem('custom_auth_token') } catch {}
-      }
-      if (!token) {
-        try { token = localStorage.getItem('access_token') } catch {}
-      }
-      if (token) headers['Authorization'] = `Bearer ${token}`
-    }
+    const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+    const uploadUrl = isAdminPage ? '/api/admin/upload' : '/api/upload'
 
-    // 增加请求超时，避免前端长时间等待
-    const controller = new AbortController()
-    const pending = fetch(uploadUrl, {
+    const response = await safeFetch(uploadUrl, {
       method: 'POST',
-      headers,
+      useAuth: !isAdminPage,
       body: formData,
-      signal: controller.signal,
     })
-    const timeout = setTimeout(() => controller.abort('timeout'), 30000)
-    let response: Response
-    try {
-      response = await pending
-    } finally {
-      clearTimeout(timeout)
+
+    const result = await handleApiResponse(response)
+    const payload = result?.data ?? result
+
+    if (!payload?.url) {
+      throw new Error('上传失败：未返回文件URL')
     }
 
-    if (!response.ok) {
-      let errorMessage = `上传失败: HTTP ${response.status}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.error || errorMessage;
-      } catch (parseError) {
-        // 如果响应不是JSON格式，使用响应文本
-        const errorText = await response.text();
-        errorMessage = errorText || errorMessage;
-      }
-      throw new Error(errorMessage);
-    }
-
-    const result = await response.json();
-    console.log('✅ 文件上传成功:', result.url);
-
-    return result.url;
+    return payload.url as string
   } catch (error) {
-    console.error('❌ 上传过程中发生错误:', error);
-    throw error;
+    console.error('上传过程中发生错误:', error)
+    if (error instanceof Error) throw error
+    throw new Error('上传失败，请重试')
   }
 }
 
@@ -107,24 +65,20 @@ export async function deleteFileFromSupabase(
   bucket: string = 'images'
 ): Promise<void> {
   try {
-    // 使用管理员客户端避免RLS权限问题
-    const client = supabaseAdmin || supabase;
-    
-    // 从URL中提取文件路径
-    const urlParts = url.split('/');
-    const fileName = urlParts.slice(-2).join('/'); // folder/filename.ext
+    const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+    const deleteUrl = isAdminPage ? '/api/admin/upload/delete' : '/api/upload/delete'
 
-    const { error } = await client.storage
-      .from(bucket)
-      .remove([fileName]);
+    const response = await safeFetch(deleteUrl, {
+      method: 'POST',
+      useAuth: !isAdminPage,
+      body: JSON.stringify({ url, bucket }),
+    })
 
-    if (error) {
-      console.error('Delete error:', error);
-      throw new Error(`删除失败: ${error.message}`);
-    }
+    await handleApiResponse(response)
   } catch (error) {
-    console.error('Delete failed:', error);
-    throw error;
+    console.error('删除文件失败:', error)
+    if (error instanceof Error) throw error
+    throw new Error('删除文件失败，请重试')
   }
 }
 
@@ -173,51 +127,30 @@ export async function uploadFileWithInfo(
 
   try {
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', file, file.name)
     formData.append('bucket', bucket)
     formData.append('folder', folder)
 
-    // 非管理员统一走 /api/upload，带认证；为 getSession 加超时并回退本地 token
     const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
     const uploadUrl = isAdminPage ? '/api/admin/upload' : '/api/upload'
-    const headers: Record<string, string> = {}
+    const response = await safeFetch(uploadUrl, {
+      method: 'POST',
+      useAuth: !isAdminPage,
+      body: formData,
+    })
 
-    if (!isAdminPage) {
-      let token: string | null = null
-      try {
-        const sessionResult = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('getSession timeout')), 3000))
-        ]) as { data: { session?: any } }
-        token = sessionResult?.data?.session?.access_token || null
-      } catch {}
-      if (!token) { try { token = localStorage.getItem('custom_auth_token') || null } catch {} }
-      if (!token) { try { token = localStorage.getItem('access_token') || null } catch {} }
-      if (token) headers['Authorization'] = `Bearer ${token}`
+    const result = await handleApiResponse(response)
+    const payload = result?.data ?? result
+
+    if (!payload?.url) {
+      throw new Error('上传失败：未返回文件URL')
     }
 
-    const controller = new AbortController()
-    const pending = fetch(uploadUrl, { method: 'POST', headers, body: formData, signal: controller.signal })
-    const timeout = setTimeout(() => controller.abort('timeout'), 30000)
-    let resp: Response
-    try {
-      resp = await pending
-    } finally {
-      clearTimeout(timeout)
-    }
-
-    if (!resp.ok) {
-      let errorMessage = `上传失败: HTTP ${resp.status}`
-      try { const e = await resp.json(); errorMessage = e.error || errorMessage } catch { /* ignore */ }
-      throw new Error(errorMessage)
-    }
-
-    const result = await resp.json()
     return {
-      url: result.url as string,
-      filename: result.filename || file.name,
-      size: result.size || file.size,
-      type: result.type || file.type
+      url: payload.url as string,
+      filename: payload.filename || file.name,
+      size: payload.size || file.size,
+      type: payload.type || file.type,
     }
   } catch (error) {
     console.error('上传过程中发生错误:', error)

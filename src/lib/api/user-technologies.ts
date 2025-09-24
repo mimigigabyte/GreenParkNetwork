@@ -65,11 +65,14 @@ export async function deleteUserTechnologyApi(id: string, userId: string): Promi
 
 // 获取单个用户技术详情
 export async function getUserTechnologyByIdApi(id: string): Promise<AdminTechnology> {
-  const response = await fetch(`/api/user/technologies/${id}`)
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(errorData.error || '获取技术详情失败')
+  const response = await safeFetch(`/api/user/technologies/${id}`, {
+    method: 'GET',
+    useAuth: true,
+  })
+  const result = await handleApiResponse(response)
+  const payload = result?.data ?? result
+  if (!payload) {
+    throw new Error('获取技术详情失败')
   }
-  const result = await response.json()
-  return result.data as AdminTechnology
+  return payload as AdminTechnology
 }

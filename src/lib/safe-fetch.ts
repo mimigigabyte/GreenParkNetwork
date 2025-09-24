@@ -69,10 +69,11 @@ async function getAuthToken(): Promise<string | null> {
 export async function safeFetch(url: string, options: SafeFetchOptions = {}): Promise<Response> {
   try {
     const { headers = {}, useAuth = false, ...restOptions } = options;
+    const isFormData = typeof FormData !== 'undefined' && restOptions.body instanceof FormData;
     
     // 创建基础headers
     const baseHeaders: Record<string, string | null | undefined> = {
-      'Content-Type': createContentTypeHeader(),
+      ...(isFormData ? {} : { 'Content-Type': createContentTypeHeader() }),
       ...headers
     };
     
