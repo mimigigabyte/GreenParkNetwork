@@ -14,6 +14,18 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   const user = await authenticateRequestUser(request)
+  const adminHeader = request.headers.get('x-admin-user')
+  let parsedOverride: AdminOverrideUser | null = null
+
+  if (!user && adminHeader) {
+    try {
+      const decoded = Buffer.from(adminHeader, 'base64').toString('utf8')
+      parsedOverride = JSON.parse(decoded) as AdminOverrideUser
+    } catch (overrideError) {
+      console.warn('Admin override解析失败(GET):', overrideError)
+    }
+  }
+
   if (!user && !parsedOverride?.id) {
     return NextResponse.json({ success: false, error: '未登录' }, { status: 401 })
   }
@@ -22,12 +34,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: '服务不可用' }, { status: 500 })
   }
 
-  const toColumn = user.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
+  const toColumn = user?.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
+  const targetId = user?.id || parsedOverride?.id
 
   const { data, error } = await serviceSupabase
     .from('internal_messages')
     .select('*')
-    .eq(toColumn, user.id)
+    .eq(toColumn, targetId)
     .order('created_at', { ascending: false })
 
   if (error) {
