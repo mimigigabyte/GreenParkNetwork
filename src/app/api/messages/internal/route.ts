@@ -37,6 +37,32 @@ export async function GET(request: NextRequest) {
   const toColumn = user?.authType === 'custom' ? 'custom_to_user_id' : 'to_user_id'
   const targetId = user?.id || parsedOverride?.id
 
+  if (!targetId) {
+    return NextResponse.json({ success: false, error: '无法确定用户身份' }, { status: 400 })
+  }
+
+  const messageId = request.nextUrl.searchParams.get('id')
+
+  if (messageId) {
+    const { data, error } = await serviceSupabase
+      .from('internal_messages')
+      .select('*')
+      .eq('id', messageId)
+      .eq(toColumn, targetId)
+      .maybeSingle()
+
+    if (error) {
+      console.error('获取站内信详情失败:', error)
+      return NextResponse.json({ success: false, error: '获取站内信详情失败' }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ success: false, error: '消息不存在' }, { status: 404 })
+    }
+
+    return NextResponse.json({ success: true, data })
+  }
+
   const { data, error } = await serviceSupabase
     .from('internal_messages')
     .select('*')

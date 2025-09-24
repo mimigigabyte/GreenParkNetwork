@@ -253,29 +253,21 @@ export async function getReceivedInternalMessages(): Promise<InternalMessage[]> 
  * 根据ID获取单条站内信
  */
 export async function getInternalMessageById(messageId: string): Promise<InternalMessage> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    throw new Error('用户未登录');
-  }
-
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .select('*')
-    .eq('id', messageId)
-    .eq('to_user_id', user.id) // 确保只能查看发给自己的消息
-    .single();
-
-  if (error) {
+  try {
+    const response = await safeFetch(`/api/messages/internal?id=${encodeURIComponent(messageId)}`, {
+      method: 'GET',
+      useAuth: true,
+    });
+    const result = await handleApiResponse(response);
+    const data = result?.data ?? result;
+    if (!data) {
+      throw new Error('消息不存在');
+    }
+    return data as InternalMessage;
+  } catch (error) {
     console.error('获取站内信详情失败:', error);
-    throw new Error(error.message || '获取站内信详情失败');
+    throw error instanceof Error ? error : new Error('获取站内信详情失败');
   }
-
-  if (!data) {
-    throw new Error('消息不存在');
-  }
-
-  return data;
 }
 
 /**
