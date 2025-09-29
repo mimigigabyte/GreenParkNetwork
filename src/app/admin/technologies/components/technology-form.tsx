@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { AdminTechnology, TECH_SOURCE_OPTIONS, TECH_ACQUISITION_METHOD_OPTIONS, AdminCategory, AdminSubcategory, AdminCompany, AdminCountry, AdminProvince, AdminDevelopmentZone, TechSource, TechAcquisitionMethod, TechnologyAttachment } from '@/lib/types/admin'
 import { LanguageTabs, LanguageField } from '@/components/admin/forms/language-tabs'
 import { ImageUpload } from '@/components/admin/forms/image-upload'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { uploadMultipleFilesWithInfo } from '@/lib/supabase-storage'
 import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
 import { generateCompanyLogo } from '@/lib/logoGenerator'
@@ -45,6 +46,8 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [companyFilterInput, setCompanyFilterInput] = useState('')
+  const [companyFilter, setCompanyFilter] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   
@@ -124,24 +127,68 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
     }
   }
 
+  // 企业搜索关键字防抖
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCompanyFilter(companyFilterInput.trim())
+    }, 300)
+
+    return () => clearTimeout(handler)
+  }, [companyFilterInput])
+
   // 加载企业数据
   const loadCompanies = async () => {
     try {
       setIsLoadingCompanies(true)
-      const response = await fetch('/api/admin/companies')
-      if (response.ok) {
+      const pageSize = 200
+      let page = 1
+      const collected: AdminCompany[] = []
+      const seen = new Set<string>()
+
+      while (true) {
+        const response = await fetch(`/api/admin/companies?page=${page}&pageSize=${pageSize}`)
+        if (!response.ok) {
+          console.error('❌ 加载企业数据失败:', response.status)
+          break
+        }
+
         const result = await response.json()
-        setCompanies(result.data || [])
-        console.log('✅ 加载企业数据成功:', result.data)
-      } else {
-        console.error('❌ 加载企业数据失败:', response.status)
+        const pageData: AdminCompany[] = Array.isArray(result?.data) ? result.data : []
+        pageData.forEach(company => {
+          if (company?.id && !seen.has(company.id)) {
+            seen.add(company.id)
+            collected.push(company)
+          }
+        })
+
+        const total: number | undefined = result?.pagination?.total
+        console.log(`✅ 加载企业数据第 ${page} 页成功:`, pageData.length)
+
+        if (!pageData.length || pageData.length < pageSize) {
+          break
+        }
+
+        if (typeof total === 'number' && collected.length >= total) {
+          break
+        }
+
+        page += 1
       }
+
+      setCompanies(collected)
     } catch (error) {
       console.error('加载企业数据失败:', error)
+      setCompanies([])
     } finally {
       setIsLoadingCompanies(false)
     }
   }
+
+  const filteredCompanies = companies.filter(company => {
+    if (!companyFilter) return true
+    const keyword = companyFilter.toLowerCase()
+    return (company.name_zh || '').toLowerCase().includes(keyword) || (company.name_en || '').toLowerCase().includes(keyword)
+  })
 
   // 加载国家数据
   const loadCountries = async () => {
@@ -809,19 +856,42 @@ export function TechnologyForm({ technology, onSuccess, onCancel }: TechnologyFo
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     选择现有企业
                   </label>
-                  <select
-                    value={formData.company_id}
-                    onChange={(e) => handleCompanyChange(e.target.value)}
+                  <Select
+                    value={formData.company_id || '__none'}
+                    onValueChange={(value) => handleCompanyChange(value === '__none' ? '' : value)}
                     disabled={isLoadingCompanies}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100"
                   >
-                    <option value="">选择企业（自动填充企业信息）</option>
-                    {companies.map(company => (
-                      <option key={company.id} value={company.id}>
-                        {company.name_zh}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100">
+                      <SelectValue placeholder="选择企业（自动填充企业信息）" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      <div className="p-2">
+                        <input
+                          type="text"
+                          value={companyFilterInput}
+                          onChange={(e) => setCompanyFilterInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              setCompanyFilter(companyFilterInput.trim())
+                            }
+                          }}
+                          placeholder="搜索企业名称..."
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                      <SelectItem value="__none">不关联现有企业</SelectItem>
+                      {filteredCompanies.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-gray-500">未找到匹配的企业</div>
+                      ) : (
+                        filteredCompanies.map(company => (
+                          <SelectItem key={company.id} value={company.id}>
+                            {company.name_zh || company.name_en || '未命名企业'}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                   <p className="text-xs text-gray-500 mt-1">选择企业会自动填充下方的企业信息</p>
                 </div>
                 

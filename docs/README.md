@@ -72,6 +72,9 @@
 │   │       │       └── delete/route.ts       # 批量删除站内信
 │   │       │   └── contact/route.ts          # 用户联系咨询/问题反馈的创建与查询
 │   │       └── admin/        # 管理后台API
+│   │           ├── upload/             # 管理端上传接口
+│   │           │   ├── route.ts        # 管理端文件上传（支持图片与技术资料文档）
+│   │           │   └── delete/route.ts # 管理端删除上传文件
 │   │           └── wipo-scraper/   # WIPO数据抓取与导入
 │   │               ├── scrape/route.ts        # 单条抓取
 │   │               ├── process/route.ts       # 本地处理与拼装

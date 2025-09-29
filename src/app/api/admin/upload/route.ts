@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkAdminAuth } from '@/lib/admin-auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// POST - 上传文件到 Supabase Storage
+import { isAllowedTechAttachment, allowedAttachmentHint } from '@/lib/validators'
+
 export async function POST(request: NextRequest) {
   try {
     // 检查管理员权限
@@ -31,9 +32,24 @@ export async function POST(request: NextRequest) {
       folder
     })
 
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ success: false, error: '只支持图片文件' }, { status: 400 })
+    const isImageFile = file.type ? file.type.startsWith('image/') : false
+    const isTechAttachmentFolder = folder.includes('technology-attachments')
+
+    if (!isImageFile) {
+      if (isTechAttachmentFolder) {
+        const allowed = isAllowedTechAttachment(file)
+        if (!allowed) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: `不支持的文件类型。${allowedAttachmentHint('zh')}`,
+            },
+            { status: 400 }
+          )
+        }
+      } else {
+        return NextResponse.json({ success: false, error: '只支持图片文件' }, { status: 400 })
+      }
     }
 
     // 验证文件大小 (10MB)
@@ -45,7 +61,7 @@ export async function POST(request: NextRequest) {
     // 生成唯一文件名
     const fileExt = file.name.split('.').pop()
     const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-    
+
     console.log('📤 生成的文件名:', fileName)
 
     // 上传文件到 Supabase Storage
@@ -61,17 +77,17 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('❌ Supabase Storage 上传错误:', error)
-      
+
       if (error.message.includes('Bucket not found')) {
-        return NextResponse.json({ 
+        return NextResponse.json({
           success: false,
-          error: `存储桶 '${bucket}' 不存在` 
+          error: `存储桶 '${bucket}' 不存在`
         }, { status: 400 })
       }
-      
-      return NextResponse.json({ 
+
+      return NextResponse.json({
         success: false,
-        error: `上传失败: ${error.message}` 
+        error: `上传失败: ${error.message}`
       }, { status: 500 })
     }
 
@@ -83,9 +99,9 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(fileName)
 
     if (!publicData || !publicData.publicUrl) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: false,
-        error: '无法生成文件访问URL' 
+        error: '无法生成文件访问URL'
       }, { status: 500 })
     }
 
@@ -104,9 +120,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('💥 文件上传过程中出现异常:', error)
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : '上传失败，请重试' 
+      error: error instanceof Error ? error.message : '上传失败，请重试'
     }, { status: 500 })
   }
 }
