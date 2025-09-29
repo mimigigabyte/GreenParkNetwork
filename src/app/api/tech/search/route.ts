@@ -9,7 +9,9 @@ export const revalidate = 0;
 export async function GET(request: NextRequest) {
   try {
     // 检查管理员客户端是否可用
-    if (!supabaseAdmin) {
+    const adminClient = supabaseAdmin;
+
+    if (!adminClient) {
       console.error('supabaseAdmin is not available');
       return NextResponse.json(
         { error: '服务配置错误' },
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
         categoryId = category;
         console.log('✅ 使用UUID作为分类ID:', categoryId);
       } else {
-        const { data: slugData, error: slugError } = await supabaseAdmin
+        const { data: slugData, error: slugError } = await adminClient
           .from('admin_categories')
           .select('id')
           .eq('slug', category)
@@ -88,7 +90,7 @@ export async function GET(request: NextRequest) {
         subCategoryId = subCategory;
         console.log('✅ 使用UUID作为子分类ID:', subCategoryId);
       } else {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await adminClient
           .from('admin_subcategories')
           .select('id')
           .eq('slug', subCategory)
@@ -110,7 +112,7 @@ export async function GET(request: NextRequest) {
         countryId = country;
         console.log('✅ 使用UUID作为国家ID:', countryId);
       } else {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await adminClient
           .from('admin_countries')
           .select('id')
           .eq('code', country)
@@ -132,7 +134,7 @@ export async function GET(request: NextRequest) {
         provinceId = province;
         console.log('✅ 使用UUID作为省份ID:', provinceId);
       } else {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await adminClient
           .from('admin_provinces')
           .select('id')
           .eq('code', province)
@@ -154,7 +156,7 @@ export async function GET(request: NextRequest) {
         developmentZoneId = developmentZone;
         console.log('✅ 使用UUID作为经开区ID:', developmentZoneId);
       } else {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await adminClient
           .from('admin_development_zones')
           .select('id')
           .eq('code', developmentZone)
@@ -272,7 +274,7 @@ export async function GET(request: NextRequest) {
 
       const selectArgs = Object.keys(selectOptions).length > 0 ? selectOptions : undefined;
 
-      const builder = supabaseAdmin
+      const builder = adminClient
         .from('admin_technologies')
         .select(columns, selectArgs);
 
@@ -398,10 +400,10 @@ export async function GET(request: NextRequest) {
 
     // 并行查询所有关联数据，优化查询性能
     const [categoriesData, subcategoriesData, countriesData, developmentZonesData] = await Promise.all([
-      categoryIds.length > 0 ? supabaseAdmin.from('admin_categories').select('id, name_zh, name_en').in('id', categoryIds) : { data: [] },
-      subcategoryIds.length > 0 ? supabaseAdmin.from('admin_subcategories').select('id, name_zh, name_en').in('id', subcategoryIds) : { data: [] },
-      countryIds.length > 0 ? supabaseAdmin.from('admin_countries').select('id, name_zh, name_en, logo_url').in('id', countryIds) : { data: [] },
-      developmentZoneIds.length > 0 ? supabaseAdmin.from('admin_development_zones').select('id, name_zh, name_en').in('id', developmentZoneIds) : { data: [] }
+      categoryIds.length > 0 ? adminClient.from('admin_categories').select('id, name_zh, name_en').in('id', categoryIds) : { data: [] },
+      subcategoryIds.length > 0 ? adminClient.from('admin_subcategories').select('id, name_zh, name_en').in('id', subcategoryIds) : { data: [] },
+      countryIds.length > 0 ? adminClient.from('admin_countries').select('id, name_zh, name_en, logo_url').in('id', countryIds) : { data: [] },
+      developmentZoneIds.length > 0 ? adminClient.from('admin_development_zones').select('id, name_zh, name_en').in('id', developmentZoneIds) : { data: [] }
     ]);
     
     console.log('✅ 关联数据查询完成');
