@@ -47,20 +47,9 @@ export async function GET(request: NextRequest) {
       console.warn('⚠️ 检测到经开区筛选但没有省份筛选，这可能导致结果不准确');
     }
 
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-
-    // 构建基础查询
-    let query = supabaseAdmin
-      .from('admin_technologies')
-      .select('*', { count: 'exact' })
-      .eq('is_active', true) // 只显示启用的技术
-      .eq('review_status', 'published'); // 只显示已发布的技术
-
-    // 存储所有需要解析的筛选条件
     const filterConditions = {
       keyword: !!keyword,
-      category: !!category, 
+      category: !!category,
       subCategory: !!subCategory,
       country: !!country,
       province: !!province,
@@ -69,30 +58,20 @@ export async function GET(request: NextRequest) {
 
     console.log('🎯 开始应用联合筛选条件:', filterConditions);
 
-    // 关键词搜索
-    if (keyword) {
-      query = query.or(`name_zh.ilike.%${keyword}%,name_en.ilike.%${keyword}%,description_zh.ilike.%${keyword}%`);
-      console.log('✅ 已应用关键词筛选:', keyword);
-    }
-
-    // 分类筛选 - 优化查询逻辑
+    // 解析筛选条件所需的ID
+    let categoryId: string | null = null;
     if (category) {
       console.log('🔍 开始查找分类:', category);
-      let categoryId = null;
-      
-      // 优化：先判断是否为UUID格式，减少不必要的查询
       if (category.includes('-') && category.length > 30) {
-        // 直接使用UUID
         categoryId = category;
         console.log('✅ 使用UUID作为分类ID:', categoryId);
       } else {
-        // 通过slug查找ID
         const { data: slugData, error: slugError } = await supabaseAdmin
           .from('admin_categories')
           .select('id')
           .eq('slug', category)
           .single();
-        
+
         if (!slugError && slugData) {
           categoryId = slugData.id;
           console.log('✅ 通过slug找到分类ID:', category, '->', categoryId);
@@ -100,30 +79,21 @@ export async function GET(request: NextRequest) {
           console.log('❌ 未找到分类:', category);
         }
       }
-      
-      if (categoryId) {
-        query = query.eq('category_id', categoryId);
-        console.log('✅ 已应用分类筛选条件');
-      }
     }
 
-    // 子分类筛选 - 优化查询逻辑
+    let subCategoryId: string | null = null;
     if (subCategory) {
       console.log('🔍 开始查找子分类:', subCategory);
-      let subCategoryId = null;
-      
-      // 优化：先判断是否为UUID格式
       if (subCategory.includes('-') && subCategory.length > 30) {
         subCategoryId = subCategory;
         console.log('✅ 使用UUID作为子分类ID:', subCategoryId);
       } else {
-        // 通过slug查找ID
         const { data, error } = await supabaseAdmin
           .from('admin_subcategories')
           .select('id')
           .eq('slug', subCategory)
           .single();
-        
+
         if (!error && data) {
           subCategoryId = data.id;
           console.log('✅ 通过slug找到子分类ID:', subCategory, '->', subCategoryId);
@@ -131,30 +101,21 @@ export async function GET(request: NextRequest) {
           console.log('❌ 未找到子分类:', subCategory);
         }
       }
-      
-      if (subCategoryId) {
-        query = query.eq('subcategory_id', subCategoryId);
-        console.log('✅ 已应用子分类筛选条件');
-      }
     }
 
-    // 国别筛选 - 优化查询逻辑
+    let countryId: string | null = null;
     if (country) {
       console.log('🔍 开始查找国家:', country);
-      let countryId = null;
-      
-      // 优化：先判断是否为UUID格式
       if (country.includes('-') && country.length > 30) {
         countryId = country;
         console.log('✅ 使用UUID作为国家ID:', countryId);
       } else {
-        // 通过code查找ID
         const { data, error } = await supabaseAdmin
           .from('admin_countries')
           .select('id')
           .eq('code', country)
           .single();
-        
+
         if (!error && data) {
           countryId = data.id;
           console.log('✅ 通过code找到国家ID:', country, '->', countryId);
@@ -162,30 +123,21 @@ export async function GET(request: NextRequest) {
           console.log('❌ 未找到国家:', country);
         }
       }
-      
-      if (countryId) {
-        query = query.eq('company_country_id', countryId);
-        console.log('✅ 已应用国家筛选条件');
-      }
     }
 
-    // 省份筛选 - 优化查询逻辑
+    let provinceId: string | null = null;
     if (province) {
       console.log('🔍 开始查找省份:', province);
-      let provinceId = null;
-      
-      // 优化：先判断是否为UUID格式
       if (province.includes('-') && province.length > 30) {
         provinceId = province;
         console.log('✅ 使用UUID作为省份ID:', provinceId);
       } else {
-        // 通过code查找ID
         const { data, error } = await supabaseAdmin
           .from('admin_provinces')
           .select('id')
           .eq('code', province)
           .single();
-        
+
         if (!error && data) {
           provinceId = data.id;
           console.log('✅ 通过code找到省份ID:', province, '->', provinceId);
@@ -193,42 +145,47 @@ export async function GET(request: NextRequest) {
           console.log('❌ 未找到省份:', province);
         }
       }
-      
-      if (provinceId) {
-        query = query.eq('company_province_id', provinceId);
-        console.log('✅ 已应用省份筛选条件');
-      }
     }
 
-    // 经开区筛选 - 优化查询逻辑
+    let developmentZoneId: string | null = null;
     if (developmentZone) {
       console.log('🔍 开始查找经开区:', developmentZone);
-      let zoneId = null;
-      
-      // 优化：先判断是否为UUID格式
       if (developmentZone.includes('-') && developmentZone.length > 30) {
-        zoneId = developmentZone;
-        console.log('✅ 使用UUID作为经开区ID:', zoneId);
+        developmentZoneId = developmentZone;
+        console.log('✅ 使用UUID作为经开区ID:', developmentZoneId);
       } else {
-        // 通过code查找ID
         const { data, error } = await supabaseAdmin
           .from('admin_development_zones')
           .select('id')
           .eq('code', developmentZone)
           .single();
-        
+
         if (!error && data) {
-          zoneId = data.id;
-          console.log('✅ 通过code找到经开区ID:', developmentZone, '->', zoneId);
+          developmentZoneId = data.id;
+          console.log('✅ 通过code找到经开区ID:', developmentZone, '->', developmentZoneId);
         } else {
           console.log('❌ 未找到经开区:', developmentZone);
         }
       }
-      
-      if (zoneId) {
-        query = query.eq('company_development_zone_id', zoneId);
-        console.log('✅ 已应用经开区筛选条件');
-      }
+    }
+
+    if (keyword) {
+      console.log('✅ 已应用关键词筛选:', keyword);
+    }
+    if (categoryId) {
+      console.log('✅ 已应用分类筛选条件');
+    }
+    if (subCategoryId) {
+      console.log('✅ 已应用子分类筛选条件');
+    }
+    if (countryId) {
+      console.log('✅ 已应用国家筛选条件');
+    }
+    if (provinceId) {
+      console.log('✅ 已应用省份筛选条件');
+    }
+    if (developmentZoneId) {
+      console.log('✅ 已应用经开区筛选条件');
     }
 
     // 排序
@@ -250,33 +207,176 @@ export async function GET(request: NextRequest) {
         break;
     }
 
-    // 执行联合查询
-    console.log('🎯 开始执行联合查询，应用的筛选条件总数:', Object.values(filterConditions).filter(Boolean).length);
-    
-    const { data: technologies, error, count } = await query
-      .order('featured_weight', { ascending: false })
-      // Primary order by selected field, then tie-break by id for stable pagination
-      .order(orderField, { ascending: orderAscending })
-      .order('id', { ascending: true })
-      .range(from, to);
+    const applyCommonFilters = (builder: any) => {
+      let q = builder
+        .eq('is_active', true)
+        .eq('review_status', 'published');
 
-    if (error) {
-      console.error('搜索技术失败:', error);
+      if (keyword) {
+        q = q.or(`name_zh.ilike.%${keyword}%,name_en.ilike.%${keyword}%,description_zh.ilike.%${keyword}%`);
+      }
+
+      if (categoryId) {
+        q = q.eq('category_id', categoryId);
+      }
+
+      if (subCategoryId) {
+        q = q.eq('subcategory_id', subCategoryId);
+      }
+
+      if (countryId) {
+        q = q.eq('company_country_id', countryId);
+      }
+
+      if (provinceId) {
+        q = q.eq('company_province_id', provinceId);
+      }
+
+      if (developmentZoneId) {
+        q = q.eq('company_development_zone_id', developmentZoneId);
+      }
+
+      return q;
+    };
+
+    const hasDescriptionConditions = [
+      'and(description_zh.not.is.null,description_zh.not.eq.)',
+      'and(description_en.not.is.null,description_en.not.eq.)'
+    ].join(',');
+
+    const noDescriptionConditions = [
+      'and(description_zh.is.null,description_en.is.null)',
+      'and(description_zh.is.null,description_en.eq.)',
+      'and(description_zh.eq.,description_en.is.null)',
+      'and(description_zh.eq.,description_en.eq.)'
+    ].join(',');
+
+    const applyDescriptionPreference = (builder: any, mode: 'with' | 'without' | 'all') => {
+      if (mode === 'with') {
+        return builder.or(hasDescriptionConditions);
+      }
+      if (mode === 'without') {
+        return builder.or(noDescriptionConditions);
+      }
+      return builder;
+    };
+
+    const buildQuery = (columns = '*', options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }) => {
+      const selectOptions: Record<string, any> = {};
+      if (options?.count) {
+        selectOptions.count = options.count;
+      }
+      if (options?.head) {
+        selectOptions.head = options.head;
+      }
+
+      const selectArgs = Object.keys(selectOptions).length > 0 ? selectOptions : undefined;
+
+      const builder = supabaseAdmin
+        .from('admin_technologies')
+        .select(columns, selectArgs);
+
+      return applyCommonFilters(builder);
+    };
+
+    const applyOrdering = (builder: any) => builder
+      .order('featured_weight', { ascending: false })
+      .order(orderField, { ascending: orderAscending })
+      .order('id', { ascending: true });
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const {
+      count: withDescriptionCount,
+      error: withDescriptionError
+    } = await applyDescriptionPreference(buildQuery('id', { count: 'exact', head: true }), 'with');
+
+    if (withDescriptionError) {
+      console.error('统计有描述的技术数量失败:', withDescriptionError);
       return NextResponse.json(
-        { error: '搜索失败: ' + error.message },
+        { error: '搜索失败: ' + withDescriptionError.message },
         { status: 500 }
       );
     }
 
-    console.log(`🎯 联合查询完成: 找到 ${count} 个技术，返回 ${technologies?.length} 个`);
+    const {
+      count: withoutDescriptionCount,
+      error: withoutDescriptionError
+    } = await applyDescriptionPreference(buildQuery('id', { count: 'exact', head: true }), 'without');
+
+    if (withoutDescriptionError) {
+      console.error('统计无描述的技术数量失败:', withoutDescriptionError);
+      return NextResponse.json(
+        { error: '搜索失败: ' + withoutDescriptionError.message },
+        { status: 500 }
+      );
+    }
+
+    const withCount = withDescriptionCount || 0;
+    const withoutCount = withoutDescriptionCount || 0;
+    const totalCount = withCount + withoutCount;
+
+    console.log('📊 技术描述分布统计:', {
+      withDescription: withCount,
+      withoutDescription: withoutCount,
+      total: totalCount
+    });
+
+    let describedTechnologies: any[] = [];
+    if (withCount > 0 && from < withCount) {
+      const describedFrom = from;
+      const describedTo = Math.min(to, withCount - 1);
+
+      const { data, error } = await applyDescriptionPreference(
+        applyOrdering(buildQuery('*')),
+        'with'
+      ).range(describedFrom, describedTo);
+
+      if (error) {
+        console.error('查询有描述的技术失败:', error);
+        return NextResponse.json(
+          { error: '搜索失败: ' + error.message },
+          { status: 500 }
+        );
+      }
+
+      describedTechnologies = data || [];
+    }
+
+    let undescribedTechnologies: any[] = [];
+    if (withoutCount > 0 && to >= withCount) {
+      const undescribedFrom = Math.max(0, from - withCount);
+      const undescribedTo = Math.min(to - withCount, withoutCount - 1);
+
+      if (undescribedFrom <= undescribedTo) {
+        const { data, error } = await applyDescriptionPreference(
+          applyOrdering(buildQuery('*')),
+          'without'
+        ).range(undescribedFrom, undescribedTo);
+
+        if (error) {
+          console.error('查询无描述的技术失败:', error);
+          return NextResponse.json(
+            { error: '搜索失败: ' + error.message },
+            { status: 500 }
+          );
+        }
+
+        undescribedTechnologies = data || [];
+      }
+    }
+
+    const technologies = [...describedTechnologies, ...undescribedTechnologies];
+
+    console.log(`🎯 联合查询完成: 找到 ${totalCount} 个技术，返回 ${technologies.length} 个`);
     console.log('📊 筛选效果:', {
       appliedFilters: Object.values(filterConditions).filter(Boolean).length,
-      totalResults: count,
-      returnedResults: technologies?.length
+      totalResults: totalCount,
+      returnedResults: technologies.length
     });
-    
-    // 详细日志：显示前几个技术的关键信息
-    if (technologies && technologies.length > 0) {
+
+    if (technologies.length > 0) {
       console.log('🔍 返回的技术列表（前3个）:');
       technologies.slice(0, 3).forEach((tech, index) => {
         console.log(`  ${index + 1}. ${tech.name_zh} (ID: ${tech.id}, 状态: ${tech.review_status}, 更新时间: ${tech.updated_at})`);
@@ -384,15 +484,15 @@ export async function GET(request: NextRequest) {
 
     const result = {
       products,
-      total: count || 0,
+      total: totalCount,
       page,
       pageSize,
-      totalPages: Math.ceil((count || 0) / pageSize),
+      totalPages: Math.ceil(totalCount / pageSize),
       categories: [],
       stats: {
         companyCount: 0,
-        technologyCount: count || 0,
-        totalResults: count || 0
+        technologyCount: totalCount,
+        totalResults: totalCount
       }
     };
 
